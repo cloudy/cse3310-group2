@@ -11,7 +11,14 @@ if [ ! -d "$OSDIR" ]; then
 
 	echo "Deleting opensplice.tar.gz ..."
 	rm opensplice.tar.gz
+
+	echo "Updating release.com ..."
+	sed -i 12s@.*@"OSPL_HOME="$OSDIR"@" $OSDIR/release.com
 fi
 
+echo "Sourcing release.com ..."
+source $OSDIR/release.com
+
 echo "Setting opensplice path ..."
-export OSPL_HOME=OSDIR
+export OSPL_HOME="$OSDIR"/
+
