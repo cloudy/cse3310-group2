@@ -9,7 +9,6 @@ using namespace std;
 
 //Global Data
 enum OnlineStatus {Online, Offline};
-enum Windows {Login = 0, Chatroom = 1, Settings = 2};
 
 class User
 {
@@ -176,7 +175,7 @@ WINDOW* ChatMessage_TopBar()
 	WINDOW *window = MakeWindow(3, COLS, 0, 0, "");
 
 	//Print the text inside top bar window
-	mvwprintw(window, 1, 1, "F1 Jump to Chatrooms Menu\t F2 Jump to Message \t F3 Settings\t F4 Logout");
+	mvwprintw(window, 1, 1, "F1 Jump to Users Menu\t F2 Jump to Chatrooms Menu\t F3 Jump to Message \t F7 Settings\t F8 Logout");
 
 	//Refresh the Window
 	wrefresh(window);
@@ -186,20 +185,15 @@ WINDOW* ChatMessage_Users()
 {
 	//Create the Window
 	int userHeight = 21, userWidth = 30;
-	WINDOW* window = MakeWindow(userHeight, userWidth, 19, 0, "Users");
+	WINDOW* window = MakeWindow(userHeight, userWidth, 3, 0, "Users");
 
 	//Print the text inside the Users Window
-	mvwprintw(window, userHeight - 2, userWidth / 2 - 10, "F6 to View All Users");
-
-
-	//Only show the current users in the chatroom
-	vector<User> usersInSameChatroom;
-	FindOthersinUsersChatroom(usersInSameChatroom);
-	for (int i = 0; i < usersInSameChatroom.size(); i++)
+	mvwprintw(window, userHeight - 2, userWidth / 2 - 10, "F5 to View All Users");
+	for (int i = 0; i < Users.size(); i++)
 	{
 		//Print the User's Name
-		mvwprintw(window,  2 + i, 2, usersInSameChatroom[i].Name.c_str());
-		if (usersInSameChatroom[i].Status == Online)
+		mvwprintw(window,  2 + i, 2, Users[i].Name.c_str());
+		if (Users[i].Status == Online)
 		{
 			//If the user is online, print a green word
 			wattron(window, COLOR_PAIR(2));
@@ -225,10 +219,10 @@ WINDOW* ChatMessage_Chatrooms(int SelectedIndex)
 	string roomNames[10];
 
 	//Create the Window
-	WINDOW *window = MakeWindow(chatHeight, chatWidth, 3, 0, "Chatrooms");
+	WINDOW *window = MakeWindow(chatHeight, chatWidth, 25, 0, "Chatrooms");
 
 	//Display the Chatroom Footer
-	mvwprintw(window, chatHeight - 2, chatWidth / 2 - 12, "F5 to Switch to Chatroom");
+	mvwprintw(window, chatHeight - 2, chatWidth / 2 - 12, "F6 to Switch to Chatroom");
 
 	//Display the Chatrooms
 	CalculateChatroomNames(roomNames);
@@ -237,26 +231,16 @@ WINDOW* ChatMessage_Chatrooms(int SelectedIndex)
 	for (int i = 0; i < 10; i++)
 	{
 		mvwprintw(window, 2 + i, 1, "%s", roomNames[i].c_str());
-
-		//if there is more than one user in the chatroom
 		if (roomStats[i] > 1)
 			mvwprintw(window, 2 + i, 20, "%d users", roomStats[i]);
-		//if there is only one user in the chatroom
 		else if (roomStats[i] == 1)
 			mvwprintw(window, 2 + i, 20, "%d user", roomStats[i]);
-		//there are no users in the chatroom
 		else
 		{
-			mvwchgat(window, 2 + i, 1, chatWidth - 2, A_NORMAL, 8, NULL);
-			wattron(window, A_NORMAL | COLOR_PAIR(8));
-			mvwprintw(window, 2 + i, 20, "0 users");
-			wattroff(window, A_NORMAL | COLOR_PAIR(8));
-		}
-
-		//highlight the highlighted index
-		if (SelectedIndex == i)
-		{
 			mvwchgat(window, 2 + i, 1, chatWidth - 2, A_NORMAL, 7, NULL);
+			wattron(window, A_NORMAL | COLOR_PAIR(7));
+			mvwprintw(window, 2 + i, 20, "0 users");
+			wattroff(window, A_NORMAL | COLOR_PAIR(7));
 		}
 	}
 
@@ -300,6 +284,14 @@ WINDOW* ChatMessage_SendMessage()
 
 	//Refresh the Window
 	wrefresh(window);
+
+	//Let the user type a message
+	int input;
+	while (input = getch())
+	{
+		mvwprintw(window, 2, 1 + charCount++, "%c", input);
+		message += input;
+	}
 }
 
 void ChatMessage_Draw()
@@ -307,32 +299,9 @@ void ChatMessage_Draw()
 	vector<WINDOW*> windows;
 	windows.push_back(ChatMessage_TopBar());
 	windows.push_back(ChatMessage_Users());
-	windows.push_back(ChatMessage_Chatrooms(0));
+	windows.push_back(ChatMessage_Chatrooms(-1));
 	windows.push_back(ChatMessage_ChatHistory());
 	windows.push_back(ChatMessage_SendMessage());
-
-	//Navigation
-	int ch;
-	while (ch = getch())
-	{
-		switch (ch)
-		{
-			case KEY_F(1):
-				break;
-			case KEY_F(2):
-				break;
-			case KEY_F(3):
-				break;
-			case KEY_F(4):
-				break;
-			case KEY_F(5):
-				break;
-			case KEY_F(6):
-				break;
-			case KEY_F(7):
-				break;	
-		}
-	}
 }
 
 //- - - - - - - - - - - ALL USERS WINDOW - - - - - - - - - - -
@@ -545,7 +514,6 @@ int main()
 	init_pair(9, COLOR_BLUE, COLOR_BLACK);
 	init_pair(10, COLOR_MAGENTA,COLOR_BLACK);
 	init_pair(11, COLOR_CYAN, COLOR_BLACK);
-	init_pair(12, COLOR_BLUE, COLOR_WHITE); //selected Index
 
     //Create Fake Data to similate program
     CreateFakeData();
@@ -554,10 +522,10 @@ int main()
 	//StartScreen_Draw();
 
 	//Show the Chat Message Room
-	ChatMessage_Draw();
+	//ChatMessage_Draw();
 
 	//Show the All Users Window
-	//AllUsers_Draw();
+	AllUsers_Draw();
 
 	//Show the "Settings Window"
 	//Settings_Draw();
