@@ -1,3 +1,3 @@
-all
-  g++ gui.cpp -lncurses
-  ./a.out
+all:
+	g++ gui.cpp -lncurses
+	./a.out
