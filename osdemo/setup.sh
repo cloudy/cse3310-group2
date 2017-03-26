@@ -20,5 +20,5 @@ echo "Sourcing release.com ..."
 source $OSDIR/release.com
 
 echo "Setting opensplice path ..."
-export OSPL_HOME="$OSDIR"/
+export OSPL_HOME="$OSDIR"
 
