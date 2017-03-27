@@ -22,10 +22,12 @@ void Controller::run()
 
 void Controller::ncursesLoop()
 {
-	while (true)
+	char ch;
+	while ((ch = getch()) != KEY_F(1))
 	{
-		printf("ncurses looped\n");
-		this_thread::sleep_for(chrono::milliseconds(1000));
+		ncurses.handleInput(ch);
+		//printf("ncurses looped\n");
+		//this_thread::sleep_for(chrono::milliseconds(1000));
 	}
 }
 

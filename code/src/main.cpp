@@ -12,5 +12,6 @@ int main(int argc, char* argv[])
 	super_chat.run();
 	int i;
 	std::cin >> i;
+	endwin();
 	return 0;
 }

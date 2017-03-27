@@ -2,6 +2,7 @@
 #define CHATROOM_H 2016
 
 #include <deque>
+#include <string>
 
 #include "constants.h"
 #include "message.h"
