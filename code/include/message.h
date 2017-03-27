@@ -10,10 +10,10 @@ public:
 	void publish();
 
 private:
-	char content[MESSAGE_SIZE_MAX];
+	char content[MAX_MESSAGE_SIZE];
 	unsigned long long user_uuid; //DISCUSSION: For now, I'll keep this type same as interface
-	unsigned long long checksum; //DISCUSSION: For now, I'll keep this type same as interface
 	unsigned long chat_room_index; //DISCUSSION: could be int?
+	unsigned long long checksum; //DISCUSSION: For now, I'll keep this type same as interface
 };
 
 #endif

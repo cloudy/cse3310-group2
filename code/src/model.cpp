@@ -2,5 +2,4 @@
 
 Model::Model()
 {
-
 }
