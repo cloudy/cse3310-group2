@@ -1,7 +1,6 @@
-CC= g++ 
-CFLAGS=
+CC= g++ -std=c++11
+CFLAGS= -pthread
 SRC_FILES= $(wildcard ./src/*.cpp)
 
-all: bin/superchat.exe
-	$(CC) $(CFLAGS) SRC_FILES -I ./include/ -o bin/program.out
-	./a.out
+all:
+	$(CC) $(CFLAGS) $(SRC_FILES) -I ./include/ -o ./bin/superchat.exe
