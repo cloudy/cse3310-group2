@@ -6,7 +6,7 @@ module SuperChat
    // Revision History:
    //     Created 3/23/2017
    //     fixed spelling, added pragme keylist  3/25/2017
-
+   //     add comments after class discussion   3/27/2017
 
    const unsigned long MESSAGE_SIZE_MAX = 144;
    const unsigned long CHATROOM_NAME_MAX = 25;
@@ -27,6 +27,7 @@ module SuperChat
       // optional checksum for integrity assurance.
       unsigned long chatroom_idx;
       // an integer representing the checkroom index.
+      // the chatroom index valid values are 0 to 9
    };
 #pragma keylist message
 
@@ -37,6 +38,7 @@ module SuperChat
 
       unsigned long chatroom_idx;
       // an integer representing the checkroom index.
+      // the chatroom index valid values are 0 to 9
       char chatroom_name[CHATROOM_NAME_MAX];
       // name of the chatroom
    };
@@ -44,8 +46,8 @@ module SuperChat
 
    struct user
    {
-      // this information is published by every
-      // SuperChat client every USER_UPDATE_PERIOD seconds
+      // this information is published by each
+      // SuperChat client no less than every  USER_UPDATE_PERIOD seconds
 
       char nick[NICK_SIZE_MAX];
       // users nickname
@@ -53,6 +55,7 @@ module SuperChat
       // unique identifier for a user.  contents TBD.
       unsigned long chatroom_idx;
       // an integer representing the checkroom index.
+      // the chatroom index valid values are 0 to 9
    };
 #pragma keylist user
 
