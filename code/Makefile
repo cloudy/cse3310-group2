@@ -8,8 +8,8 @@ IDL_SRC= idl/SuperChat.idl
 GUI_SRC= src/view.cpp
 OSDDS_SRC= src/DDSEntityManager.cpp src/CheckStatus.cpp src/SuperChat.cpp
 INTERFACE_SRC= src/chat_room.cpp  src/controller.cpp  \
-									 src/message.cpp src/user.cpp \
-									 src/model.cpp src/main.cpp
+                                     src/message.cpp src/user.cpp \
+                                     src/model.cpp src/main.cpp
 IDLPP_GEN_SRC= bin/SuperChatDcps_impl.h bin/SuperChat.cpp \
                                      bin/SuperChatSplDcps.cpp bin/SuperChatDcps.cpp \
                                      bin/SuperChatDcps_impl.cpp bin/ccpp_SuperChat.h \
@@ -30,10 +30,9 @@ view.o: $(GUI_SRC)
 	@echo Compiling gui files...
 	$(CXX) $(GUI_SRC) $(INCLUDES) $(LDFLAGS) -c
  
-osdds.o:
+osdds.o: $(OSDDS_SRC) $(IDLPP_GEN_SRC)
 	@echo Compiling opensplice files...
 	$(CXX) $(INCLUDES) $(OSDDS_SRC) $(IDLPP_GEN_SRC) $(LDFLAGS) -o bin/SuperChatDavis
-	touch osdds.o
 
 clean:
 	@echo Deleting $(shell ls bin/)...
