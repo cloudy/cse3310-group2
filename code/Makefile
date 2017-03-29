@@ -1,3 +1,7 @@
+CC= g++ -std=c++11
+CFLAGS= -pthread -lncurses -lpanel
+SRC_FILES= $(wildcard ./src/*.cpp)
+
 all:
-	g++ gui.cpp -lncurses
-	./a.out
+	$(CC) $(SRC_FILES) -I ./include/ $(CFLAGS) -o ./bin/superchat.exe
+

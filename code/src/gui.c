@@ -9,11 +9,11 @@
 using namespace std;
 
 //Global Data
-enum OnlineStatus {Online, Offline};
+///enum OnlineStatus {Online, Offline};
 enum Windows {Login = 0, Chatroom = 1, Settings = 2};
-const int NUM_CHATROOMS = 10;
+///const int NUM_CHATROOMS = 10;
 
-class User
+/*class User
 {
 	public:
 		string Name;
@@ -22,20 +22,20 @@ class User
 		int UserID;
 		int ChatroomID;
 		int ColorIndex;
-};
+};*/
 
-class Message
+/*class Message
 {
 public:
 	string UserName;
 	int UserID;
 	int ChatroomID;
 	string Message;
-};
+};*/
 
-vector <User> Users(0);
-vector <Message> ChatMessages(0);
-User currentUser;
+///vector <User> Users(0);
+///vector <Message> ChatMessages(0);
+///User currentUser;
 
 //- - - - - - - - - - - CALCULATION FUNCTIONS - - - - - - - - - - -
 WINDOW* MakeWindow(int Height, int Width, int Yposition, int Xposition, string Title)
@@ -557,19 +557,19 @@ int main()
     CreateFakeData();
 
     
-    //StartScreen_Draw();
+    StartScreen_Draw();
 
-    //Prompt the User for a Username
-	//StartScreen_Draw();
+    Prompt the User for a Username
+	StartScreen_Draw();
 
-	//Show the Chat Message Room
+	Show the Chat Message Room
 	ChatMessage_Draw();
 
-	//Show the All Users Window
-	//AllUsers_Draw();
+	Show the All Users Window
+	AllUsers_Draw();
 
-	//Show the "Settings Window"
-	//Settings_Draw();
+	Show the "Settings Window"
+	Settings_Draw();
 
 	int c = getch();
 
