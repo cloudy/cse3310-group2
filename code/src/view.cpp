@@ -6,7 +6,9 @@
 #define NCOLS 40
 
 using namespace std;
-
+//
+// TO DO: PASS ARGUMENT TO CONSTRUCTOR TO START IN QUIET MODE. FOR TESTING. ~ JOE
+//
 View::View()
 {
 	// Initialize curses

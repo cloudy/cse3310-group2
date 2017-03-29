@@ -13,7 +13,7 @@ public:
 
 private:
 	Model chat_building;
-	View ncurses;
+	//View ncurses;
 
 	void ncursesLoop();
 	void openSpliceLoop();
