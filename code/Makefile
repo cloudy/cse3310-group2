@@ -1,12 +1,12 @@
 CXX= g++ -std=c++11
 CXXFLAGS= -pthread
 
-LDFLAGS= -lncurses -lpanel
-INCLUDES= -Iinclude/
+LDFLAGS= -lncurses -lpanel -L${OSPL_HOME}/lib/ -ldcpssacpp -lddskernel
+INCLUDES= -Iinclude/ -Isrc/ -Ibin/ -I${OSPL_HOME}/include/dcps/C++/SACPP/
 
 IDL_SRC= idl/SuperChat.idl
 GUI_SRC= src/view.cpp
-OSDDS_SRC= //INSERT SRC HERE//
+OSDDS_SRC= src/DDSEntityManager.cpp src/CheckStatus.cpp src/SuperChat.cpp
 INTERFACE_SRC= src/chat_room.cpp  src/controller.cpp  \
 									 src/message.cpp src/user.cpp \
 									 src/model.cpp src/main.cpp
@@ -17,7 +17,7 @@ IDLPP_GEN_SRC= bin/SuperChatDcps_impl.h bin/SuperChat.cpp \
 
 all: idlpp.make view.o osdds.o
 	@echo Final linking and compilation...
-	$(CXX) $(CXXFLAGS) view.o $(INTERFACE_SRC) $(INCLUDES) $(LDFLAGS) -o ./bin/SuperChat
+	$(CXX) $(CXXFLAGS) view.o $(INTERFACE_SRC) $(INCLUDES) $(LDFLAGS) -o bin/SuperChat
 	@echo Deleting object files...
 	rm *.o
 
@@ -32,6 +32,7 @@ view.o: $(GUI_SRC)
  
 osdds.o:
 	@echo Compiling opensplice files...
+	$(CXX) $(INCLUDES) $(OSDDS_SRC) $(IDLPP_GEN_SRC) $(LDFLAGS) -o bin/SuperChatDavis
 	touch osdds.o
 
 clean:
