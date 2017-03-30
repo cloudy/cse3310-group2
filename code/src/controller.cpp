@@ -33,9 +33,20 @@ void Controller::ncursesLoop()
 
 void Controller::openSpliceLoop()
 {
+	int seconds = 0;
+
 	while (true)
 	{
-		printf("opensplice looped\n");
-		this_thread::sleep_for(chrono::milliseconds(2500));
+		if (seconds %5 ==0)
+		{
+			printf("opensplice looped\n");
+		}
+		if (seconds % 60 == 0)
+		{
+			break;
+		}
+		
+		seconds++;
+		this_thread::sleep_for(chrono::milliseconds(1000));
 	}
 }

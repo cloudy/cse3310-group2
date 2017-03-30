@@ -6,17 +6,20 @@
 #include "chat_room.h"
 #include "user.h"
 
+using namespace DDS;
+using namespace SuperChat;
+
 class Model
 {
 public:
 	Model();
 	void changeChatRoom();
-	User lookupUser(unsigned long long uuid); 
+	//User lookupUser(unsigned long long uuid); 
 
 private:
 	ChatRoom chat_rooms[10];
-	std::vector<User> users; //DISCUSSION: Should this be a vector
-	User current_user;
+	//std::vector<User> users; //DISCUSSION: Should this be a vector
+	//User current_user{(char *)"user"};
 };
 
 #endif
