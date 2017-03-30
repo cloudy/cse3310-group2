@@ -2,9 +2,6 @@
 
 #include <cstring>
 
-#define NLINES 10
-#define NCOLS 40
-
 using namespace std;
 
 View::View()
@@ -12,7 +9,7 @@ View::View()
 
 }
 
-void View::initialize()
+void View::initialize()//TODO: Create all windows
 {
 	//initialize ncurses
 	initscr();
@@ -36,7 +33,7 @@ void View::initialize()
 	init_pair(11, COLOR_CYAN, COLOR_BLACK);
 	init_pair(12, COLOR_BLUE, COLOR_WHITE); //selected Index
 }
-
+//------------------------WINDOWS------------------------------
 WINDOW* View::makeWindow(int Height, int Width, int Yposition, int Xposition, string Title)
 {
 	//Create the Window
@@ -54,7 +51,7 @@ WINDOW* View::makeWindow(int Height, int Width, int Yposition, int Xposition, st
 		wattroff(returnWindow, A_BOLD | COLOR_PAIR(1));
 	}
 
-	refresh();
+	//refresh(); //refresh later
 
 	return returnWindow;
 }
@@ -66,7 +63,118 @@ void View::deleteWindows(std::vector<WINDOW*> & windows)
 		delwin(windows[i]);
 }
 
+//- - - - - - - - - - - SETTINGS WINDOW - - - - - - - - - - -
+WINDOW* View::createSettingsTopBar()
+{
+	//Make the window
+	WINDOW *window = MakeWindow(LINES, COLS, 0, 0, "");
 
+	//Print the text inside top bar window
+	mvwprintw(window, 1, 1, "F1 - Cancel\t\tF2 - Save and Return\t\tF3 - Change Username\t\tF4 - Change Chatroom Name");
+
+	//Refresh the Window
+	//wrefresh(window); //refresh later
+	return window;
+}
+
+WINDOW* View::createSettingsChangeUserName()
+{
+	//Make the window
+	int window_width = COLS / 2;
+
+	WINDOW *window = MakeWindow(10, window_width - 1, 4, 1, "Change UserName");
+
+	//Print Columns "Current UserName" and "New Username"
+	wattron(window, A_BOLD);
+	mvwprintw(window, 2, window_width / 2 - 8, "Current Username");
+	mvwprintw(window, 6, window_width / 2 - 6, "New Username");
+	wattroff(window, A_BOLD);
+
+	//Print the Current Username
+	wattron(window, COLOR_PAIR(9));
+	mvwprintw(window, 3, window_width / 2 - currentUser.Name.length() / 2, currentUser.Name.c_str()); //TODO: cnat print current user when first created, dont know user. separate function?
+	wattroff(window, COLOR_PAIR(9));
+
+	//Input box for New Username
+	mvwchgat(window, 7, window_width / 2 - 10, 20, A_NORMAL, 4, NULL);
+	mvwprintw(window, 8, window_width / 2 - 8, "8 characters only");
+
+
+	//Refresh the Window
+	//wrefresh(window); //refresh later
+	return window;
+}
+
+WINDOW* View::createSettingsChangeChatroomName()
+{
+	//Make the window
+	int window_width = COLS / 2;
+
+	WINDOW *window = MakeWindow(10, window_width, 4, window_width, "Change Chatroom Name");
+
+	//Print Columns "Current UserName" and "New Username"
+	wattron(window, A_BOLD);
+	mvwprintw(window, 2, window_width / 2 - 8, "Current Chatroom Name");
+	mvwprintw(window, 6, window_width / 2 - 6, "New Chatroom Name");
+	wattroff(window, A_BOLD);
+
+	//Print the Current Username
+	wattron(window, COLOR_PAIR(9));
+	mvwprintw(window, 3, window_width / 2 - currentUser.ChatroomName.length() / 2, currentUser.ChatroomName.c_str()); //TODO: Same problem as user name. call function to update this when window is displayed
+	wattroff(window, COLOR_PAIR(9));
+
+	//Input box for New Chatroom name
+	mvwchgat(window, 7, window_width / 2 - 8, 20, A_NORMAL, 4, NULL);
+	mvwprintw(window, 8, window_width / 2 - 7, "20 characters only");
+
+	//Refresh the Window
+	//wrefresh(window); //refresh later
+	return window;
+}
+
+WINDOW* View::createSettingsAllUsers()
+{
+	//Make the window
+	WINDOW *window = MakeWindow(20, COLS - 2, 14, 1, "All Users");
+
+	//Create the Columns "Users", "Status", "Chatroom", "Time Online"
+	wattron(window, A_BOLD);
+	mvwprintw(window, 2, 1, "%-8s\t\t\t%-8s\t\t\t%-10s\t\t\t%s", "User", "Status", "Chatroom", "Time Online");
+	wattroff(window, A_BOLD);
+
+
+	//TODO: Same issue. cant show when window is made. call function before showing this.
+	//Print the User Profiles
+	for (int i = 0; i < Users.size(); i++)
+	{
+		//Print User Name
+		mvwprintw(window, 3 + i, 1, "%-8s\t\t\t", Users[i].Name.c_str());
+		if (Users[i].Status == Online)
+		{
+			//Print Online Status
+			wattron(window, COLOR_PAIR(2));
+			wprintw(window, "%-8s\t\t\t", "Online");
+			wattroff(window, COLOR_PAIR(2));
+			//Print ChatroomName and Time Online
+			wprintw(window, "%-10s\t\t\t%s", Users[i].ChatroomName.c_str(), "2 Minutes");
+		}
+		else
+		{
+			//Print Offline Status
+			wattron(window, COLOR_PAIR(3));
+			wprintw(window, "%-8s\t\t\t", "Offline");
+			wattroff(window, COLOR_PAIR(3));
+			//Print Blanks for ChatroomName and Time Online Fields
+			wprintw(window, "%-10s\t\t\t%s", "----------", "----------");
+		}
+	}
+
+	//Refresh the Window
+	//wrefresh(window); //refresh later
+	return window;
+}
+
+//LOGIC
 void View::handleInput(char ch)
 {	
 	switch(ch)

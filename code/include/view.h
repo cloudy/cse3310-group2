@@ -9,7 +9,9 @@
 #include <stdlib.h>
 #include <panel.h>
 
-enum class Windows { Login = 0, Chatroom = 1, Settings = 2 };
+#include "model.h"
+
+enum class Window { Login = 0, Chatroom = 1, Settings = 2 };
 
 class View
 {
@@ -19,9 +21,19 @@ public:
 	void handleInput(char ch);
 
 private:
-	const Model& chat_building;
+	Model& chat_building;
 
+	//ncurses stuff
 	int chatroom_menu_index;
+	WINDOW* settings_top_bar;
+	WINDOW* settings_change_user_name;
+	WINDOW* settings_change_chat_room_name;
+	WINDOW* settings_all_users;
+	
+	WINDOW* createSettingsTopBar();
+	WINDOW* createSettingsChangeUserName();
+	WINDOW* createSettingsChangeChatroomName();
+	WINDOW* createSettingsAllUsers();
 
 	WINDOW* makeWindow(int Height, int Width, int Yposition, int Xposition, std::string Title);
 	void deleteWindows(std::vector<WINDOW*> & windows);

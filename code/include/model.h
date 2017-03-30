@@ -15,7 +15,7 @@ public:
 
 
 	//getters
-	std::vector<std::string> getAllChatroomNames() const;
+	std::vector<std::string> getAllChatroomNames();
 
 private:
 	ChatRoom chat_rooms[10];

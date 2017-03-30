@@ -30,7 +30,7 @@ User Model::findUser(unsigned long long uuid)
 }
 
 //getters
-vector<string> Model::getAllChatroomNames() const
+vector<string> Model::getAllChatroomNames()
 {
 	vector<string> chat_room_names;
 	for (ChatRoom cr : chat_rooms)

@@ -92,149 +92,149 @@ using namespace std;
 //	}
 //}
 
-void CalculateChatroomStats(int* rooms)
-{
-	//Count how many users are in the chatroom
+//void CalculateChatroomStats(int* rooms)
+//{
+//	//Count how many users are in the chatroom
+//
+//	//Set the array to 0
+//	for (int i = 0; i < 10; i++)
+//		rooms[i] = 0;
+//
+//	rooms[currentUser.ChatroomID]++;
+//	//Total up the amount of users in each chatroom
+//	for (int i = 1; i < Users.size(); i++)
+//		rooms[Users[i].ChatroomID]++;
+//}
 
-	//Set the array to 0
-	for (int i = 0; i < 10; i++)
-		rooms[i] = 0;
-
-	rooms[currentUser.ChatroomID]++;
-	//Total up the amount of users in each chatroom
-	for (int i = 1; i < Users.size(); i++)
-		rooms[Users[i].ChatroomID]++;
-}
-
-void FindOthersinUsersChatroom(vector<User> & usersInSameChatroom)
-{
-	//Find all of the users in the same chatroom as the current user
-	usersInSameChatroom.push_back(currentUser);
-	for (int i = 1; i < Users.size(); i++)
-		if (Users[i].ChatroomID == currentUser.ChatroomID)
-			usersInSameChatroom.push_back(Users[i]);
-}
+//void FindOthersinUsersChatroom(vector<User> & usersInSameChatroom)
+//{
+//	//Find all of the users in the same chatroom as the current user
+//	usersInSameChatroom.push_back(currentUser);
+//	for (int i = 1; i < Users.size(); i++)
+//		if (Users[i].ChatroomID == currentUser.ChatroomID)
+//			usersInSameChatroom.push_back(Users[i]);
+//}
 
 //- - - - - - - - - - - SETTINGS WINDOW - - - - - - - - - - -
 
-WINDOW* Settings_TopBar()
-{
-	//Make the window
-	WINDOW *window = MakeWindow(LINES, COLS, 0, 0, "");
+//WINDOW* Settings_TopBar()
+//{
+//	//Make the window
+//	WINDOW *window = MakeWindow(LINES, COLS, 0, 0, "");
+//
+//	//Print the text inside top bar window
+//	mvwprintw(window, 1, 1, "F1 - Cancel\t\tF2 - Save and Return\t\tF3 - Change Username\t\tF4 - Change Chatroom Name");
+//
+//	//Refresh the Window
+//	wrefresh(window);
+//	return window;
+//}
 
-	//Print the text inside top bar window
-	mvwprintw(window, 1, 1, "F1 - Cancel\t\tF2 - Save and Return\t\tF3 - Change Username\t\tF4 - Change Chatroom Name");
+//WINDOW* Settings_ChangeUserName()
+//{
+//	//Make the window
+//	int window_width = COLS / 2;
+//
+//	WINDOW *window = MakeWindow(10, window_width - 1, 4, 1, "Change UserName");
+//
+//	//Print Columns "Current UserName" and "New Username"
+//	wattron(window, A_BOLD);
+//	mvwprintw(window, 2, window_width / 2 - 8, "Current Username");
+//	mvwprintw(window, 6, window_width / 2 - 6, "New Username");
+//	wattroff(window, A_BOLD);
+//
+//	//Print the Current Username
+//	wattron(window, COLOR_PAIR(9));
+//	mvwprintw(window, 3, window_width / 2 - currentUser.Name.length() / 2, currentUser.Name.c_str());
+//	wattroff(window, COLOR_PAIR(9));
+//
+//	//Input box for New Username
+//	mvwchgat(window, 7, window_width / 2 - 10, 20, A_NORMAL, 4, NULL);
+//	mvwprintw(window, 8, window_width / 2 - 8, "8 characters only");
+//
+//
+//	//Refresh the Window
+//	wrefresh(window);
+//	return window;
+//}
 
-	//Refresh the Window
-	wrefresh(window);
-	return window;
-}
-
-WINDOW* Settings_ChangeUserName()
-{
-	//Make the window
-	int window_width = COLS / 2;
-
-	WINDOW *window = MakeWindow(10, window_width - 1, 4, 1, "Change UserName");
-
-	//Print Columns "Current UserName" and "New Username"
-	wattron(window, A_BOLD);
-	mvwprintw(window, 2, window_width / 2 - 8, "Current Username");
-	mvwprintw(window, 6, window_width / 2 - 6, "New Username");
-	wattroff(window, A_BOLD);
-
-	//Print the Current Username
-	wattron(window, COLOR_PAIR(9));
-	mvwprintw(window, 3, window_width / 2 - currentUser.Name.length() / 2, currentUser.Name.c_str());
-	wattroff(window, COLOR_PAIR(9));
-
-	//Input box for New Username
-	mvwchgat(window, 7, window_width / 2 - 10, 20, A_NORMAL, 4, NULL);
-	mvwprintw(window, 8, window_width / 2 - 8, "8 characters only");
-
-
-	//Refresh the Window
-	wrefresh(window);
-	return window;
-}
-
-WINDOW* Settings_ChangeChatroomName()
-{
-	//Make the window
-	int window_width = COLS / 2;
-
-	WINDOW *window = MakeWindow(10, window_width, 4, window_width, "Change Chatroom Name");
-
-	//Print Columns "Current UserName" and "New Username"
-	wattron(window, A_BOLD);
-	mvwprintw(window, 2, window_width / 2 - 8, "Current Chatroom Name");
-	mvwprintw(window, 6, window_width / 2 - 6, "New Chatroom Name");
-	wattroff(window, A_BOLD);
-
-	//Print the Current Username
-	wattron(window, COLOR_PAIR(9));
-	mvwprintw(window, 3, window_width / 2 - currentUser.ChatroomName.length() / 2, currentUser.ChatroomName.c_str());
-	wattroff(window, COLOR_PAIR(9));
-
-	//Input box for New Chatroom name
-	mvwchgat(window, 7, window_width / 2 - 8, 20, A_NORMAL, 4, NULL);
-	mvwprintw(window, 8, window_width / 2 - 7, "20 characters only");
-
-	//Refresh the Window
-	wrefresh(window);
-	return window;
-}
+//WINDOW* Settings_ChangeChatroomName()
+//{
+//	//Make the window
+//	int window_width = COLS / 2;
+//
+//	WINDOW *window = MakeWindow(10, window_width, 4, window_width, "Change Chatroom Name");
+//
+//	//Print Columns "Current UserName" and "New Username"
+//	wattron(window, A_BOLD);
+//	mvwprintw(window, 2, window_width / 2 - 8, "Current Chatroom Name");
+//	mvwprintw(window, 6, window_width / 2 - 6, "New Chatroom Name");
+//	wattroff(window, A_BOLD);
+//
+//	//Print the Current Username
+//	wattron(window, COLOR_PAIR(9));
+//	mvwprintw(window, 3, window_width / 2 - currentUser.ChatroomName.length() / 2, currentUser.ChatroomName.c_str());
+//	wattroff(window, COLOR_PAIR(9));
+//
+//	//Input box for New Chatroom name
+//	mvwchgat(window, 7, window_width / 2 - 8, 20, A_NORMAL, 4, NULL);
+//	mvwprintw(window, 8, window_width / 2 - 7, "20 characters only");
+//
+//	//Refresh the Window
+//	wrefresh(window);
+//	return window;
+//}
 
 WINDOW* Settings_AllUsers()
 {
-	//Make the window
-	WINDOW *window = MakeWindow(20, COLS - 2, 14, 1, "All Users");
+	////Make the window
+	//WINDOW *window = MakeWindow(20, COLS - 2, 14, 1, "All Users");
 
-	//Create the Columns "Users", "Status", "Chatroom", "Time Online"
-	wattron(window, A_BOLD);
-	mvwprintw(window, 2, 1, "%-8s\t\t\t%-8s\t\t\t%-10s\t\t\t%s", "User", "Status", "Chatroom", "Time Online");
-	wattroff(window, A_BOLD);
+	////Create the Columns "Users", "Status", "Chatroom", "Time Online"
+	//wattron(window, A_BOLD);
+	//mvwprintw(window, 2, 1, "%-8s\t\t\t%-8s\t\t\t%-10s\t\t\t%s", "User", "Status", "Chatroom", "Time Online");
+	//wattroff(window, A_BOLD);
 
-	//Print the User Profiles
-	for (int i = 0; i < Users.size(); i++)
-	{
-		//Print User Name
-		mvwprintw(window, 3 + i, 1, "%-8s\t\t\t", Users[i].Name.c_str());
-		if (Users[i].Status == Online)
-		{
-			//Print Online Status
-			wattron(window, COLOR_PAIR(2));
-			wprintw(window, "%-8s\t\t\t", "Online");
-			wattroff(window, COLOR_PAIR(2));
-			//Print ChatroomName and Time Online
-			wprintw(window, "%-10s\t\t\t%s", Users[i].ChatroomName.c_str(), "2 Minutes");
-		}
-		else
-		{
-			//Print Offline Status
-			wattron(window, COLOR_PAIR(3));
-			wprintw(window, "%-8s\t\t\t", "Offline");
-			wattroff(window, COLOR_PAIR(3));
-			//Print Blanks for ChatroomName and Time Online Fields
-			wprintw(window, "%-10s\t\t\t%s", "----------", "----------");
-		}
-	}
+	////Print the User Profiles
+	//for (int i = 0; i < Users.size(); i++)
+	//{
+	//	//Print User Name
+	//	mvwprintw(window, 3 + i, 1, "%-8s\t\t\t", Users[i].Name.c_str());
+	//	if (Users[i].Status == Online)
+	//	{
+	//		//Print Online Status
+	//		wattron(window, COLOR_PAIR(2));
+	//		wprintw(window, "%-8s\t\t\t", "Online");
+	//		wattroff(window, COLOR_PAIR(2));
+	//		//Print ChatroomName and Time Online
+	//		wprintw(window, "%-10s\t\t\t%s", Users[i].ChatroomName.c_str(), "2 Minutes");
+	//	}
+	//	else
+	//	{
+	//		//Print Offline Status
+	//		wattron(window, COLOR_PAIR(3));
+	//		wprintw(window, "%-8s\t\t\t", "Offline");
+	//		wattroff(window, COLOR_PAIR(3));
+	//		//Print Blanks for ChatroomName and Time Online Fields
+	//		wprintw(window, "%-10s\t\t\t%s", "----------", "----------");
+	//	}
+	//}
 
-	//Refresh the Window
-	wrefresh(window);
-	return window;
+	////Refresh the Window
+	//wrefresh(window);
+	//return window;
 }
 
-void Settings_Draw()
-{
-	vector<WINDOW*> windows;
-	windows.push_back(Settings_TopBar());
-	windows.push_back(Settings_ChangeUserName());
-	windows.push_back(Settings_ChangeChatroomName());
-	windows.push_back(Settings_AllUsers());
-
-	getch();
-}
+//void Settings_Draw() //TODO: DONT THINK I NEED THIS
+//{
+//	vector<WINDOW*> windows;
+//	windows.push_back(Settings_TopBar());
+//	windows.push_back(Settings_ChangeUserName());
+//	windows.push_back(Settings_ChangeChatroomName());
+//	windows.push_back(Settings_AllUsers());
+//
+//	getch();
+//}
 
 //- - - - - - - - - - - CHAT MESSAGE WINDOW - - - - - - - - - - -
 
