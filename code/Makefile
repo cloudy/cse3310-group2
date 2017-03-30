@@ -2,7 +2,6 @@ CXX= g++ -std=c++11
 CXXFLAGS= -pthread -Wall -Wextra -g
 
 LDFLAGS= -lncurses -lpanel -L${OSPL_HOME}/lib/ -ldcpssacpp -lddskernel
-SFLAGS=  -shared
 INCLUDES= -Iinclude/ -Isrc/ -Ibin/idl -I${OSPL_HOME}/include/dcps/C++/SACPP/
 
 OBJDIR = obj/
@@ -16,7 +15,6 @@ OSDDS_IDL_GEN= bin/idl/SuperChatDcps_impl.h bin/idl/SuperChat.cpp \
                                      bin/idl/SuperChatDcps_impl.cpp bin/idl/ccpp_SuperChat.h \
                                      bin/idl/SuperChatDcps.h bin/idl/SuperChat.h bin/idl/SuperChatSplDcps.h
 INTERFACE_SRC= src/controller.cpp src/model.cpp src/main.cpp
-INTERFACE_OBJ= $(INTERFACE_SRC: .cpp=.o)
 
 all: idlpp.make view.o osdds.o 
 	@echo Final linking and compilation...
