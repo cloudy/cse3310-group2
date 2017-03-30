@@ -10,13 +10,17 @@ class Model
 {
 public:
 	Model();
-	void changeChatRoom();
-	User lookupUser(unsigned long long uuid); 
+	void moveUserToNewChatRoom(User user, ChatRoom destination_chat_room);
+	User findUser(unsigned long long uuid);
+
+
+	//getters
+	std::vector<std::string> getAllChatroomNames() const;
 
 private:
 	ChatRoom chat_rooms[10];
-	std::vector<User> users; //DISCUSSION: Should this be a vector
-	User current_user;
+	std::vector<User> users; //DISCUSSION: current user will never change, can we just keep our user as first index in vector?
+	User* current_user; //DISCUSSION: current user will never change, can we just keep our user as first index in vector?
 };
 
 #endif

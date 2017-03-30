@@ -2,18 +2,29 @@
 #define MESSAGE_H 2016
 
 #include "constants.h"
+#include <string>
 
 class Message
 {
 public:
 	Message();
-	void publish();
+	bool isCorrupted();
+
+	//getters
+	std::string getContent();
+	unsigned long long getAuthorUUID();
+	unsigned long getChatRoomIndex();
+	unsigned long long getChecksum();
+	std::string getAuthorNickName();
 
 private:
-	char content[MAX_MESSAGE_SIZE];
-	unsigned long long user_uuid; //DISCUSSION: For now, I'll keep this type same as interface
-	unsigned long chat_room_index; //DISCUSSION: could be int?
-	unsigned long long checksum; //DISCUSSION: For now, I'll keep this type same as interface
+	std::string content;
+	unsigned long long author_uuid;
+	unsigned long chat_room_index; 
+	unsigned long long checksum; 
+	std::string author_nick_name;
+
+	unsigned long long calculateChecksum();
 };
 
 #endif

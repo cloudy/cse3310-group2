@@ -9,22 +9,22 @@
 #include <stdlib.h>
 #include <panel.h>
 
+enum class Windows { Login = 0, Chatroom = 1, Settings = 2 };
+
 class View
 {
 public:
 	View();
+	void initialize();
 	void handleInput(char ch);
 
 private:
-	WINDOW* windows[3];
-	PANEL* panels[3];
-	PANEL* top;
-	void init_wins(WINDOW **wins, int n);
-	void win_show(WINDOW *win, char *label, int label_color);
-	void print_in_middle(WINDOW *win, int starty, int startx, int width, char *string, chtype color);
+	const Model& chat_building;
 
-	WINDOW* MakeWindow(int Height, int Width, int Yposition, int Xposition, std::string Title);
-	void DeleteWindows(std::vector<WINDOW*> & windows);
+	int chatroom_menu_index;
+
+	WINDOW* makeWindow(int Height, int Width, int Yposition, int Xposition, std::string Title);
+	void deleteWindows(std::vector<WINDOW*> & windows);
 };
 
 #endif

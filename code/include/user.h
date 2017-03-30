@@ -10,14 +10,24 @@ class User
 {
 public:
 	User();
-	void changeName();
+
+	//setters
+	void setName(std::string desired_name);
+	void setChatRoomIndex(unsigned long index);
+
+	//getters
+	std::string getNickName();
+	unsigned long long getUUID();
+	OnlineStatus getStatus();
+	unsigned long getChatRoomIndex();
+	int getColorIndex();
 
 private:
-	char nick_name[MAX_NICKNAME_LENGTH];
+	std::string nick_name;
 	unsigned long long uuid;
-	unsigned long chat_room_index; //DISCUSSION: could be an int?
 	OnlineStatus status;
-	int ColorIndex;
+	unsigned long chat_room_index; //DISCUSSION: could be an int?
+	int color_index;
 };
 
 #endif

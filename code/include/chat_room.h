@@ -1,25 +1,33 @@
 #ifndef CHATROOM_H
 #define CHATROOM_H 2016
 
-#include <deque>
+#include <list>
 #include <string>
 
 #include "constants.h"
 #include "message.h"
+#include "user.h"
 
 class ChatRoom
 {
 public:
 	ChatRoom();
-	void changeName(char name[MAX_CHATROOM_NAME_LENGTH]);
+	void changeName(std::string desired_name);
+	void addUser(User& user);
+	void removeUser(User& user);
+	void addMessage(Message& message);
 
 	//getters
 	std::string getName();
+	unsigned long getChatRoomIndex();
+	std::list<User&> getUsersInChatRoom();
+	int getNumOfUsers();
 
 private:
 	unsigned long chat_room_index; //DISCUSION: could be int?
-	char chat_room_name[MAX_CHATROOM_NAME_LENGTH];
-	std::deque<Message> message_history; //Using deque because it allows easy push_back, pop_front for history
+	std::string chat_room_name;
+	std::list<Message&> message_history; //Using list because it allows easy push_back, pop_front for history
+	std::list<User&> users_in_chatroom;
 };
 
 #endif
