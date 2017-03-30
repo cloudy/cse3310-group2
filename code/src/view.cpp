@@ -56,11 +56,153 @@ WINDOW* View::makeWindow(int Height, int Width, int Yposition, int Xposition, st
 	return returnWindow;
 }
 
-void View::deleteWindows(std::vector<WINDOW*> & windows)
+void View::deleteWindows(std::vector<WINDOW*> & windows) //TODO: might not need this
 {
 	//Clear all of the windows
 	for (int i = 0; i < windows.size(); i++)
 		delwin(windows[i]);
+} 
+
+//- - - - - - - - - - - CHAT MESSAGE WINDOW - - - - - - - - - - -
+WINDOW* View::createChatMessageTopBar()
+{
+	//Make the window
+	WINDOW *window = MakeWindow(LINES, COLS, 0, 0, "");
+
+
+	//Print the text inside top bar window
+	mvwprintw(window, 1, 1, "F4 - Chatrooms Menu \t\t F5 - Send Message \t\t F6 - Settings \t\t F7 - Logout");
+
+	//Refresh the Window
+	//wrefresh(window); //refresh later
+}
+
+WINDOW* View::createChatMessageUsers()
+{
+	//Create the Window
+	int userHeight = 21, userWidth = 30;
+	string header = currentUser.ChatroomName + " Users";//TODO
+	WINDOW* window = MakeWindow(userHeight, userWidth, 19, 1, header);
+
+
+	//TODO: Move to function update
+	//Print the text inside the Users Window
+	mvwprintw(window, userHeight - 2, userWidth / 2 - 7, "F6 - All Users");
+
+
+	//Only show the current users in the chatroom
+	vector<User> usersInSameChatroom;
+	FindOthersinUsersChatroom(usersInSameChatroom);
+	for (int i = 0; i < usersInSameChatroom.size(); i++)
+	{
+		//Print the User's Name
+		mvwprintw(window, 2 + i, 2, usersInSameChatroom[i].Name.c_str());
+		if (usersInSameChatroom[i].Status == Online)
+		{
+			//If the user is online, print a green word
+			wattron(window, COLOR_PAIR(2));
+			mvwprintw(window, 2 + i, 20, "Online");
+			wattroff(window, COLOR_PAIR(2));
+		}
+		else
+		{
+			wattron(window, COLOR_PAIR(3));
+			mvwprintw(window, 2 + i, 20, "Offline");
+			wattroff(window, COLOR_PAIR(3));
+		}
+	}
+
+	//Refresh the Window
+	//wrefresh(window); //refresh later
+}
+
+WINDOW* View::createChatMessageChatrooms(int SelectedIndex)
+{
+	int chatHeight = 16, chatWidth = 30;
+	int roomStats[10];
+	string roomNames[10];
+
+	//Create the Window
+	WINDOW *window = MakeWindow(chatHeight, chatWidth, 3, 1, "Chatrooms");
+
+	//TODO: Update function
+	//Display the Chatroom Footer
+	mvwprintw(window, chatHeight - 2, chatWidth / 2 - 12, "F5 to Switch to Chatroom");
+
+	//Display the Chatrooms
+	CalculateChatroomNames(roomNames);
+	CalculateChatroomStats(roomStats);
+
+	for (int i = 0; i < 10; i++)
+	{
+		mvwprintw(window, 2 + i, 1, "%s", roomNames[i].c_str());
+
+		//if there is more than one user in the chatroom
+		if (roomStats[i] > 1)
+			mvwprintw(window, 2 + i, 20, "%d users", roomStats[i]);
+		//if there is only one user in the chatroom
+		else if (roomStats[i] == 1)
+			mvwprintw(window, 2 + i, 20, "%d user", roomStats[i]);
+		//there are no users in the chatroom
+		else
+		{
+			mvwchgat(window, 2 + i, 1, chatWidth - 2, A_NORMAL, 8, NULL);
+			wattron(window, A_NORMAL | COLOR_PAIR(8));
+			mvwprintw(window, 2 + i, 20, "0 users");
+			wattroff(window, A_NORMAL | COLOR_PAIR(8));
+		}
+
+		//highlight the selected user
+		if (SelectedIndex == i)
+			mvwchgat(window, 2 + i, 1, chatWidth - 2, A_NORMAL, 9, NULL);
+	}
+
+	//Refresh the Window
+	//wrefresh(window); //refresh later
+}
+
+WINDOW* View::createChatMessageChatHistory()
+{
+	int winWidth = COLS - 32;
+	int winHeight = LINES - 13;
+	//Initialize the Window
+	WINDOW *window = MakeWindow(winHeight, winWidth, 3, 31, currentUser.ChatroomName);
+
+	//TODO: update function
+	//delete a message if necessary to keep it at a max of MAX_CHAT_HISTORY
+	if (ChatMessages.size() > MAX_CHAT_HISTORY)
+		ChatMessages.erase(ChatMessages.begin());
+
+	//Print the Chat History
+	for (int i = 0; i < ChatMessages.size() && i < MAX_CHAT_HISTORY; i++)
+	{
+		mvwprintw(window, 2 * i + 2, 2, "%s:", ChatMessages[i].UserName.c_str());
+		mvwprintw(window, 2 * i + 3, 5, "%s", ChatMessages[i].Message.c_str());
+	}
+
+	//Refresh the Window
+	//wrefresh(window); //refresh later
+}
+
+WINDOW* View::createChatMessageSendMessage(string message)
+{
+	int winHeight = 9;
+	int winWidth = COLS - 32;
+	int charCount = 0;
+
+	//Initialize the Window
+	WINDOW *window = MakeWindow(winHeight, winWidth, LINES - winHeight - 1, 31, "Send a Message");
+
+	//TODO: Update function
+	//Print the "Send a Message" Footer
+	mvwprintw(window, winHeight - 2, 1, "Press 'Enter' To Send Message");
+	mvwprintw(window, winHeight - 2, winWidth - 26, "%d Characters Remaining", MESSAGE_LENGTH - Message.length());
+
+	//Print the message
+	mvwprintw(window, 2, 1, Message.c_str());
+
+	//Refresh the Window
+	//wrefresh(window); //refresh later
 }
 
 //- - - - - - - - - - - SETTINGS WINDOW - - - - - - - - - - -

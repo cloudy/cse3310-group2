@@ -25,6 +25,22 @@ private:
 
 	//ncurses stuff
 	int chatroom_menu_index;
+	Window current_window;
+
+	//- - - - - - - - - - - CHAT MESSAGE WINDOW - - - - - - - - - - -
+	WINDOW* chat_message_top_bar;
+	WINDOW* chat_message_users;
+	WINDOW* chat_message_chatrooms;
+	WINDOW* chat_message_chat_history;
+	WINDOW* chat_message_send_message;
+
+	WINDOW* createChatMessageTopBar();
+	WINDOW* createChatMessageUsers();
+	WINDOW* createChatMessageChatrooms(int SelectedIndex);
+	WINDOW* createChatMessageChatHistory();
+	WINDOW* createChatMessageSendMessage(std::string message);
+
+	//- - - - - - - - - - - SETTINGS WINDOW - - - - - - - - - - -
 	WINDOW* settings_top_bar;
 	WINDOW* settings_change_user_name;
 	WINDOW* settings_change_chat_room_name;
