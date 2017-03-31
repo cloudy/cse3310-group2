@@ -37,13 +37,9 @@ void Controller::openSpliceLoop()
 
 	while (true)
 	{
-		if (seconds %5 ==0)
+		if (seconds %3 ==0)
 		{
 			printf("opensplice looped\n");
-		}
-		if (seconds % 60 == 0)
-		{
-			break;
 		}
 		
 		seconds++;
