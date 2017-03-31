@@ -59,15 +59,6 @@ public:
 			delwin(windows[i]);
 	}
 
-	void FindOthersinUsersChatroom(vector<User> & usersInSameChatroom)
-	{
-		//Find all of the users in the same chatroom as the current user
-		usersInSameChatroom.push_back(currentUser);
-		for (int i = 1; i < Users.size(); i++)
-			if (Users[i].ChatroomID == currentUser.ChatroomID)
-				usersInSameChatroom.push_back(Users[i]);
-	}
-
 	//- - - - - - - - - - - SETTINGS WINDOW - - - - - - - - - - -
 
 	WINDOW* Settings_TopBar()
@@ -99,7 +90,8 @@ public:
 
 		//Print the Current Username
 		wattron(window, COLOR_PAIR(9));
-		mvwprintw(window, 3, window_width / 2 - currentUser.Name.length() / 2, currentUser.Name.c_str());
+		string current_user_name = chat_building.local_user.getNickName(); //CHANGE: access through model
+		mvwprintw(window, 3, window_width / 2 - current_user_name.length() / 2, current_user_name.c_str()); //CHANGE: access through model
 		wattroff(window, COLOR_PAIR(9));
 
 		//Input box for New Username
@@ -113,7 +105,7 @@ public:
 		//Refresh the Window
 		wrefresh(window);
 		delwin(window);
-		return window;
+		return window; //DISCUSSION: Why delete the window and then return it?
 	}
 
 	WINDOW* Settings_ChangeChatroomName(string new_chatroom_name)
@@ -131,7 +123,8 @@ public:
 
 		//Print the Current Username
 		wattron(window, COLOR_PAIR(9));
-		mvwprintw(window, 3, window_width / 2 - currentUser.ChatroomName.length() / 2, currentUser.ChatroomName.c_str());
+		string current_user_chatroom_name = chat_building.chat_rooms[chat_building.local_user.getChatRoomIndex()].getName(); //CHANGE: access through model
+		mvwprintw(window, 3, window_width / 2 - current_user_chatroom_name.length() / 2, current_user_chatroom_name.c_str()); //CHANGE: access through model
 		wattroff(window, COLOR_PAIR(9));
 
 		//Input box for New Chatroom name
@@ -159,18 +152,19 @@ public:
 		wattroff(window, A_BOLD);
 
 		//Print the User Profiles
-		for (int i = 0; i < Users.size(); i++)
+		for (int i = 0; i < chat_building.users.size(); i++) //CHANGE: access through model
 		{
+			User temp_user = chat_building.users[i];  //CHANGE: access through model
 			//Print User Name
-			mvwprintw(window, 3 + i, 1, "%-8s\t\t\t", Users[i].Name.c_str());
-			if (Users[i].Status == Online)
+			mvwprintw(window, 3 + i, 1, "%-8s\t\t\t", temp_user.getNickName().c_str());  //CHANGE: access through model
+			if (temp_user.getStatus() == Online)
 			{
 				//Print Online Status
 				wattron(window, COLOR_PAIR(2));
 				wprintw(window, "%-8s\t\t\t", "Online");
 				wattroff(window, COLOR_PAIR(2));
 				//Print ChatroomName and Time Online
-				wprintw(window, "%-10s\t\t\t%s", Users[i].ChatroomName.c_str(), "2 Minutes");
+				wprintw(window, "%-10s\t\t\t%s", chat_building.chat_rooms[temp_user.getChatRoomIndex()].getName().c_str(), "2 Minutes"); //CHANGE: access through model
 			}
 			else
 			{
@@ -191,7 +185,7 @@ public:
 
 	void Settings_Draw()
 	{
-		string new_user_nick = currentUser.Name, new_chatroom_name = currentUser.ChatroomName;
+		string new_user_nick = chat_building.local_user.getNickName(), new_chatroom_name = chat_building.chat_rooms[chat_building.local_user.getChatRoomIndex()].getName();  //CHANGE: access through model
 		int input_char;
 
 		Settings_TopBar();
@@ -235,10 +229,15 @@ public:
 			{
 				break;
 			}
-			else if (window_char == KEY_F(5))
+			else if (window_char == KEY_F(5)) //CHANGE: changed logic so we don't send info to other computers if nothing has changed
 			{
 				//Save the results if the user wanted to
-				currentUser.Name = new_user_nick;
+				if (chat_building.local_user.getNickName() != new_user_nick) // if they actually changed their nick name
+				{
+					chat_building.local_user.setName(new_user_nick); //CHANGE: access through model
+					//TODO: OPENSPLICE: Add current user to the user outbox in model for change to be sent //DISCUSSION: do we need this or is this handled by 
+				}
+
 				currentUser.ChatroomName = new_chatroom_name;
 				break;
 			}
@@ -273,13 +272,12 @@ public:
 
 
 		//Only show the current users in the chatroom
-		vector<User*> usersInSameChatroom = ;
-		FindOthersinUsersChatroom(usersInSameChatroom);
+		vector<User> usersInSameChatroom = chat_building.getUsersInChatRoom(chat_building.local_user.getChatRoomIndex()); //CHANGE: moved functionality into model
 		for (int i = 0; i < usersInSameChatroom.size(); i++)
 		{
 			//Print the User's Name
-			mvwprintw(window, 2 + i, 2, usersInSameChatroom[i].Name.c_str());
-			if (usersInSameChatroom[i].Status == Online)
+			mvwprintw(window, 2 + i, 2, usersInSameChatroom[i].getNickName().c_str()); //CHANGE: .name to .getNickName()
+			if (usersInSameChatroom[i].getStatus() == Online) //CHANGE: .Status to .getStatus()
 			{
 				//If the user is online, print a green word
 				wattron(window, COLOR_PAIR(2));
@@ -578,47 +576,7 @@ public:
 
 	}
 
-	//- - - - - - - - - - - FAKE DATA CREATION - - - - - - - - - - -
-	void CreateFakeData()
-	{
-		string userNames[] = { "Joe", "Robert", "Rivka", "Ramon", "Stephani", "Jewel", "Isaias", "Murray", "Darell", "Alyce", "Carylon", "Dona", "George", "Doug", "Hannah" };
-		srand(time(NULL));
-
-		//Create the Fake Users
-		User tempUser;
-		for (int i = 0, chatID = rand() % 10; i < 15; i++, chatID = rand() % 10)
-		{
-			tempUser.Name = userNames[rand() % 15];
-			if (i % 2 == 0)
-				tempUser.Status = Online;
-			else tempUser.Status = Offline;
-			tempUser.ChatroomName = FakeChatroomNames[chatID];
-			tempUser.UserID = i;
-			tempUser.ColorIndex = -1;
-			tempUser.ChatroomID = chatID;
-			Users.push_back(tempUser);
-		}
-
-		//Assign the current User as the first user in Users
-		currentUser = Users[0];
-		vector<User> usersInSameChatroom(0);
-		FindOthersinUsersChatroom(usersInSameChatroom);
-
-		//Create the Fake Chat Messages
-		Message tempMessage;
-		for (int i = 0; i < 3; i++)
-		{
-			tempMessage.UserName = usersInSameChatroom[rand() % usersInSameChatroom.size()].Name;
-			tempMessage.UserID = usersInSameChatroom[rand() % usersInSameChatroom.size()].UserID;
-			tempMessage.Message = "";
-			for (int j = 0, randomNum = rand() % 144; j < randomNum; j++)
-			{
-				tempMessage.Message += rand() % 26 + 65;
-			}
-
-			ChatMessages.push_back(tempMessage);
-		}
-	}
+	//- - - - - - - - - - - FAKE DATA CREATION - - - - - - - - - - - //CHANGE: moved to populateForTesting in model
 
 	//- - - - - - - - - - - MAIN - - - - - - - - - - -
 	void StartGUI()
