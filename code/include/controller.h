@@ -12,9 +12,7 @@ public:
 	void run();
 
 private:
-	Model chat_building;
-	View ncurses;
-
+	
 	void ncursesLoop();
 	void openSpliceLoop();
 };

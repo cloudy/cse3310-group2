@@ -30,11 +30,20 @@ User Model::findUser(unsigned long long uuid)
 }
 
 //getters
-vector<string> Model::getAllChatroomNames()
+string Model::getChatroomName(unsigned long desired_chatroom_index)
 {
-	vector<string> chat_room_names;
-	for (ChatRoom cr : chat_rooms)
+	return chat_rooms[desired_chatroom_index].getName();
+}
+
+vector<User*> Model::getUsersInChatRoom(unsigned long desired_chatroom_index)
+{
+	vector<User*> result;
+	for (User& user : users)
 	{
-		chat_room_names.push_back(cr.getName());
+		if (user.getChatRoomIndex() == desired_chatroom_index)
+		{
+			result.push_back(&user);
+		}
 	}
+	return result;
 }

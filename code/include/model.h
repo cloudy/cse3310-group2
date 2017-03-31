@@ -15,7 +15,9 @@ public:
 
 
 	//getters
-	std::vector<std::string> getAllChatroomNames();
+	std::string getChatroomName(unsigned long desired_chatroom_index);
+	std::vector<ChatRoom*> getChatRooms;
+	std::vector<User*> getUsersInChatRoom(unsigned long desired_chatroom_index);
 
 private:
 	ChatRoom chat_rooms[10];

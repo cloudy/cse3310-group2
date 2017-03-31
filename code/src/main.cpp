@@ -3,7 +3,7 @@
 
 #include "controller.h"
 
-//GLOBAL CONSTANTS
+//GLOBAL VARIABLES
 
 int main(int argc, char* argv[])
 {

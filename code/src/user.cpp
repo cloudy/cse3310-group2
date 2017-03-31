@@ -11,7 +11,7 @@ User::User()
 //setters
 void User::setName(string desired_name)
 {
-	if (desired_name.length() > MAX_NICKNAME_LENGTH)
+	if (desired_name.length() > MAX_USER_NICK_SIZE)
 	{
 		throw runtime_error("Tried to set name that was too long.");
 	}
@@ -41,7 +41,7 @@ unsigned long long User::getUUID()
 
 OnlineStatus User::getStatus()
 {
-	return status;
+	return online_status;
 }
 
 unsigned long User::getChatRoomIndex()

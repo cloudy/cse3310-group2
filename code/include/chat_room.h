@@ -13,21 +13,16 @@ class ChatRoom
 public:
 	ChatRoom();
 	void changeName(std::string desired_name);
-	void addUser(User& user);
-	void removeUser(User& user);
-	void addMessage(Message& message);
+	void addMessage(Message message);
 
 	//getters
 	std::string getName();
 	unsigned long getChatRoomIndex();
-	std::list<User&> getUsersInChatRoom();
-	int getNumOfUsers();
 
 private:
 	unsigned long chat_room_index; //DISCUSION: could be int?
 	std::string chat_room_name;
-	std::list<Message&> message_history; //Using list because it allows easy push_back, pop_front for history
-	std::list<User&> users_in_chatroom;
+	std::list<Message> message_history; //Using list because it allows easy push_back, pop_front for history
 };
 
 #endif
