@@ -6,18 +6,6 @@ Model::Model()
 {
 }
 
-void Model::moveUserToNewChatRoom(User user, ChatRoom destination_chat_room)
-{
-	//remove from old chatroom
-	chat_rooms[user.getChatRoomIndex()].removeUser(user);
-
-	//update chatroom_index
-	user.setChatRoomIndex(destination_chat_room.getChatRoomIndex());
-
-	//add to new chatroom
-	chat_rooms[user.getChatRoomIndex()].addUser(user);
-}
-
 User Model::findUser(unsigned long long uuid)
 {
 	for (User u : users)
@@ -29,11 +17,21 @@ User Model::findUser(unsigned long long uuid)
 	}
 }
 
-//getters
-string Model::getChatroomName(unsigned long desired_chatroom_index)
+int Model::calculateNumUsersInChatRoom(unsigned long desired_chatroom_index)
 {
-	return chat_rooms[desired_chatroom_index].getName();
+	int count = 0;
+	for (User& user : users)
+	{
+		if (user.getChatRoomIndex() == desired_chatroom_index)
+		{
+			count++;
+		}
+	}
+
+	return count;
 }
+
+//getters
 
 vector<User*> Model::getUsersInChatRoom(unsigned long desired_chatroom_index)
 {

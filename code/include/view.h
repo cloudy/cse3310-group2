@@ -59,20 +59,6 @@ public:
 			delwin(windows[i]);
 	}
 
-	void CalculateChatroomStats(int* rooms)
-	{
-		//Count how many users are in the chatroom
-
-		//Set the array to 0
-		for (int i = 0; i < 10; i++)
-			rooms[i] = 0;
-
-		rooms[currentUser.ChatroomID]++;
-		//Total up the amount of users in each chatroom
-		for (int i = 1; i < Users.size(); i++)
-			rooms[Users[i].ChatroomID]++;
-	}
-
 	void FindOthersinUsersChatroom(vector<User> & usersInSameChatroom)
 	{
 		//Find all of the users in the same chatroom as the current user
@@ -287,7 +273,7 @@ public:
 
 
 		//Only show the current users in the chatroom
-		vector<User> usersInSameChatroom;
+		vector<User*> usersInSameChatroom = ;
 		FindOthersinUsersChatroom(usersInSameChatroom);
 		for (int i = 0; i < usersInSameChatroom.size(); i++)
 		{
@@ -316,7 +302,7 @@ public:
 	WINDOW* ChatMessage_Chatrooms(int SelectedIndex)
 	{
 		int chatHeight = 16, chatWidth = 30;
-		//vector<string> roomNames = chat_building.getAllChatroomNames(); //CHANGE: moved functionality into model TODO
+		string roomNames[10]; 
 		int roomStats[10];
 
 		//Create the Window
@@ -325,8 +311,12 @@ public:
 		//Display the Chatroom Footer
 		mvwprintw(window, chatHeight - 2, chatWidth / 2 - 12, "F5 to Switch to Chatroom");
 
-		//Display the Chatrooms
-		CalculateChatroomStats(roomStats);
+		//CHANGE: Moved functionality for getting info into model
+		for (int i = 0; i < 10; i++)
+		{
+			roomNames[i] = chat_building.chat_rooms[i].getName();
+			roomStats[i] = chat_building.calculateNumUsersInChatRoom(i);
+		}
 
 		for (int i = 0; i < 10; i++)
 		{

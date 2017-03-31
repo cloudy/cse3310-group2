@@ -4,7 +4,7 @@
 #include <string>
 #include "constants.h"
 
-enum class OnlineStatus { Online, Offline };
+enum OnlineStatus { Online, Offline };
 
 class User
 {
