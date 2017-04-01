@@ -24,7 +24,7 @@ User Model::findUser(unsigned long long uuid)
 
 string Model::calculateCurrentChatRoomName()
 {
-	return chat_rooms[local_user->getChatRoomIndex()].getName();
+	return chat_rooms[users[0].getChatRoomIndex()].getName();
 }
 
 bool Model::isUserNew(unsigned long long uuid)
@@ -47,7 +47,6 @@ void Model::populateForTesting() //TODO
 	unsigned long chat_room_indexes[] = { 0,0,0,1,1,1,2,2,2,3,3,3,4,4,4 };
 	User me = User("me", 0, 0);
 	users.push_back(me);
-	local_user = &(users[0]);
 	for (int i = 0; i < 15; i++)
 	{
 		users.push_back(User(user_names[i], uuids[i], chat_room_indexes[i]));

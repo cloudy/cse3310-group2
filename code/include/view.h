@@ -91,7 +91,7 @@ public:
 
 		//Print the Current Username
 		wattron(window, COLOR_PAIR(9));
-		string current_user_name = chat_building.local_user->getNickName(); //CHANGE: access through model
+		string current_user_name = chat_building.users[0].getNickName(); //CHANGE: access through model
 		mvwprintw(window, 3, window_width / 2 - current_user_name.length() / 2, current_user_name.c_str()); //CHANGE: access through model
 		wattroff(window, COLOR_PAIR(9));
 
@@ -186,7 +186,7 @@ public:
 
 	void Settings_Draw()
 	{
-		string new_user_nick = chat_building.local_user->getNickName(), new_chatroom_name = chat_building.calculateCurrentChatRoomName();  //CHANGE: access through model
+		string new_user_nick = chat_building.users[0].getNickName(), new_chatroom_name = chat_building.calculateCurrentChatRoomName();  //CHANGE: access through model
 		int input_char;
 
 		Settings_TopBar();
@@ -233,9 +233,9 @@ public:
 			else if (window_char == KEY_F(5)) //CHANGE: changed logic so we don't send chatroom info to other computers if name hasn't changed
 			{
 				//update username even if it didnt change because it isn't too slower than checking. don't publish manually since it will be included in heartbeat
-				chat_building.local_user->setName(new_user_nick); //CHANGE: access through model
+				chat_building.users[0].setName(new_user_nick); //CHANGE: access through model
 
-				ChatRoom& curent_chat_room = chat_building.chat_rooms[chat_building.local_user->getChatRoomIndex()];
+				ChatRoom& curent_chat_room = chat_building.chat_rooms[chat_building.users[0].getChatRoomIndex()];
 				//update and publish chat room name if user actually changed chat room name
 				if (curent_chat_room.getName() != new_chatroom_name) 
 				{
@@ -275,7 +275,7 @@ public:
 
 
 		//Only show the current users in the chatroom
-		vector<User> usersInSameChatroom = chat_building.getUsersInChatRoom(chat_building.local_user->getChatRoomIndex()); //CHANGE: moved functionality into model
+		vector<User> usersInSameChatroom = chat_building.getUsersInChatRoom(chat_building.users[0].getChatRoomIndex()); //CHANGE: moved functionality into model
 		for (int i = 0; i < usersInSameChatroom.size(); i++)
 		{
 			//Print the User's Name
@@ -355,7 +355,7 @@ public:
 		//Initialize the Window
 		WINDOW *window = MakeWindow(winHeight, winWidth, 3, 31, chat_building.calculateCurrentChatRoomName()); //CHANGE: 
 
-		ChatRoom& current_chat_room = chat_building.chat_rooms[chat_building.local_user->getChatRoomIndex()]; //CHANGE:
+		ChatRoom& current_chat_room = chat_building.chat_rooms[chat_building.users[0].getChatRoomIndex()]; //CHANGE:
 		//delete a message if necessary to keep it at a max of MAX_CHAT_HISTORY //CHANGE: don't need to worry about size going over. I handle this when using addMessage().
 		//if (curent_chat_room.message_history.size() > MAX_CHAT_HISTORY)
 			//ChatMessages.erase(ChatMessages.begin());
@@ -398,7 +398,7 @@ public:
 		WINDOW *mainWin = newwin(LINES, COLS, 0, 0);
 
 		//Assign the user to the passed chatroomIndex
-		chat_building.local_user->setChatRoomIndex(chatroom_index); //CHANGE: access through model
+		chat_building.users[0].setChatRoomIndex(chatroom_index); //CHANGE: access through model
 		//Do Lookup below for chatroomName
 		//currentUser.ChatroomName = FakeChatroomNames[chatroom_index]; //CHANGE: don't need this?
 
@@ -460,8 +460,8 @@ public:
 					if (sub_char == 10) //ENTER key
 					{
 						//Send the message //CHANGE: use message constructor and send through model
-						Message newMessage = Message(*(chat_building.local_user), user_Message);
-						chat_building.chat_rooms[chat_building.local_user->getChatRoomIndex()].addMessage(newMessage);
+						Message newMessage = Message(chat_building.users[0], user_Message);
+						chat_building.chat_rooms[chat_building.users[0].getChatRoomIndex()].addMessage(newMessage);
 						user_Message = "";
 
 						//Redraw the Chatmessage History

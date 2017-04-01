@@ -12,8 +12,8 @@ public:
 	Model();
 
 	ChatRoom chat_rooms[10];
-	std::vector<User> users;
-	User* local_user; //Reference to our actual user
+	std::vector<User> users; //TESTING: can we have our user be first in the vector?
+	//User* local_user; //Reference to our actual user
 
 	void populateForTesting();
 	bool isUserNew(unsigned long long uuid); //TODO: logic for checking this when get heartbeat, if new, add to users.
