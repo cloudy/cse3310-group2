@@ -24,7 +24,7 @@ void Controller::run(bool is_testing)
 
 void Controller::ncursesLoop()
 {
-	ncurses.StartGUI();
+	//ncurses.StartGUI();
 }
 //dont do OS stuff until View.logged_in is true
 void Controller::openSpliceLoop() 

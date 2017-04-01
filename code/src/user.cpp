@@ -67,7 +67,7 @@ int User::getColorIndex()
 
 string User::timeToString()
 {
-	char* result;
+	char result[10];
 	int temp_time_seconds = time_online_seconds;
 	int hours = temp_time_seconds / 3600;
 	temp_time_seconds = temp_time_seconds % 3600;
