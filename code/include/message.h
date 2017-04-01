@@ -1,13 +1,15 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H 2016
 
-#include "constants.h"
 #include <string>
+
+#include "constants.h"
+#include "user.h"
 
 class Message
 {
 public:
-	Message(std::string p_author_nick_name, unsigned long long p_author_uuid, unsigned long p_chat_room_index, std::string p_content);
+	Message(User p_user, std::string p_content);
 	Message(std::string p_author_nick_name, unsigned long long p_author_uuid, unsigned long p_chat_room_index, std::string p_content, unsigned long long p_checksum);
 	bool isCorrupted();
 

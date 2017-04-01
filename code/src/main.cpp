@@ -6,6 +6,6 @@
 int main(int argc, char* argv[])
 {
 	Controller super_chat;
-	super_chat.run();
+	super_chat.run(true);
 	return 0;
 }

@@ -41,42 +41,25 @@ bool Model::isUserNew(unsigned long long uuid)
 
 void Model::populateForTesting() //TODO
 {
-	string userNames[] = { "Joe", "Robert", "Rivka", "Ramon", "Stephani", "Jewel", "Isaias", "Murray", "Darell", "Alyce", "Carylon", "Dona", "George", "Doug", "Hannah" };
-	srand(time(NULL));
-
-	//Create the Fake Users
-	User tempUser;
-	for (int i = 0, chatID = rand() % 10; i < 15; i++, chatID = rand() % 10)
+	//Create Fake Users
+	string user_names[] = { "Joe", "Robert", "Rivka", "Ramon", "Stephani", "Jewel", "Isaias", "Murray", "Darell", "Alyce", "Carylon", "Dona", "George", "Doug", "Hannah" };
+	unsigned long long uuids[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+	unsigned long chat_room_indexes[] = { 0,0,0,1,1,1,2,2,2,3,3,3,4,4,4 };
+	User me = User("me", 0, 0);
+	users.push_back(me);
+	local_user = &(users[0]);
+	for (int i = 0; i < 15; i++)
 	{
-		tempUser.Name = userNames[rand() % 15];
-		if (i % 2 == 0)
-			tempUser.Status = Online;
-		else tempUser.Status = Offline;
-				tempUser.ChatroomName = FakeChatroomNames[chatID];
-		tempUser.UserID = i;
-		tempUser.ColorIndex = -1;
-		tempUser.ChatroomID = chatID;
-		Users.push_back(tempUser);
+		users.push_back(User(user_names[i], uuids[i], chat_room_indexes[i]));
 	}
 
-	//Assign the current User as the first user in Users
-	currentUser = Users[0];
-	vector<User> usersInSameChatroom(0);
-	FindOthersinUsersChatroom(usersInSameChatroom);
-
-	//Create the Fake Chat Messages
-	Message tempMessage;
-	for (int i = 0; i < 3; i++)
+	//Create Fake Chat Messages
+	string message_contents[] = { "Hello", "You Still there?", "I guess nice guys finish last." };
+	for (int i = 0; i < 15; i++)
 	{
-		tempMessage.UserName = usersInSameChatroom[rand() % usersInSameChatroom.size()].Name;
-		tempMessage.UserID = usersInSameChatroom[rand() % usersInSameChatroom.size()].UserID;
-		tempMessage.Message = "";
-		for (int j = 0, randomNum = rand() % 144; j < randomNum; j++)
-		{
-			tempMessage.Message += rand() % 26 + 65;
-		}
-
-		ChatMessages.push_back(tempMessage);
+		chat_rooms[users[i].getChatRoomIndex].addMessage(Message(users[i], message_contents[0]));
+		chat_rooms[users[i].getChatRoomIndex].addMessage(Message(users[i], message_contents[1]));
+		chat_rooms[users[i].getChatRoomIndex].addMessage(Message(users[i], message_contents[2]));
 	}
 }
 

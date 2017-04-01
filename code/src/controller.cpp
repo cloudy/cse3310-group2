@@ -7,8 +7,13 @@ using namespace std;
 
 Controller::Controller() : chat_building(Model()), ncurses(View(chat_building)) {}
 
-void Controller::run()
+void Controller::run(bool is_testing)
 {
+	if (is_testing)
+	{
+		chat_building.populateForTesting();
+	}
+
 	thread ncurses_thread(&Controller::ncursesLoop, Controller());
 	thread open_splice_thread(&Controller::openSpliceLoop, Controller());
 	

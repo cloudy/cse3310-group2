@@ -8,7 +8,7 @@ class Controller
 {
 public:
 	Controller();
-	void run();
+	void run(bool is_testing);
 
 private:
 	Model chat_building;

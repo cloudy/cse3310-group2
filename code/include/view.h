@@ -356,16 +356,16 @@ public:
 		//Initialize the Window
 		WINDOW *window = MakeWindow(winHeight, winWidth, 3, 31, currentUser.ChatroomName);
 
-		ChatRoom& curent_chat_room = chat_building.chat_rooms[chat_building.local_user->getChatRoomIndex()]; //CHANGE:
+		ChatRoom& current_chat_room = chat_building.chat_rooms[chat_building.local_user->getChatRoomIndex()]; //CHANGE:
 		//delete a message if necessary to keep it at a max of MAX_CHAT_HISTORY //CHANGE: don't need to worry about size going over. I handle this when using addMessage().
 		//if (curent_chat_room.message_history.size() > MAX_CHAT_HISTORY)
 			//ChatMessages.erase(ChatMessages.begin());
 
 		//Print the Chat History
-		for (int i = 0; i < curent_chat_room.message_history.size() && i < MAX_CHAT_HISTORY; i++)
+		for (int i = 0; i < current_chat_room.message_history.size() && i < MAX_CHAT_HISTORY; i++)
 		{
-			mvwprintw(window, 2 * i + 2, 2, "%s:", curent_chat_room.message_history[i].getAuthorNickName().c_str()); //CHANGE: access through model
-			mvwprintw(window, 2 * i + 3, 5, "%s", curent_chat_room.message_history[i].getContent().c_str()); //CHANGE: access through model
+			mvwprintw(window, 2 * i + 2, 2, "%s:", current_chat_room.message_history[i].getAuthorNickName().c_str()); //CHANGE: access through model
+			mvwprintw(window, 2 * i + 3, 5, "%s", current_chat_room.message_history[i].getContent().c_str()); //CHANGE: access through model
 		}
 
 		//Refresh the Window
@@ -461,7 +461,7 @@ public:
 					if (sub_char == 10) //ENTER key
 					{
 						//Send the message //CHANGE: use message constructor and send through model
-						Message newMessage = Message(chat_building.local_user->getNickName(), chat_building.local_user->getUUID(), chat_building.local_user->getChatRoomIndex(), user_Message);
+						Message newMessage = Message(*(chat_building.local_user), user_Message);
 						chat_building.chat_rooms[chat_building.local_user->getChatRoomIndex()].addMessage(newMessage);
 						user_Message = "";
 
