@@ -299,7 +299,7 @@ int main()
       if (seconds%60 == 0)
       {
         // once a minute change the chatroom name
-        chatroom messageInstance;
+        SuperChat::chatroom messageInstance;
         messageInstance.chatroom_idx = 1;
         if ( seconds%120 )
         {
@@ -316,7 +316,7 @@ int main()
     {
       user messageInstance;
       messageInstance.uuid = 123;
-      strncpy ( messageInstance.nick, "Donny", sizeof ( messageInstance.nick ) );
+      strncpy ( messageInstance.nick, "Tim", sizeof ( messageInstance.nick ) );
       messageInstance.chatroom_idx = 0;  // public
       if (seconds%2 == 0) 
       {

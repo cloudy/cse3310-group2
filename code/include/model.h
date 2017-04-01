@@ -6,9 +6,6 @@
 #include "chat_room.h"
 #include "user.h"
 
-using namespace DDS;
-using namespace SuperChat;
-
 class Model
 {
 public:
@@ -18,8 +15,8 @@ public:
 
 private:
 	ChatRoom chat_rooms[10];
-	//std::vector<User> users; //DISCUSSION: Should this be a vector
-	//User current_user{(char *)"user"};
+	std::vector<User> users; //DISCUSSION: Should this be a vector
+	User current_user;
 };
 
 #endif
