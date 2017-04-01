@@ -1,5 +1,6 @@
 #include "user.h"
 
+#include <stdexcept>
 
 using namespace std;
 

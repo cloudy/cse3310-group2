@@ -19,7 +19,7 @@ void ChatRoom::changeName(string desired_name)
 void ChatRoom::addMessage(Message message)
 {
 	//remove from front if history is full
-	if (message_history.size >= MAX_CHAT_HISTORY)
+	if (message_history.size() >= MAX_CHAT_HISTORY)
 	{
 		message_history.pop_front();
 	}

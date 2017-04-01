@@ -11,15 +11,15 @@
 
 #include "model.h"
 
-using namespace std;
-using namespace GUI_DATA;
-
 //Global Data
 namespace GUI_DATA
 {
 	enum Windows { Login = 0, Chatroom = 1, Settings = 2 };
 	int chatroom_menu_index;
 }
+
+using namespace std;
+using namespace GUI_DATA;
 
 class View //CHANGE: Basically moved everything into a class. Made it easier to access model as an common attribute rather than passing reference between each function. 
 {
@@ -354,7 +354,7 @@ public:
 		int winWidth = COLS - 32;
 		int winHeight = LINES - 13;
 		//Initialize the Window
-		WINDOW *window = MakeWindow(winHeight, winWidth, 3, 31, currentUser.ChatroomName);
+		WINDOW *window = MakeWindow(winHeight, winWidth, 3, 31, chat_building.calculateCurrentChatRoomName()); //CHANGE: 
 
 		ChatRoom& current_chat_room = chat_building.chat_rooms[chat_building.local_user->getChatRoomIndex()]; //CHANGE:
 		//delete a message if necessary to keep it at a max of MAX_CHAT_HISTORY //CHANGE: don't need to worry about size going over. I handle this when using addMessage().

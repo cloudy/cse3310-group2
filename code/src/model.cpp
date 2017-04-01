@@ -57,9 +57,9 @@ void Model::populateForTesting() //TODO
 	string message_contents[] = { "Hello", "You Still there?", "I guess nice guys finish last." };
 	for (int i = 0; i < 15; i++)
 	{
-		chat_rooms[users[i].getChatRoomIndex].addMessage(Message(users[i], message_contents[0]));
-		chat_rooms[users[i].getChatRoomIndex].addMessage(Message(users[i], message_contents[1]));
-		chat_rooms[users[i].getChatRoomIndex].addMessage(Message(users[i], message_contents[2]));
+		chat_rooms[users[i].getChatRoomIndex()].addMessage(Message(users[i], message_contents[0]));
+		chat_rooms[users[i].getChatRoomIndex()].addMessage(Message(users[i], message_contents[1]));
+		chat_rooms[users[i].getChatRoomIndex()].addMessage(Message(users[i], message_contents[2]));
 	}
 }
 
