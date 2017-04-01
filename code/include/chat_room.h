@@ -12,6 +12,7 @@ class ChatRoom
 {
 public:
 	ChatRoom();
+	ChatRoom(unsigned long p_chat_room_index, std::string p_chat_room_name);
 
 	std::deque<Message> message_history; //Using deque because it allows easy push_back, pop_front for history
 

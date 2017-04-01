@@ -5,10 +5,7 @@
 
 using namespace std;
 
-Controller::Controller()
-{
-
-}
+Controller::Controller() : chat_building(Model()), ncurses(View(chat_building)) {}
 
 void Controller::run()
 {
@@ -22,16 +19,10 @@ void Controller::run()
 
 void Controller::ncursesLoop()
 {
-	char ch;
-	while ((ch = getch()) != KEY_F(1))
-	{
-		ncurses.handleInput(ch);
-		//printf("ncurses looped\n");
-		//this_thread::sleep_for(chrono::milliseconds(1000));
-	}
+	ncurses.StartGUI();
 }
-
-void Controller::openSpliceLoop()
+//dont do OS stuff until View.logged_in is true
+void Controller::openSpliceLoop() 
 {
 	while (true)
 	{

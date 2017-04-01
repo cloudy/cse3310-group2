@@ -13,10 +13,10 @@ public:
 
 	ChatRoom chat_rooms[10];
 	std::vector<User> users;
-	User& local_user; //Reference to our actual 
+	User* local_user; //Reference to our actual user
 
 	void populateForTesting();
-	bool isUserNew(); //TODO: implement. also logic for checking this when get heartbeat, if new, add to users.
+	bool isUserNew(unsigned long long uuid); //TODO: logic for checking this when get heartbeat, if new, add to users.
 
 	User findUser(unsigned long long uuid);
 	int calculateNumUsersInChatRoom(unsigned long desired_chatroom_index);

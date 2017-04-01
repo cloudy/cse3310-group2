@@ -7,6 +7,8 @@ ChatRoom::ChatRoom()
 
 }
 
+ChatRoom::ChatRoom(unsigned long p_chat_room_index, std::string p_chat_room_name) : chat_room_index(p_chat_room_index), chat_room_name(p_chat_room_name) {}
+
 
 void ChatRoom::changeName(string desired_name)
 {

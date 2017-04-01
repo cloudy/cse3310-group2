@@ -2,9 +2,13 @@
 
 using namespace std;
 
-Model::Model() : local_user(users.at(0))
+Model::Model()
 {
-
+	for (int i = 0; i < NUM_CHATROOMS; i++)
+	{
+		string name = "Chatroom #" + to_string(i);
+		chat_rooms[i] = ChatRoom(i, name);
+	}
 }
 
 User Model::findUser(unsigned long long uuid)
@@ -20,7 +24,19 @@ User Model::findUser(unsigned long long uuid)
 
 string Model::calculateCurrentChatRoomName()
 {
-	return chat_rooms[local_user.getChatRoomIndex()].getName();
+	return chat_rooms[local_user->getChatRoomIndex()].getName();
+}
+
+bool Model::isUserNew(unsigned long long uuid)
+{
+	for (User u : users)
+	{
+		if (u.getUUID() == uuid)
+		{
+			return false;
+		}
+	}
+	return true;
 }
 
 void Model::populateForTesting() //TODO
@@ -80,14 +96,14 @@ int Model::calculateNumUsersInChatRoom(unsigned long desired_chatroom_index)
 
 //getters
 
-vector<User*> Model::getUsersInChatRoom(unsigned long desired_chatroom_index)
+vector<User> Model::getUsersInChatRoom(unsigned long desired_chatroom_index)
 {
-	vector<User*> result;
-	for (User& user : users)
+	vector<User> result;
+	for (User user : users)
 	{
 		if (user.getChatRoomIndex() == desired_chatroom_index)
 		{
-			result.push_back(&user);
+			result.push_back(user);
 		}
 	}
 	return result;
