@@ -17,21 +17,38 @@ User::User(std::string p_nick_name, unsigned long long p_uuid, unsigned long p_c
 //setters
 void User::setName(string desired_name)
 {
-	if (desired_name.length() > MAX_USER_NICK_SIZE)
+	try
 	{
-		throw runtime_error("Tried to set name that was too long.");
+		if (desired_name.length() > MAX_USER_NICK_SIZE)
+		{
+			throw runtime_error("Tried to set name that was too long.");
+		}
+
+		nick_name = desired_name;
 	}
-	nick_name = desired_name;
+
+	catch (const std::exception& e)
+	{
+		printf(e.what());
+	}
 }
 
 void User::setChatRoomIndex(unsigned long index)
 {
-	if (index < 0 || index > NUM_CHATROOMS)
+	try
 	{
-		throw runtime_error("Tried to change to invalid chatroom index.");
+		if (index < 0 || index > NUM_CHATROOMS)
+		{
+			throw runtime_error("Tried to change to invalid chatroom index.");
+		}
+
+		chat_room_index = index;
 	}
 
-	chat_room_index = index;
+	catch (const std::exception& e)
+	{
+		printf(e.what());
+	}
 }
 
 void User::setStatus(OnlineStatus desired_status)
