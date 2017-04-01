@@ -123,7 +123,7 @@ public:
 
 		//Print the Current Username
 		wattron(window, COLOR_PAIR(9));
-		string current_user_chatroom_name = chat_building.chat_rooms[chat_building.local_user.getChatRoomIndex()].getName(); //CHANGE: access through model
+		string current_user_chatroom_name = chat_building.calculateCurrentChatRoomName(); //CHANGE: access through model
 		mvwprintw(window, 3, window_width / 2 - current_user_chatroom_name.length() / 2, current_user_chatroom_name.c_str()); //CHANGE: access through model
 		wattroff(window, COLOR_PAIR(9));
 
@@ -164,7 +164,7 @@ public:
 				wprintw(window, "%-8s\t\t\t", "Online");
 				wattroff(window, COLOR_PAIR(2));
 				//Print ChatroomName and Time Online
-				wprintw(window, "%-10s\t\t\t%s", chat_building.chat_rooms[temp_user.getChatRoomIndex()].getName().c_str(), "2 Minutes"); //CHANGE: access through model
+				wprintw(window, "%-10s\t\t\t%s", chat_building.chat_rooms[temp_user.getChatRoomIndex()].getName().c_str(), temp_user.timeToString()); //CHANGE: access through model and added time functionality
 			}
 			else
 			{
@@ -185,7 +185,7 @@ public:
 
 	void Settings_Draw()
 	{
-		string new_user_nick = chat_building.local_user.getNickName(), new_chatroom_name = chat_building.chat_rooms[chat_building.local_user.getChatRoomIndex()].getName();  //CHANGE: access through model
+		string new_user_nick = chat_building.local_user.getNickName(), new_chatroom_name = chat_building.calculateCurrentChatRoomName();  //CHANGE: access through model
 		int input_char;
 
 		Settings_TopBar();
@@ -229,16 +229,18 @@ public:
 			{
 				break;
 			}
-			else if (window_char == KEY_F(5)) //CHANGE: changed logic so we don't send info to other computers if nothing has changed
+			else if (window_char == KEY_F(5)) //CHANGE: changed logic so we don't send chatroom info to other computers if name hasn't changed
 			{
-				//Save the results if the user wanted to
-				if (chat_building.local_user.getNickName() != new_user_nick) // if they actually changed their nick name
-				{
-					chat_building.local_user.setName(new_user_nick); //CHANGE: access through model
-					//TODO: OPENSPLICE: Add current user to the user outbox in model for change to be sent //DISCUSSION: do we need this or is this handled by 
-				}
+				//update username even if it didnt change because it isn't too slower than checking. don't publish manually since it will be included in heartbeat
+				chat_building.local_user.setName(new_user_nick); //CHANGE: access through model
 
-				currentUser.ChatroomName = new_chatroom_name;
+				ChatRoom& curent_chat_room = chat_building.chat_rooms[chat_building.local_user.getChatRoomIndex()];
+				//update and publish chat room name if user actually changed chat room name
+				if (curent_chat_room.getName() != new_chatroom_name) 
+				{
+					curent_chat_room.setName(new_chatroom_name);
+					//TODO: OPENSPLICE: add chat_room to outbox
+				}
 				break;
 			}
 		}
@@ -264,7 +266,7 @@ public:
 	{
 		//Create the Window
 		int userHeight = 21, userWidth = 30;
-		string header = currentUser.ChatroomName + " Users";
+		string header = chat_building.calculateCurrentChatRoomName() + " Users"; //CHANGE: access through model
 		WINDOW* window = MakeWindow(userHeight, userWidth, 19, 1, header);
 
 		//Print the text inside the Users Window
@@ -352,15 +354,16 @@ public:
 		//Initialize the Window
 		WINDOW *window = MakeWindow(winHeight, winWidth, 3, 31, currentUser.ChatroomName);
 
-		//delete a message if necessary to keep it at a max of MAX_CHAT_HISTORY
-		if (ChatMessages.size() > MAX_CHAT_HISTORY)
-			ChatMessages.erase(ChatMessages.begin());
+		ChatRoom& curent_chat_room = chat_building.chat_rooms[chat_building.local_user.getChatRoomIndex()]; //CHANGE:
+		//delete a message if necessary to keep it at a max of MAX_CHAT_HISTORY //CHANGE: don't need to worry about size going over. I handle this when using addMessage().
+		//if (curent_chat_room.message_history.size() > MAX_CHAT_HISTORY)
+			//ChatMessages.erase(ChatMessages.begin());
 
 		//Print the Chat History
-		for (int i = 0; i < ChatMessages.size() && i < MAX_CHAT_HISTORY; i++)
+		for (int i = 0; i < curent_chat_room.message_history.size() && i < MAX_CHAT_HISTORY; i++)
 		{
-			mvwprintw(window, 2 * i + 2, 2, "%s:", ChatMessages[i].UserName.c_str());
-			mvwprintw(window, 2 * i + 3, 5, "%s", ChatMessages[i].Message.c_str());
+			mvwprintw(window, 2 * i + 2, 2, "%s:", curent_chat_room.message_history[i].getAuthorNickName().c_str()); //CHANGE: access through model
+			mvwprintw(window, 2 * i + 3, 5, "%s", curent_chat_room.message_history[i].getContent().c_str()); //CHANGE: access through model
 		}
 
 		//Refresh the Window
@@ -394,9 +397,9 @@ public:
 		WINDOW *mainWin = newwin(LINES, COLS, 0, 0);
 
 		//Assign the user to the passed chatroomIndex
-		currentUser.ChatroomID = chatroom_index;
+		chat_building.local_user.setChatRoomIndex(chatroom_index); //CHANGE: access through model
 		//Do Lookup below for chatroomName
-		currentUser.ChatroomName = FakeChatroomNames[chatroom_index];
+		//currentUser.ChatroomName = FakeChatroomNames[chatroom_index]; //CHANGE: don't need this?
 
 		ChatMessage_TopBar();
 		ChatMessage_Users();
@@ -455,14 +458,9 @@ public:
 					//Check what input was
 					if (sub_char == 10) //ENTER key
 					{
-						//Send the message
-						Message newMessage;
-						newMessage.UserName = currentUser.Name;
-						newMessage.UserID = currentUser.UserID;
-						newMessage.ChatroomID = currentUser.ChatroomID;
-						newMessage.Message = user_Message;
-
-						ChatMessages.push_back(newMessage);
+						//Send the message //CHANGE: use message constructor and send through model
+						Message newMessage = Message(chat_building.local_user.getNickName(), chat_building.local_user.getUUID(), chat_building.local_user.getChatRoomIndex(), user_Message);
+						chat_building.chat_rooms[chat_building.local_user.getChatRoomIndex()].addMessage(newMessage);
 						user_Message = "";
 
 						//Redraw the Chatmessage History
@@ -532,7 +530,10 @@ public:
 		delwin(window);
 	}
 
-	void StartScreen_Draw()
+	//DISCUSSION: IMPORTANT: make sure logic is right here. 1) we will make local user with default values 2) in here, when enter is pushed, load user is called, if file doesnt exist, 
+	// generate uuid and save user 3) if file exists, use exisitng uuid 4) set these two attributes for current user
+	// need to keep bool loggedin in model so we don't publish user heartbeat with default info
+	void StartScreen_Draw() 
 	{
 		StartScreen_TopBorder();
 		StartScreen_Username("usernick");
@@ -600,9 +601,6 @@ public:
 		init_pair(10, COLOR_MAGENTA, COLOR_BLACK);
 		init_pair(11, COLOR_CYAN, COLOR_BLACK);
 		init_pair(12, COLOR_BLUE, COLOR_WHITE); //selected Index
-
-												//Create Fake Data to similate program
-		CreateFakeData();
 
 		//Show the Login Screen
 		StartScreen_Draw();

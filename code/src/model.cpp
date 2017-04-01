@@ -18,6 +18,11 @@ User Model::findUser(unsigned long long uuid)
 	}
 }
 
+string Model::calculateCurrentChatRoomName()
+{
+	return chat_rooms[local_user.getChatRoomIndex()].getName();
+}
+
 void Model::populateForTesting() //TODO
 {
 	string userNames[] = { "Joe", "Robert", "Rivka", "Ramon", "Stephani", "Jewel", "Isaias", "Murray", "Darell", "Alyce", "Carylon", "Dona", "George", "Doug", "Hannah" };

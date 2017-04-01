@@ -28,6 +28,11 @@ void User::setChatRoomIndex(unsigned long index)
 	chat_room_index = index;
 }
 
+void User::setStatus(OnlineStatus desired_status)
+{
+	online_status = desired_status;
+}
+
 //getters
 string User::getNickName()
 {
@@ -52,4 +57,17 @@ unsigned long User::getChatRoomIndex()
 int User::getColorIndex()
 {
 	return color_index;
+}
+
+string User::timeToString()
+{
+	char* result;
+	int temp_time_seconds = time_online_seconds;
+	int hours = temp_time_seconds / 3600;
+	temp_time_seconds = temp_time_seconds % 3600;
+	int minutes = temp_time_seconds / 60;
+	int seconds = time_online_seconds % 60;
+	sprintf(result, "%2d:%2d:%2d", hours, minutes, seconds);
+	string string_result(result);
+	return string_result;
 }

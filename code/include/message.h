@@ -7,7 +7,8 @@
 class Message
 {
 public:
-	Message();
+	Message(std::string p_author_nick_name, unsigned long long p_author_uuid, unsigned long p_chat_room_index, std::string p_content);
+	Message(std::string p_author_nick_name, unsigned long long p_author_uuid, unsigned long p_chat_room_index, std::string p_content, unsigned long long p_checksum);
 	bool isCorrupted();
 
 	//getters
@@ -16,6 +17,7 @@ public:
 	unsigned long getChatRoomIndex();
 	unsigned long long getChecksum();
 	std::string getAuthorNickName();
+	//TODO: .toStruct for OpenSplice
 
 private:
 	std::string content;
@@ -24,7 +26,7 @@ private:
 	unsigned long long checksum; 
 	std::string author_nick_name;
 
-	unsigned long long calculateChecksum();
+	unsigned long long calculateChecksum(); //TODO: KARTIK
 };
 
 #endif

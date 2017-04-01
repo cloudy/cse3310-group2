@@ -16,6 +16,7 @@ void ChatRoom::changeName(string desired_name)
 
 void ChatRoom::addMessage(Message message)
 {
+	//remove from front if history is full
 	if (message_history.size >= MAX_CHAT_HISTORY)
 	{
 		message_history.pop_front();
@@ -34,4 +35,10 @@ string ChatRoom::getName()
 unsigned long ChatRoom::getChatRoomIndex()
 {
 	return chat_room_index;
+}
+
+//setters
+void ChatRoom::setName(std::string desired_name)
+{
+	chat_room_name = desired_name;
 }
