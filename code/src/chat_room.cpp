@@ -15,6 +15,14 @@ void ChatRoom::changeName(string desired_name)
 	chat_room_name = desired_name;
 }
 
+chatroom ChatRoom::convertToOS()
+{
+	chatroom result;
+	result.chatroom_idx = chat_room_index;
+	strcpy(result.chatroom_name, chat_room_name.c_str());
+	return result;
+}
+
 
 void ChatRoom::addMessage(Message message)
 {
