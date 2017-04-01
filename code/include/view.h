@@ -15,7 +15,6 @@
 namespace GUI_DATA
 {
 	enum Windows { Login = 0, Chatroom = 1, Settings = 2 };
-	int chatroom_menu_index;
 }
 
 using namespace std;

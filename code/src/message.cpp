@@ -15,6 +15,11 @@ bool Message::isCorrupted()
 	return !(calculateChecksum() == checksum);
 }
 
+unsigned long long Message::calculateChecksum()
+{
+	return 0;
+}
+
 //getters
 string Message::getContent()
 {
