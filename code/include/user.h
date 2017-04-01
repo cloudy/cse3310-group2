@@ -3,6 +3,7 @@
 
 #include <string>
 #include "constants.h"
+#include "ddsincludes.h"
 
 enum OnlineStatus { Online, Offline };
 
@@ -18,7 +19,7 @@ public:
 	static void saveUser(); //TODO: KARTIK
 	static unsigned long long generateUUID(); //TODO: KARTIK
 
-	//TODO: .toStruct for OpenSplice
+	user convertToOS();
 
 	//setters
 	void setName(std::string desired_name);

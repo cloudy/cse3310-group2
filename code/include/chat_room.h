@@ -7,6 +7,9 @@
 #include "constants.h"
 #include "message.h"
 #include "user.h"
+#include "ddsincludes.h"
+
+using namespace SuperChat;
 
 class ChatRoom
 {
@@ -16,10 +19,9 @@ public:
 
 	std::deque<Message> message_history; //Using deque because it allows easy push_back, pop_front for history
 
-	//TODO: .toStruct for OpenSplice
-
 	void changeName(std::string desired_name);
 	void addMessage(Message message);
+	chatroom convertToOS();
 
 	//getters
 	std::string getName();

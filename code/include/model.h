@@ -5,6 +5,7 @@
 
 #include "chat_room.h"
 #include "user.h"
+#include "message.h"
 
 class Model
 {
@@ -13,6 +14,11 @@ public:
 
 	ChatRoom chat_rooms[10];
 	std::vector<User> users; //TESTING: can we have our user be first in the vector?
+
+	//vectors that will be accessed in OS loop of outgoing things to be published
+	std::vector<ChatRoom> chat_room_outbox;
+	std::vector<Message> message_outbox;
+
 	//User* local_user; //Reference to our actual user
 
 	void populateForTesting();

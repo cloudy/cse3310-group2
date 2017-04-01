@@ -14,6 +14,15 @@ User::User()
 User::User(std::string p_nick_name, unsigned long long p_uuid, unsigned long p_chat_room_index) :
 	nick_name(p_nick_name), uuid(p_uuid), chat_room_index(p_chat_room_index), online_status(Online), time_online_seconds(0) {} //by default, a new user will be online and their duration is 0 seconds
 
+user User::convertToOS()
+{
+	user result;
+	result.nick = nick_name.c_str();
+    result.uuid = uuid;
+    result.chatroom_idx = chat_room_index;
+    return result;
+}
+
 //setters
 void User::setName(string desired_name)
 {
