@@ -4,7 +4,8 @@ using namespace std;
 
 Model::Model()
 {
-	for (int i = 0; i < NUM_CHATROOMS; i++)
+	chat_rooms[0] = ChatRoom(0, "public");
+	for (int i = 1; i < NUM_CHATROOMS; i++)
 	{
 		string name = "Chatroom #" + to_string(i);
 		chat_rooms[i] = ChatRoom(i, name);

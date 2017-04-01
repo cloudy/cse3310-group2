@@ -34,7 +34,6 @@ public:
 	unsigned long long getUUID();
 	OnlineStatus getStatus();
 	unsigned long getChatRoomIndex();
-	int getColorIndex();
 
 	std::string timeToString();
 
