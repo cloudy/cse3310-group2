@@ -164,7 +164,7 @@ public:
 				wprintw(window, "%-8s\t\t\t", "Online");
 				wattroff(window, COLOR_PAIR(2));
 				//Print ChatroomName and Time Online
-				wprintw(window, "%-10s\t\t\t%s", chat_building.chat_rooms[temp_user.getChatRoomIndex()].getName().c_str(), temp_user.timeToString()); //CHANGE: access through model and added time functionality
+				wprintw(window, "%-10s\t\t\t%s", chat_building.chat_rooms[temp_user.getChatRoomIndex()].getName().c_str(), temp_user.timeToString().c_str()); //CHANGE: access through model and added time functionality
 			}
 			else
 			{

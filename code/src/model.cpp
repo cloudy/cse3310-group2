@@ -51,6 +51,7 @@ void Model::populateForTesting() //TODO
 	for (int i = 0; i < 15; i++)
 	{
 		users.push_back(User(user_names[i], uuids[i], chat_room_indexes[i]));
+		users[i].time_online_seconds = i * 37;
 	}
 
 	//Create Fake Chat Messages
