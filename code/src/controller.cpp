@@ -31,7 +31,7 @@ void Controller::openSpliceLoop()
 {
 	while (true)
 	{
-		printf("opensplice looped\n");
+		//printf("opensplice looped\n");
 		this_thread::sleep_for(chrono::milliseconds(2500));
 	}
 }
