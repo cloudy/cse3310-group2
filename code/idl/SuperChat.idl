@@ -5,7 +5,7 @@ module SuperChat
 
    // Revision History:
    //     Created 3/23/2017
-
+   //     fixed spelling, added pragme keylist  3/25/2017
 
 
    const unsigned long MESSAGE_SIZE_MAX = 144;
@@ -54,5 +54,6 @@ module SuperChat
       unsigned long chatroom_idx;
       // an integer representing the checkroom index.
    };
+#pragma keylist user
 
 };
