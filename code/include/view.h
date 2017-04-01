@@ -461,6 +461,7 @@ public:
 						//Send the message //CHANGE: use message constructor and send through model
 						Message newMessage = Message(chat_building.users[0], user_Message);
 						chat_building.chat_rooms[chat_building.users[0].getChatRoomIndex()].addMessage(newMessage);
+						//TODO:add message to outbox
 						user_Message = "";
 
 						//Redraw the Chatmessage History
@@ -531,7 +532,7 @@ public:
 	}
 
 	//DISCUSSION: IMPORTANT: make sure logic is right here. 1) in here, when enter is pushed, load user is called, if file doesnt exist, 
-	// generate uuid 3) if file exists, use exisitng uuid 4) push new User onto users with this info, set local_user to point to this, set logged_in to true
+	// generate uuid 3) if file exists, use exisitng uuid 4) push new User onto users with this info, set logged_in to true
 	// need to keep bool loggedin in model so we don't publish user heartbeat with default info
 	void StartScreen_Draw() 
 	{

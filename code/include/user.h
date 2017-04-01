@@ -17,9 +17,10 @@ public:
 	User();
 	User(std::string p_nick_name, unsigned long long p_uuid, unsigned long p_chat_room_index);
 
-	static User loadUser(); //TODO: KARTIK, if file doesn't exist throw userfiledoesnotexist exception that will be cuaght
-	static void saveUser(); //TODO: KARTIK
+	static User loadUser(std::string desired_name); //TODO: KARTIK, if file doesn't exist throw userfiledoesnotexist exception that will be cuaght 
 	static unsigned long long generateUUID(); //TODO: KARTIK
+
+	void saveUser(); //TODO: KARTIK
 
 	user convertToOS();
 
@@ -42,7 +43,6 @@ private:
 	unsigned long long uuid;
 	OnlineStatus online_status;
 	unsigned long chat_room_index;
-	int color_index; //DISCUSSION: is this used?
 
 	int time_online_seconds; //TODO: DISCUSSION: logic for incrementing this. do we do ++ for every loop, +2.5 or +5 for each heartbeat
 };

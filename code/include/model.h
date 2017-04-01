@@ -19,8 +19,6 @@ public:
 	std::vector<ChatRoom> chat_room_outbox;
 	std::vector<Message> message_outbox;
 
-	//User* local_user; //Reference to our actual user
-
 	void populateForTesting();
 	bool isUserNew(unsigned long long uuid); //TODO: logic for checking this when get heartbeat, if new, add to users.
 
