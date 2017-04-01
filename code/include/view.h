@@ -25,7 +25,7 @@ class View //CHANGE: Basically moved everything into a class. Made it easier to 
 private:
 	Model& chat_building;
 public:
-	CHANGE: Constructor; basically gives you reference to the model that controller is using so any changes you make to it here will be reflected in the model used by controller class.
+	//CHANGE: Constructor; basically gives you reference to the model that controller is using so any changes you make to it here will be reflected in the model used by controller class.
 	View(Model& parameter_chat_building) : chat_building(parameter_chat_building), logged_in(false) {}; //this assigns model in this class to the model in controller when an instance of this class is made in controller.
 	bool logged_in;
 
@@ -580,11 +580,32 @@ public:
 	//- - - - - - - - - - - FAKE DATA CREATION - - - - - - - - - - - //CHANGE: moved to populateForTesting in model
 
 	//- - - - - - - - - - - MAIN - - - - - - - - - - -
-	void StartGUI()
-	{
-		int i = 0;
-		printf("Address of model in view is %p\n", &chat_building);
-		chat_building.users[0].setChatRoomIndex(i);
+void StartGUI()
+{
+	//initialize ncurses
+	initscr();
+	start_color();
+    cbreak();
+    keypad(stdscr, TRUE);
+    noecho();
+
+    //Create the Color Pairs - Global Throughout Program
+    init_pair(1, COLOR_BLACK, COLOR_WHITE);	 //Inverse
+	init_pair(2, COLOR_GREEN, COLOR_BLACK); //Online
+	init_pair(3, COLOR_RED, COLOR_BLACK);   //Offline
+	init_pair(4, COLOR_WHITE, COLOR_BLUE);	//Textbox
+	init_pair(5, COLOR_WHITE, COLOR_BLACK); //Normal
+	init_pair(7, COLOR_WHITE, COLOR_YELLOW); //Element of Interest
+	init_pair(8, COLOR_YELLOW, COLOR_BLACK);
+	init_pair(9, COLOR_BLUE, COLOR_BLACK);
+	init_pair(10, COLOR_MAGENTA,COLOR_BLACK);
+	init_pair(11, COLOR_CYAN, COLOR_BLACK);
+	init_pair(12, COLOR_BLUE, COLOR_WHITE); //selected Index
+
+    //Show the Login Screen
+	StartScreen_Draw();
+
+	endwin();
 	}
 };
 //

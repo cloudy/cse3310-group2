@@ -3,8 +3,8 @@
 #include <thread>
 #include <chrono>
 
-#include "controller.h"
 #include "model.h"
+#include "view.h"
 
 Model chat_building;
 View ncurses(chat_building);
