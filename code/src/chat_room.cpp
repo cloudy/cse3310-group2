@@ -19,7 +19,7 @@ chatroom ChatRoom::convertToOS()
 {
 	chatroom result;
 	result.chatroom_idx = chat_room_index;
-	result.chatroom_name = chat_room_name.c_str();
+	strcpy(result.chatroom_name, chat_room_name.c_str());
 	return result;
 }
 

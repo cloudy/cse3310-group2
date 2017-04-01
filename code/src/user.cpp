@@ -17,7 +17,7 @@ User::User(std::string p_nick_name, unsigned long long p_uuid, unsigned long p_c
 user User::convertToOS()
 {
 	user result;
-	result.nick = nick_name.c_str();
+	strcpy(result.nick, nick_name.c_str());
     result.uuid = uuid;
     result.chatroom_idx = chat_room_index;
     return result;

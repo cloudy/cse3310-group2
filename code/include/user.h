@@ -5,6 +5,8 @@
 #include "constants.h"
 #include "ddsincludes.h"
 
+using namespace SuperChat;
+
 enum OnlineStatus { Online, Offline };
 
 class UserFileDoesNotExist {};

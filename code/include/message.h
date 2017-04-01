@@ -7,6 +7,8 @@
 #include "user.h"
 #include "ddsincludes.h"
 
+using namespace SuperChat;
+
 class Message
 {
 public:

@@ -13,7 +13,7 @@ Message::Message(std::string p_author_nick_name, unsigned long long p_author_uui
 message Message::convertToOS()
 {
 	message result;
-	result.message = content.c_str();
+	strcpy(result.message, content.c_str());
 	result.uuid = author_uuid;
 	result.cksum = checksum;
 	result.chatroom_idx  = chat_room_index;
