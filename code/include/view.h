@@ -393,7 +393,7 @@ public:
 		delwin(window);
 	}
 
-	int ChatMessage_Draw(int chatroom_index)
+	int ChatMessage_Draw(unsigned long chatroom_index)
 	{
 		WINDOW *mainWin = newwin(LINES, COLS, 0, 0);
 
@@ -541,7 +541,7 @@ public:
 
 		string user_nick;
 		int input_char;
-		int chat_room_index;
+		unsigned long chat_room_index; //change: tet:
 
 		user_nick = "";
 		chat_room_index = 0;

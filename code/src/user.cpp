@@ -29,7 +29,7 @@ void User::setName(string desired_name)
 
 	catch (const std::exception& e)
 	{
-		printf(e.what());
+		//printf(e.what());
 	}
 }
 
@@ -47,7 +47,7 @@ void User::setChatRoomIndex(unsigned long index)
 
 	catch (const std::exception& e)
 	{
-		printf(e.what());
+		//printf(e.what());
 	}
 }
 
