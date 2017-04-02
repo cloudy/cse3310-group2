@@ -21,7 +21,7 @@ public:
 	std::vector<ChatRoom> chat_room_outbox;
 	std::vector<Message> message_outbox;
 
-	void populateForTesting();
+	void populateForTesting(int selected_user);
 	bool isUserNew(unsigned long long uuid); //TODO: logic for checking this when get heartbeat, if new, add to users.
 
 	void updateUsers(std::vector<SuperChat::user> p_users);

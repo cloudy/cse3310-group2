@@ -19,7 +19,9 @@ void openSpliceLoop();
 
 int main(int argc, char* argv[])
 {
-	chat_building.populateForTesting();
+	int selection = (argc < 2) ? -1 : stoi(string(argv[1]));
+
+	chat_building.populateForTesting(selection);
 	run();
 	return 0;
 }
