@@ -14,7 +14,7 @@
 //Global Data
 namespace GUI_DATA
 {
-	enum Windows { Login = 0, Chatroom = 1, Settings = 2 };
+	enum class Window { Login, Chatroom, Settings };
 }
 
 using namespace std;
@@ -26,8 +26,9 @@ private:
 	Model& chat_building;
 public:
 	//CHANGE: Constructor; basically gives you reference to the model that controller is using so any changes you make to it here will be reflected in the model used by controller class.
-	View(Model& parameter_chat_building) : chat_building(parameter_chat_building), logged_in(false) {}; //this assigns model in this class to the model in controller when an instance of this class is made in controller.
-	bool logged_in;
+	View(Model& parameter_chat_building) : chat_building(parameter_chat_building), current_window(Window::Login) {}; //this assigns model in this class to the model in controller when an instance of this class is made in controller.
+
+	Window current_window;
 
 	//- - - - - - - - - - - CALCULATION FUNCTIONS - - - - - - - - - - -
 	WINDOW* MakeWindow(int Height, int Width, int Yposition, int Xposition, string Title)
@@ -221,10 +222,12 @@ public:
 			}
 			else if (window_char == Cancel)
 			{
+				current_window = Window::Chatroom;
 				break;
 			}
 			else if (window_char == SaveAndReturn) //CHANGE: changed logic so we don't send chatroom info to other computers if name hasn't changed
 			{
+				current_window = Window::Chatroom;
 				//update username even if it didnt change because it isn't too slower than checking. don't publish manually since it will be included in heartbeat
 				if (!new_user_nick.empty())
 					chat_building.users[0].setName(new_user_nick); //CHANGE: access through model
@@ -483,6 +486,7 @@ public:
 			//Go to Settings Window
 			else if (window_char == SettingsFKey)
 			{
+				current_window = Window::Settings;
 				Settings_Draw();
 				return chat_building.users[0].getChatRoomIndex();
 			}
@@ -490,6 +494,8 @@ public:
 			//Go to the Logout Window
 			else if (window_char == LogoutFKey)
 			{
+				current_window = Window::Login;
+				chat_building.logged_in = false;
 				return -1;
 			}
 
@@ -555,6 +561,8 @@ public:
 
 			if (input_char == 10) // enter key
 			{
+				chat_building.logged_in = true;
+				current_window = Window::Chatroom;
 				do
 				{
 					//Send the user to the public chatroom
@@ -580,13 +588,17 @@ public:
 	//- - - - - - - - - - - MAIN - - - - - - - - - - -
 	void RefreshGUI()
 	{
+		if(current_window == Window::Settings)
+		{
 		Settings_AllUsers();
+		}
 
+		else if(current_window == Window::Chatroom)
+		{
 		ChatMessage_ChatHistory();
 
 		ChatMessage_Users();
-
-		//ChatMessage_Chatrooms(index);
+		}
 	}
 
 	void StartGUI()
