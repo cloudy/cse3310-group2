@@ -550,6 +550,7 @@ public:
 		input_char = getch();
 		while ((input_char > 32 && input_char < 128 && input_char != ExitFKey) || input_char == 10)
 		{
+			StartScreen_TopBorder();
 			StartScreen_Username(user_nick.c_str());
 
 			if (input_char == 10) // enter key
@@ -563,6 +564,7 @@ public:
 						chat_room_index = 0; // public
 					}
 				} while (chat_room_index != -1);
+				StartScreen_TopBorder();
 				StartScreen_Username("");
 			}
 			else if (user_nick.size() < MAX_USER_NICK_SIZE)
