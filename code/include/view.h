@@ -19,7 +19,6 @@ namespace GUI_DATA
 
 using namespace std;
 using namespace GUI_DATA;
-int index = 0;
 
 class View //CHANGE: Basically moved everything into a class. Made it easier to access model as an common attribute rather than passing reference between each function. 
 {
