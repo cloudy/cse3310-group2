@@ -52,35 +52,27 @@ public:
 		return returnWindow;
 	}
 
-	void DeleteWindows(vector<WINDOW*> & windows)
-	{
-		//Clear all of the windows
-		for (int i = 0; i < windows.size(); i++)
-			delwin(windows[i]);
-	}
-
 	//- - - - - - - - - - - SETTINGS WINDOW - - - - - - - - - - -
 
-	WINDOW* Settings_TopBar()
+	void Settings_TopBar()
 	{
 		//Make the window
 		WINDOW *window = MakeWindow(LINES, COLS, 0, 0, "");
 
 		//Print the text inside top bar window
-		mvwprintw(window, 1, 1, "F4 - Cancel\t\tF5 - Save and Return\t\tF6 - Change Username\t\tF7 - Change Chatroom Name");
+		mvwprintw(window, 1, 1, "ENTER - Save and Return\t\tF4 - Change User Nick\t\tF5 - Change Chatroom Name\t\tF6 - Cancel and Return");
 
 		//Refresh the Window
 		wrefresh(window);
 		delwin(window);
-		return window;
 	}
 
-	WINDOW* Settings_ChangeUserName(string new_nick)
+	void Settings_ChangeUserName(string new_nick)
 	{
 		//Make the window
 		int window_width = COLS / 2;
 
-		WINDOW *window = MakeWindow(10, window_width - 1, 4, 1, "Change UserName");
+		WINDOW *window = MakeWindow(10, window_width - 1, 4, 1, "Change User Nick");
 
 		//Print Columns "Current UserName" and "New Username"
 		wattron(window, A_BOLD);
@@ -105,10 +97,9 @@ public:
 		//Refresh the Window
 		wrefresh(window);
 		delwin(window);
-		return window; //DISCUSSION: Why delete the window and then return it?
 	}
 
-	WINDOW* Settings_ChangeChatroomName(string new_chatroom_name)
+	void Settings_ChangeChatroomName(string new_chatroom_name)
 	{
 		//Make the window
 		int window_width = COLS / 2;
@@ -138,10 +129,9 @@ public:
 		//Refresh the Window
 		wrefresh(window);
 		delwin(window);
-		return window;
 	}
 
-	WINDOW* Settings_AllUsers()
+	void Settings_AllUsers()
 	{
 		//Make the window
 		WINDOW *window = MakeWindow(20, COLS - 2, 14, 1, "All Users");
@@ -155,7 +145,7 @@ public:
 		for (int i = 0; i < chat_building.users.size(); i++) //CHANGE: access through model
 		{
 			User temp_user = chat_building.users[i];  //CHANGE: access through model
-			//Print User Name
+													  //Print User Name
 			mvwprintw(window, 3 + i, 1, "%-8s\t\t\t", temp_user.getNickName().c_str());  //CHANGE: access through model
 			if (temp_user.getStatus() == Online)
 			{
@@ -164,7 +154,7 @@ public:
 				wprintw(window, "%-8s\t\t\t", "Online");
 				wattroff(window, COLOR_PAIR(2));
 				//Print ChatroomName and Time Online
-				wprintw(window, "%-10s\t\t\t%s", chat_building.chat_rooms[temp_user.getChatRoomIndex()].getName().c_str(), temp_user.timeToString()); //CHANGE: access through model and added time functionality
+				wprintw(window, "%-10s\t\t\t%s", chat_building.chat_rooms[temp_user.getChatRoomIndex()].getName().c_str(), temp_user.timeToString().c_str()); //CHANGE: access through model and added time functionality
 			}
 			else
 			{
@@ -180,7 +170,6 @@ public:
 		//Refresh the Window
 		wrefresh(window);
 		delwin(window);
-		return window;
 	}
 
 	void Settings_Draw()
@@ -193,76 +182,88 @@ public:
 		Settings_ChangeChatroomName("New Chatroom Name");
 		Settings_AllUsers();
 
+		int SaveAndReturn = 10; //Enter key
+		int ChangeUserNickFKey = KEY_F(4);
+		int ChangeChatroomNameFKey = KEY_F(5);
+		int Cancel = KEY_F(6); 
+
 		int window_char, input;
 		input = getch();
 		while (window_char = input)
 		{
 			//Change the User's Name
-			if (window_char == KEY_F(6))
+			if (window_char == ChangeUserNickFKey)
 			{
 				new_user_nick = "";
 				Settings_ChangeUserName(new_user_nick);
 
-				do
+				input = getch();
+				while ((input > 31 && input < 127) && new_user_nick.size() < MAX_USER_NICK_SIZE)
 				{
-					input = getch();
 					new_user_nick += input;
 					Settings_ChangeUserName(new_user_nick);
-
-				} while ((input > 32 && input < 127) && new_user_nick.size() < MAX_USER_NICK_SIZE);
+					input = getch();
+				}
 			}
 			//Change the Chatroom Name
-			else if (window_char == KEY_F(7))
+			else if (window_char == ChangeChatroomNameFKey)
 			{
 				new_chatroom_name = "";
 				Settings_ChangeChatroomName(new_chatroom_name);
 
-				do
+				input = getch();
+				while ((input > 31 && input < 127) && new_chatroom_name.size() < MAX_CHATROOM_NAME_SIZE)
 				{
-					input = getch();
 					new_chatroom_name += input;
 					Settings_ChangeChatroomName(new_chatroom_name);
-
-				} while ((input > 32 && input < 127) && new_chatroom_name.size() < MAX_CHATROOM_NAME_SIZE);
+					input = getch();
+				}
 			}
-			else if (window_char == KEY_F(4))
+			else if (window_char == Cancel)
 			{
 				break;
 			}
-			else if (window_char == KEY_F(5)) //CHANGE: changed logic so we don't send chatroom info to other computers if name hasn't changed
+			else if (window_char == SaveAndReturn) //CHANGE: changed logic so we don't send chatroom info to other computers if name hasn't changed
 			{
 				//update username even if it didnt change because it isn't too slower than checking. don't publish manually since it will be included in heartbeat
-				chat_building.users[0].setName(new_user_nick); //CHANGE: access through model
+				if (!new_user_nick.empty())
+					chat_building.users[0].setName(new_user_nick); //CHANGE: access through model
 
-				ChatRoom& curent_chat_room = chat_building.chat_rooms[chat_building.users[0].getChatRoomIndex()];
+				ChatRoom& current_chat_room = chat_building.chat_rooms[chat_building.users[0].getChatRoomIndex()];
 				//update and publish chat room name if user actually changed chat room name
-				if (curent_chat_room.getName() != new_chatroom_name) 
+				if (current_chat_room.getName() != new_chatroom_name)
 				{
-					curent_chat_room.setName(new_chatroom_name);
-					//TODO: OPENSPLICE: add chat_room to outbox
+					//Check if the Chatroom is not Public, if it is not then you can rename it
+					if (current_chat_room.getChatRoomIndex() != 0)
+					{
+						current_chat_room.setName(new_chatroom_name);
+						chat_building.chat_room_outbox.push_back(current_chat_room);
+					}
 				}
 				break;
 			}
+			else
+				input = getch();
 		}
 	}
 
 	//- - - - - - - - - - - CHAT MESSAGE WINDOW - - - - - - - - - - -
 
-	WINDOW* ChatMessage_TopBar()
+	void ChatMessage_TopBar()
 	{
 		//Make the window
 		WINDOW *window = MakeWindow(LINES, COLS, 0, 0, "");
 
 
 		//Print the text inside top bar window
-		mvwprintw(window, 1, 1, "F4 - Chatrooms Menu \t\t F5 - Send Message \t\t F6 - Settings \t\t F7 - Logout");
+		mvwprintw(window, 1, 1, "Enter to Send Message \t\t F4 - Chatrooms Menu \t\t F6 - Settings \t\t F7 - Logout");
 
 		//Refresh the Window
 		wrefresh(window);
 		delwin(window);
 	}
 
-	WINDOW* ChatMessage_Users()
+	void ChatMessage_Users()
 	{
 		//Create the Window
 		int userHeight = 21, userWidth = 30;
@@ -277,21 +278,9 @@ public:
 		vector<User> usersInSameChatroom = chat_building.getUsersInChatRoom(chat_building.users[0].getChatRoomIndex()); //CHANGE: moved functionality into model
 		for (int i = 0; i < usersInSameChatroom.size(); i++)
 		{
-			//Print the User's Name
+			//Print the User's Name and time in chatroom
 			mvwprintw(window, 2 + i, 2, usersInSameChatroom[i].getNickName().c_str()); //CHANGE: .name to .getNickName()
-			if (usersInSameChatroom[i].getStatus() == Online) //CHANGE: .Status to .getStatus()
-			{
-				//If the user is online, print a green word
-				wattron(window, COLOR_PAIR(2));
-				mvwprintw(window, 2 + i, 20, "Online");
-				wattroff(window, COLOR_PAIR(2));
-			}
-			else
-			{
-				wattron(window, COLOR_PAIR(3));
-				mvwprintw(window, 2 + i, 20, "Offline");
-				wattroff(window, COLOR_PAIR(3));
-			}
+			mvwprintw(window, 2 + i, 20, usersInSameChatroom[i].timeToString().c_str());
 		}
 
 		//Refresh the Window
@@ -299,17 +288,17 @@ public:
 		delwin(window);
 	}
 
-	WINDOW* ChatMessage_Chatrooms(int SelectedIndex)
+	void ChatMessage_Chatrooms(int SelectedIndex)
 	{
 		int chatHeight = 16, chatWidth = 30;
-		string roomNames[10]; 
+		string roomNames[10];
 		int roomStats[10];
 
 		//Create the Window
 		WINDOW *window = MakeWindow(chatHeight, chatWidth, 3, 1, "Chatrooms");
 
 		//Display the Chatroom Footer
-		mvwprintw(window, chatHeight - 2, chatWidth / 2 - 12, "F5 to Switch to Chatroom");
+		mvwprintw(window, chatHeight - 2, chatWidth / 2 - 14, "'Enter' to Switch Classrooms");
 
 		//CHANGE: Moved functionality for getting info into model
 		for (int i = 0; i < 10; i++)
@@ -347,19 +336,17 @@ public:
 		delwin(window);
 	}
 
-	WINDOW* ChatMessage_ChatHistory()
+	void ChatMessage_ChatHistory()
 	{
 		int winWidth = COLS - 32;
 		int winHeight = LINES - 13;
+
 		//Initialize the Window
 		WINDOW *window = MakeWindow(winHeight, winWidth, 3, 31, chat_building.calculateCurrentChatRoomName()); //CHANGE: 
 
 		ChatRoom& current_chat_room = chat_building.chat_rooms[chat_building.users[0].getChatRoomIndex()]; //CHANGE:
-		//delete a message if necessary to keep it at a max of MAX_CHAT_HISTORY //CHANGE: don't need to worry about size going over. I handle this when using addMessage().
-		//if (curent_chat_room.message_history.size() > MAX_CHAT_HISTORY)
-			//ChatMessages.erase(ChatMessages.begin());
 
-		//Print the Chat History
+																										   //Print the Chat History
 		for (int i = 0; i < current_chat_room.message_history.size() && i < MAX_CHAT_HISTORY; i++)
 		{
 			mvwprintw(window, 2 * i + 2, 2, "%s:", current_chat_room.message_history[i].getAuthorNickName().c_str()); //CHANGE: access through model
@@ -371,7 +358,7 @@ public:
 		delwin(window);
 	}
 
-	WINDOW* ChatMessage_SendMessage(string Message)
+	void ChatMessage_SendMessage(string Message)
 	{
 		int winHeight = 9;
 		int winWidth = COLS - 32;
@@ -394,12 +381,11 @@ public:
 
 	int ChatMessage_Draw(unsigned long chatroom_index)
 	{
+		//Paint the Background Window
 		WINDOW *mainWin = newwin(LINES, COLS, 0, 0);
 
 		//Assign the user to the passed chatroomIndex
 		chat_building.users[0].setChatRoomIndex(chatroom_index); //CHANGE: access through model
-		//Do Lookup below for chatroomName
-		//currentUser.ChatroomName = FakeChatroomNames[chatroom_index]; //CHANGE: don't need this?
 
 		ChatMessage_TopBar();
 		ChatMessage_Users();
@@ -409,10 +395,16 @@ public:
 
 		//Navigation
 		int window_char, sub_char;
-		sub_char = getch();
+		int ChangeChatroomFKey = KEY_F(4);
+		int SendMessageFKey = KEY_F(5);
+		int SettingsFKey = KEY_F(6);
+		int LogoutFKey = KEY_F(7);
+
+		sub_char = SendMessageFKey;
 		while (window_char = sub_char)
 		{
-			if (window_char == KEY_F(4))
+			//Change the Chatroom
+			if (window_char == ChangeChatroomFKey)
 			{
 				int index = 0;
 
@@ -425,16 +417,24 @@ public:
 					sub_char = getch();
 					switch (sub_char)
 					{
+						//Up Key Pressed
 					case KEY_UP:
 						ChatMessage_Chatrooms(index >= 1 ? --index : 0);
 						break;
+
+						//Down key Pressed
 					case KEY_DOWN:
 						ChatMessage_Chatrooms(index == NUM_CHATROOMS - 1 ? NUM_CHATROOMS - 1 : ++index);
 						break;
-					case KEY_F(5):
+
+						//Enter Presed
+					case 10:
 						//Change user to this index of chatroom
 						return index;
+
+						//If the user types something unexpected, then take them to the 'Send a Message' window
 					default:
+						sub_char = SendMessageFKey;
 						break;
 					}
 
@@ -442,7 +442,7 @@ public:
 			}
 
 			//Go to the 'Send Message' Window
-			else if (window_char == KEY_F(5))
+			else if (window_char == SendMessageFKey)
 			{
 				//Clear the screen again
 				string spaces, user_Message;
@@ -461,7 +461,6 @@ public:
 						//Send the message //CHANGE: use message constructor and send through model
 						Message newMessage = Message(chat_building.users[0], user_Message);
 						chat_building.chat_rooms[chat_building.users[0].getChatRoomIndex()].addMessage(newMessage);
-						//TODO:add message to outbox
 						user_Message = "";
 
 						//Redraw the Chatmessage History
@@ -482,38 +481,40 @@ public:
 			}
 
 			//Go to Settings Window
-			else if (window_char == KEY_F(6))
+			else if (window_char == SettingsFKey)
 			{
 				Settings_Draw();
-				break;
+				return chat_building.users[0].getChatRoomIndex();
 			}
 
 			//Go to the Logout Window
-			else if (window_char == KEY_F(7))
+			else if (window_char == LogoutFKey)
 			{
-				//Show the Login Screen
 				return -1;
-				//StartScreen_Draw();
 			}
+
+			//Get a new key from the user
+			else
+				sub_char = getch();
 		}
 	}
 
 	//- - - - - - - - - - - START WINDOW - - - - - - - - - - -
 
-	WINDOW* StartScreen_TopBorder()
+	void StartScreen_TopBorder()
 	{
 		//Make the window
 		WINDOW* window = MakeWindow(3, COLS, 0, 0, "");
 
 		//Print the text inside the window
-		mvwprintw(window, 1, 1, "F4 - Set User Nick \t Enter Key - Login \t F6 - EXIT ");
+		mvwprintw(window, 1, 1, "Enter Key - Login \t F6 - EXIT ");
 
 		//Refresh the window
 		wrefresh(window);
 		delwin(window);
 	}
 
-	WINDOW* StartScreen_Username(string userName)
+	void StartScreen_Username(string userName)
 	{
 		//Make the window
 		WINDOW* window = MakeWindow(LINES - 3, COLS, 3, 0, "Username");
@@ -532,82 +533,90 @@ public:
 	}
 
 	//DISCUSSION: IMPORTANT: make sure logic is right here. 1) in here, when enter is pushed, load user is called, if file doesnt exist, 
-	// generate uuid 3) if file exists, use exisitng uuid 4) push new User onto users with this info, set logged_in to true
+	// generate uuid 3) if file exists, use exisitng uuid 4) push new User onto users with this info, set local_user to point to this, set logged_in to true
 	// need to keep bool loggedin in model so we don't publish user heartbeat with default info
-	void StartScreen_Draw() 
+	void StartScreen_Draw()
 	{
-		StartScreen_TopBorder();
-		StartScreen_Username("usernick");
-
-		string user_nick;
+		string user_nick = "";
 		int input_char;
-		unsigned long chat_room_index; //change: tet:
+		unsigned long chat_room_index = 0; //change: tet:
 
-		user_nick = "";
-		chat_room_index = 0;
+		StartScreen_TopBorder();
+		StartScreen_Username(user_nick.c_str());
 
-		do
+		int ExitFKey = KEY_F(6);
+
+		//Draw the Login Window
+		input_char = getch();
+		while ((input_char > 32 && input_char < 128 && input_char != ExitFKey) || input_char == 10)
 		{
-			input_char = getch();
-			if (input_char == KEY_F(4))
-			{
-				do // login 
-				{
-					StartScreen_TopBorder();
-					StartScreen_Username(user_nick.c_str());
-					input_char = getch();
-					if (input_char == 10) // enter key
-					{
-						do
-						{
-							chat_room_index = ChatMessage_Draw(chat_room_index);
-							if (chat_room_index<-1 && chat_room_index>9)
-							{
-								chat_room_index = 0; // public
-							}
-						} while (chat_room_index != -1);
-						StartScreen_Username("usernick");
-					}
-					else
-					{
-						user_nick += input_char;
-					}
-				} while ((input_char>32 && input_char<128) || input_char == 10);
-			}
-		} while (input_char != KEY_F(6));
+			StartScreen_TopBorder();
+			StartScreen_Username(user_nick.c_str());
 
+			if (input_char == 10) // enter key
+			{
+				do
+				{
+					//Send the user to the public chatroom
+					chat_room_index = ChatMessage_Draw(chat_room_index);
+					if (chat_room_index<-1 && chat_room_index>9)
+					{
+						chat_room_index = 0; // public
+					}
+				} while (chat_room_index != -1);
+				StartScreen_TopBorder();
+				StartScreen_Username("");
+			}
+			else if (user_nick.size() < MAX_USER_NICK_SIZE)
+			{
+				user_nick += input_char;
+			}
+
+			input_char = getch();
+		}
 	}
 
-	//- - - - - - - - - - - FAKE DATA CREATION - - - - - - - - - - - //CHANGE: moved to populateForTesting in model
-
+	
 	//- - - - - - - - - - - MAIN - - - - - - - - - - -
-void StartGUI()
-{
-	//initialize ncurses
-	initscr();
-	start_color();
-    cbreak();
-    keypad(stdscr, TRUE);
-    noecho();
+	void RefreshGUI()
+	{
+		Settings_AllUsers();
 
-    //Create the Color Pairs - Global Throughout Program
-    init_pair(1, COLOR_BLACK, COLOR_WHITE);	 //Inverse
-	init_pair(2, COLOR_GREEN, COLOR_BLACK); //Online
-	init_pair(3, COLOR_RED, COLOR_BLACK);   //Offline
-	init_pair(4, COLOR_WHITE, COLOR_BLUE);	//Textbox
-	init_pair(5, COLOR_WHITE, COLOR_BLACK); //Normal
-	init_pair(7, COLOR_WHITE, COLOR_YELLOW); //Element of Interest
-	init_pair(8, COLOR_YELLOW, COLOR_BLACK);
-	init_pair(9, COLOR_BLUE, COLOR_BLACK);
-	init_pair(10, COLOR_MAGENTA,COLOR_BLACK);
-	init_pair(11, COLOR_CYAN, COLOR_BLACK);
-	init_pair(12, COLOR_BLUE, COLOR_WHITE); //selected Index
+		ChatMessage_ChatHistory();
 
-    //Show the Login Screen
-	StartScreen_Draw();
+		ChatMessage_Users();
 
-	endwin();
+		//ChatMessage_Chatrooms(index);
+	}
+
+	void StartGUI()
+	{
+		//initialize ncurses
+		initscr();
+		start_color();
+		cbreak();
+		keypad(stdscr, TRUE);
+		noecho();
+
+		//Create the Color Pairs - Global Throughout Program
+		init_pair(1, COLOR_BLACK, COLOR_WHITE);	 //Inverse
+		init_pair(2, COLOR_GREEN, COLOR_BLACK); //Online
+		init_pair(3, COLOR_RED, COLOR_BLACK);   //Offline
+		init_pair(4, COLOR_WHITE, COLOR_BLUE);	//Textbox
+		init_pair(5, COLOR_WHITE, COLOR_BLACK); //Normal
+		init_pair(7, COLOR_WHITE, COLOR_YELLOW); //Element of Interest
+		init_pair(8, COLOR_YELLOW, COLOR_BLACK);
+		init_pair(9, COLOR_BLUE, COLOR_BLACK);
+		init_pair(10, COLOR_MAGENTA, COLOR_BLACK);
+		init_pair(11, COLOR_CYAN, COLOR_BLACK);
+		init_pair(12, COLOR_BLUE, COLOR_WHITE); //selected Index
+
+												//Show the Login Screen
+		StartScreen_Draw();
+
+		endwin();
 	}
 };
+
 //
 #endif

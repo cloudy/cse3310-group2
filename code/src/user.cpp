@@ -94,7 +94,7 @@ string User::timeToString()
 	temp_time_seconds = temp_time_seconds % 3600;
 	int minutes = temp_time_seconds / 60;
 	int seconds = time_online_seconds % 60;
-	sprintf(result, "%2d:%2d:%2d", hours, minutes, seconds);
+	sprintf(result, "%02d:%02d:%02d", hours, minutes, seconds);
 	string string_result(result);
 	return string_result;
 }

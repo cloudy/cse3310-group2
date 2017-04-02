@@ -17,145 +17,85 @@ void run();
 void ncursesLoop();
 void openSpliceLoop();
 
-bool exit_flag = false;
-
-void ctrlc ( int )
-{
-   exit_flag = true;
-}
-
 int main(int argc, char* argv[])
 {
-	chat_building.populateForTesting();
+	int selection = (argc < 2) ? -1 : stoi(string(argv[1]));
+
+	chat_building.populateForTesting(selection);
 	run();
 	return 0;
 }
 
 void run()
 {
-	//printf("Address of model in main before thread is %p\n", &chat_building);
-
 	thread ncurses_thread(ncursesLoop);
-	//thread open_splice_thread(openSpliceLoop);
+	thread open_splice_thread(openSpliceLoop);
 
 	//Added these to avoid crash
 	ncurses_thread.join();
-	//open_splice_thread.join();
+	open_splice_thread.join();
 }
 
 void ncursesLoop()
 {
-	//printf("Address of model in main after thread is %p\n", &chat_building);
 	ncurses.StartGUI();
 }
+
 //dont do OS stuff until View.logged_in is true
 void openSpliceLoop()
 {
 
-	signal ( SIGINT, ctrlc );
-
 	// instantiate classes
-	chatroom_data chatRoom ( (char*) "chatroom" );
-	user_data User ( (char*) "user" );
-	message_data Message ( (char*) "msg" );
-
-	// set up some variables
+	chatroom_data chatroom_IO ( (char*) "chatroom" );
+	user_data user_IO ( (char*) "user" );
+	message_data message_IO ( (char*) "msg" );
 	int seconds = 0;
 
-	// the main loop
-	for (; !exit_flag;)
+	while (true) // TODO: check bool is_running();
 	{
-		// send out each topic according to the rules of superchat
-		// first is chatroom
+		//--------------------OUTGOING--------------------//
+		//if(loggedin)
+		// Send heartbeat every 2 seconds
+		if (seconds % 2 == 0)
 		{
-			if (seconds % 60 == 0)
-			{
-				// once a minute change the chatroom name
-				chatroom messageInstance;
-				messageInstance.chatroom_idx = 1;
-				if ( seconds % 120 )
-				{
-					strncpy ( messageInstance.chatroom_name, "The pleasures", sizeof ( messageInstance.chatroom_name ) );
-				}
-				else
-				{
-					strncpy ( messageInstance.chatroom_name, "The !pleasures", sizeof ( messageInstance.chatroom_name ) );
-				}
-				chatRoom.send ( messageInstance );
-			}
-		}
-		// user topic
-		{
-			user messageInstance;
-			messageInstance.uuid = 123;
-			strncpy ( messageInstance.nick, "Donny", sizeof ( messageInstance.nick ) );
-			messageInstance.chatroom_idx = 0;  // public
-			if (seconds % 2 == 0)
-			{
-				// 2.0 is less than 2.5, so this is still compliant
-				User.send ( messageInstance );
-			}
-		}
-		// message topic
-		{
-			message messageInstance;
-			if (seconds % 15 == 0)
-			{
-				if ( seconds % 30 == 0 )
-				{
-					strncpy ( messageInstance.message, "This is the A message.", sizeof ( messageInstance.message ) );
-				}
-				else
-				{
-					strncpy ( messageInstance.message, "This is the B message.", sizeof ( messageInstance.message ) );
-				}
-				messageInstance.uuid = 123;
-				messageInstance.chatroom_idx = 0;
-				messageInstance.cksum = 0;
-				Message.send ( messageInstance );
-			}
+			user local_user = chat_building.users[0].convertToOS();
+			user_IO.send ( local_user );
 		}
 
-		// handle any input coming in
+		// Send chatroom outbox
+		for (ChatRoom cr : chat_building.chat_room_outbox)
 		{
-			chatroom_list_t  List;
-			chatRoom.recv ( &List );
-			for (unsigned int i = 0; i < List.size (); i++)
-			{
-				std::cout << "recieved new chatroom name " << List[i].chatroom_name <<
-				          " chatroom index " << List[i].chatroom_idx << '\n';
-			}
+			chatroom_IO.send(cr.convertToOS());
 		}
+		chat_building.chat_room_outbox.clear(); // Don't send the same thing from outbox more than once
+
+		// Send message outbox
+		for (Message m : chat_building.message_outbox)
 		{
-			user_list_t  List;
-			User.recv ( &List );
-			for (unsigned int i = 0; i < List.size (); i++)
-			{
-				std::cout << "recieved user " << List[i].nick <<
-				          " chatroom index " << List[i].chatroom_idx << '\n';
-			}
+			message_IO.send(m.convertToOS());
 		}
-		{
-			message_list_t  List;
-			Message.recv ( &List );
-			for (unsigned int i = 0; i < List.size (); i++)
-			{
-				std::cout << "recieved user " << List[i].message <<
-				          " chatroom index " << List[i].chatroom_idx << '\n';
-			}
-		}
+		chat_building.message_outbox.clear(); 
+
+		//--------------------INCOMING--------------------//
+
+		// Receive chatrooms
+		chatroom_list_t  cr_list;
+		chatroom_IO.recv ( &cr_list );
+		chat_building.updateChatRooms(cr_list);
+
+		// Receive users
+		user_list_t  u_list;
+		user_IO.recv ( &u_list );
+		chat_building.updateUsers(u_list);
+
+		// Receive messages
+		message_list_t  m_list;
+		message_IO.recv ( &m_list );
+		chat_building.updateMessages(m_list); // Sends messages to model inbox
+
 		seconds++;
+		//ncurses.RefreshGUI();
 		this_thread::sleep_for(chrono::milliseconds(1000));
 	}
 	std::cout << "normal exit" << '\n';
-
-//	chatroom_data chatRoom ( (char*) "chatroom" );
-//	user_data User ( (char*) "user" );
-//	message_data Message ( (char*) "msg" );
-//
-//	while (true)
-//	{
-//		printf("opensplice looped\n");
-//		this_thread::sleep_for(chrono::milliseconds(1000));
-//	}
 }
