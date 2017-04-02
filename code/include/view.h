@@ -237,7 +237,7 @@ public:
 					if (current_chat_room.getChatRoomIndex() != 0)
 					{
 						current_chat_room.setName(new_chatroom_name);
-						//TODO: OPENSPLICE: add chat_room to outbox
+						chat_building.chat_room_outbox.push_back(current_chat_room);
 					}
 				}
 				break;
@@ -608,7 +608,7 @@ public:
 
 void RefreshGUI()
 {
-
+	
 };
 //
 #endif

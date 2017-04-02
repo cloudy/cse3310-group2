@@ -13,7 +13,7 @@ class Message
 {
 public:
 	Message(User p_user, std::string p_content);
-	Message(std::string p_author_nick_name, unsigned long long p_author_uuid, unsigned long p_chat_room_index, std::string p_content, unsigned long long p_checksum);
+	Message(User p_user, unsigned long p_chat_room_index, std::string p_content, unsigned long long p_checksum);
 	bool isCorrupted();
 
 	message convertToOS();
