@@ -17,8 +17,8 @@ void Model::updateUsers(vector<user> p_users)
 {
 	for(user u : p_users)
 	{
-		User temp_user = User(string(user.nick), user.uuid, user.chatroom_idx);
-		int index = findUserIndex(user.uuid);
+		User temp_user = User(string(u.nick), u.uuid, u.chatroom_idx);
+		int index = findUserIndex(u.uuid);
 		if(index == -1)//if user is new
 		{
 			users.push_back(temp_user);
@@ -47,11 +47,11 @@ void Model::updateMessages(vector<message> p_messages)
 }
 
 //returns index of user in users vector. If not in the vector, returns -1, so caller should push to vector
-User Model::findUserIndex(unsigned long long uuid)
+int Model::findUserIndex(unsigned long long uuid)
 {
 	for(int i = 0; i < users.size(); i++)
 	{
-		if(users[i].getUUID() = uuid)
+		if(users[i].getUUID() == uuid)
 		{
 			return i;
 		}
