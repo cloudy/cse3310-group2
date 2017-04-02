@@ -19,6 +19,7 @@ namespace GUI_DATA
 
 using namespace std;
 using namespace GUI_DATA;
+int index = 0;
 
 class View //CHANGE: Basically moved everything into a class. Made it easier to access model as an common attribute rather than passing reference between each function. 
 {
@@ -60,7 +61,7 @@ public:
 		WINDOW *window = MakeWindow(LINES, COLS, 0, 0, "");
 
 		//Print the text inside top bar window
-		mvwprintw(window, 1, 1, "ENTER - Save and Return\t\tF4 - Change User Nick\t\tF5 - Change Chatroom Name\t\tF7 - Cancel and Return");
+		mvwprintw(window, 1, 1, "ENTER - Save and Return\t\tF4 - Change User Nick\t\tF5 - Change Chatroom Name\t\tF6 - Cancel and Return");
 
 		//Refresh the Window
 		wrefresh(window);
@@ -185,7 +186,7 @@ public:
 		int SaveAndReturn = 10; //Enter key
 		int ChangeUserNickFKey = KEY_F(4);
 		int ChangeChatroomNameFKey = KEY_F(5);
-		int Cancel = KEY_F(4);
+		int Cancel = KEY_F(6); 
 
 		int window_char, input;
 		input = getch();
@@ -256,7 +257,7 @@ public:
 
 
 		//Print the text inside top bar window
-		mvwprintw(window, 1, 1, "F4 - Chatrooms Menu \t\t F5 - Send A Message \t\t F6 - Settings \t\t F7 - Logout");
+		mvwprintw(window, 1, 1, "Enter to Send Message \t\t F4 - Chatrooms Menu \t\t F6 - Settings \t\t F7 - Logout");
 
 		//Refresh the Window
 		wrefresh(window);
@@ -399,8 +400,6 @@ public:
 		int SendMessageFKey = KEY_F(5);
 		int SettingsFKey = KEY_F(6);
 		int LogoutFKey = KEY_F(7);
-
-
 
 		sub_char = SendMessageFKey;
 		while (window_char = sub_char)
@@ -576,7 +575,19 @@ public:
 		}
 	}
 
+	
 	//- - - - - - - - - - - MAIN - - - - - - - - - - -
+	void RefreshGUI()
+	{
+		Settings_AllUsers();
+
+		ChatMessage_ChatHistory();
+
+		ChatMessage_Users();
+
+		//ChatMessage_Chatrooms(index);
+	}
+
 	void StartGUI()
 	{
 		//initialize ncurses
@@ -606,9 +617,5 @@ public:
 	}
 };
 
-void RefreshGUI()
-{
-	
-};
 //
 #endif
