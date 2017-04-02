@@ -18,7 +18,7 @@ public:
 	std::vector<User> users; //TESTING: can we have our user be first in the vector?
 
 	bool logged_in;
-	
+	bool is_running;
 	//vectors that will be accessed in OS loop of outgoing things to be published
 	std::vector<ChatRoom> chat_room_outbox;
 	std::vector<Message> message_outbox;

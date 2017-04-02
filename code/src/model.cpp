@@ -3,7 +3,7 @@
 using namespace std;
 using namespace SuperChat;
 
-Model::Model() : logged_in(false)
+Model::Model() : logged_in(false), is_running(true)
 {
 	chat_rooms[0] = ChatRoom(0, "public");
 	for (int i = 1; i < NUM_CHATROOMS; i++)

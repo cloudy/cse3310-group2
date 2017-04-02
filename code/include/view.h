@@ -626,6 +626,7 @@ public:
 												//Show the Login Screen
 		StartScreen_Draw();
 
+		chat_building.is_running = false;
 		endwin();
 	}
 };

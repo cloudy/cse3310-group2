@@ -51,7 +51,7 @@ void openSpliceLoop()
 	message_data message_IO ( (char*) "msg" );
 	int seconds = 0;
 
-	while (true) // TODO: check bool is_running();
+	while (chat_building.is_running)
 	{
 		//--------------------OUTGOING--------------------//
 		if(chat_building.logged_in)
@@ -95,7 +95,7 @@ void openSpliceLoop()
 			chat_building.updateMessages(m_list); // Sends messages to model inbox
 
 			seconds++;
-			ncurses.RefreshGUI();
+			//ncurses.RefreshGUI();
 			this_thread::sleep_for(chrono::milliseconds(1000));
 		}
 	}
