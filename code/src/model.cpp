@@ -77,7 +77,7 @@ bool Model::isUserNew(unsigned long long uuid)
 	return true;
 }
 
-void Model::populateForTesting() //TODO
+void Model::populateForTesting(int selected_user) //TODO
 {
 	//Create Fake Users
 	string user_names[] = { "Joe", "Robert", "Rivka", "Ramon", "Stephani", "Jewel", "Isaias", "Murray", "Darell", "Alyce", "Carylon", "Dona", "George", "Doug", "Hannah" };
