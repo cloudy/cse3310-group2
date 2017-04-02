@@ -33,6 +33,7 @@ void DDSEntityManager::createTopic(char *topicName)
   checkStatus(status, "DDS::DomainParticipant::get_default_topic_qos");
   reliable_topic_qos.reliability.kind = RELIABLE_RELIABILITY_QOS;
   reliable_topic_qos.durability.kind = TRANSIENT_DURABILITY_QOS;
+  reliable_topic_qos.history.depth = 200;
 
   /* Make the tailored QoS the new default. */
   status = participant->set_default_topic_qos(reliable_topic_qos);

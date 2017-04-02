@@ -8,6 +8,10 @@
 #include <sstream>
 #include <iostream>
 
+#include <boost/uuid/uuid.hpp>            // uuid class
+#include <boost/uuid/uuid_generators.hpp> // generators
+#include <boost/uuid/uuid_io.hpp>         // streaming operators etc.
+
 #include "DDSEntityManager.h"
 #include "ccpp_SuperChat.h"
 
@@ -290,6 +294,14 @@ int main()
   // set up some variables
   int seconds = 0;
 
+  // create the uuid for this user, this session
+ 
+  long long int myUUID;
+  boost::uuids::uuid uuid = boost::uuids::random_generator()();
+  std::cout << uuid << std::endl;
+  // lets go old school, and copy it over
+  memcpy ( &myUUID, &uuid, sizeof (myUUID) );
+
   // the main loop
   for (;!exit_flag;)
   {
@@ -315,9 +327,13 @@ int main()
     // user topic
     {
       user messageInstance;
-      messageInstance.uuid = 123;
+      messageInstance.uuid = myUUID;  
+
+      // note the same name with different uuid's is something
+      // you have to deal with when printing who is online and 
+      // where a message is from.
       strncpy ( messageInstance.nick, "Donny", sizeof ( messageInstance.nick ) );
-      messageInstance.chatroom_idx = 0;  // public
+      messageInstance.chatroom_idx = seconds;  // test data
       if (seconds%2 == 0) 
       {
          // 2.0 is less than 2.5, so this is still compliant
@@ -359,8 +375,9 @@ int main()
       User.recv ( &List );
       for (unsigned int i=0; i<List.size ();i++)
       {
-         std::cout << "recieved user " << List[i].nick <<
-                      " chatroom index " << List[i].chatroom_idx << '\n';
+         std::cout << "recieved user " << std::hex << List[i].uuid 
+                   << std::dec << "  " << List[i].nick 
+                   << " chatroom index " << List[i].chatroom_idx << '\n';
       }
     } 
     {
