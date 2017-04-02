@@ -14,6 +14,15 @@ User::User()
 User::User(std::string p_nick_name, unsigned long long p_uuid, unsigned long p_chat_room_index) :
 	nick_name(p_nick_name), uuid(p_uuid), chat_room_index(p_chat_room_index), online_status(Online), time_online_seconds(0) {} //by default, a new user will be online and their duration is 0 seconds
 
+user User::convertToOS()
+{
+	user result;
+	strcpy(result.nick, nick_name.c_str());
+    result.uuid = uuid;
+    result.chatroom_idx = chat_room_index;
+    return result;
+}
+
 //setters
 void User::setName(string desired_name)
 {
@@ -77,11 +86,6 @@ unsigned long User::getChatRoomIndex()
 	return chat_room_index;
 }
 
-int User::getColorIndex()
-{
-	return color_index;
-}
-
 string User::timeToString()
 {
 	char result[10];
@@ -90,7 +94,7 @@ string User::timeToString()
 	temp_time_seconds = temp_time_seconds % 3600;
 	int minutes = temp_time_seconds / 60;
 	int seconds = time_online_seconds % 60;
-	sprintf(result, "%2d:%2d:%2d", hours, minutes, seconds);
+	sprintf(result, "%02d:%02d:%02d", hours, minutes, seconds);
 	string string_result(result);
 	return string_result;
 }
