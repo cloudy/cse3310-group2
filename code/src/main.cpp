@@ -94,7 +94,7 @@ void openSpliceLoop()
 		chat_building.updateMessages(m_list); // Sends messages to model inbox
 
 		seconds++;
-		//ncurses.RefreshGUI();
+		ncurses.RefreshGUI();
 		this_thread::sleep_for(chrono::milliseconds(1000));
 	}
 	std::cout << "normal exit" << '\n';
