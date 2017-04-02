@@ -590,14 +590,14 @@ public:
 	{
 		if(current_window == Window::Settings)
 		{
-		Settings_AllUsers();
+			Settings_AllUsers();
 		}
 
 		else if(current_window == Window::Chatroom)
 		{
-		ChatMessage_ChatHistory();
+			ChatMessage_ChatHistory();
 
-		ChatMessage_Users();
+			ChatMessage_Users();
 		}
 	}
 

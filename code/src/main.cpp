@@ -94,8 +94,12 @@ void openSpliceLoop()
 			message_IO.recv ( &m_list );
 			chat_building.updateMessages(m_list); // Sends messages to model inbox
 
+			if(seconds % 1 == 0)
+			{
+				ncurses.RefreshGUI();
+			}
+
 			seconds++;
-			//ncurses.RefreshGUI();
 			this_thread::sleep_for(chrono::milliseconds(1000));
 		}
 	}
