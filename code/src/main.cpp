@@ -19,7 +19,7 @@ void openSpliceLoop();
 
 int main(int argc, char* argv[])
 {
-	chat_building.populateForTesting();
+	chat_building.populateForTesting(string(argv[1]).stoi());
 	run();
 	return 0;
 }
