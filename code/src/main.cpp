@@ -112,8 +112,9 @@ void openSpliceLoop()
 			ncurses.RefreshGUI();
 
 			seconds++;
-			this_thread::sleep_for(chrono::milliseconds(1000));
 		}
+
+		this_thread::sleep_for(chrono::milliseconds(1000));
 	}
 	std::cout << "normal exit" << '\n';
 }
