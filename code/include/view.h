@@ -298,7 +298,7 @@ public:
 		WINDOW *window = MakeWindow(chatHeight, chatWidth, 3, 1, "Chatrooms");
 
 		//Display the Chatroom Footer
-		mvwprintw(window, chatHeight - 2, chatWidth / 2 - 14, "'Enter' to Switch Classrooms");
+		mvwprintw(window, chatHeight - 2, chatWidth / 2 - 11, "Enter Switch Chatrooms");
 
 		//CHANGE: Moved functionality for getting info into model
 		for (int i = 0; i < 10; i++)
