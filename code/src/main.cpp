@@ -66,10 +66,9 @@ void openSpliceLoop()
 			//--------------------OUTGOING--------------------//
 			model_mutex.lock();
 			// Send heartbeat every 2 seconds
-			if (seconds % 2 == 0)
+			if (seconds % 10 == 0)
 			{
-				user local_user = chat_building.users[0].convertToOS();
-				user_IO.send ( local_user );
+				user_IO.send ( chat_building.users[0].convertToOS() );
 			}
 			
 			// Send chatroom outbox
