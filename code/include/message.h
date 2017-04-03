@@ -14,9 +14,11 @@ class Message
 public:
 	Message(User p_user, std::string p_content);
 	Message(User p_user, unsigned long p_chat_room_index, std::string p_content, unsigned long long p_checksum);
-	bool isCorrupted();
+	bool isCorrupted(string message);
 
 	message convertToOS();
+
+	unsigned long long calculateChecksum(string message); //TODO: KARTIK
 
 	//getters
 	std::string getContent();
@@ -33,7 +35,7 @@ private:
 	unsigned long long checksum; 
 	std::string author_nick_name;
 
-	unsigned long long calculateChecksum(); //TODO: KARTIK
+	
 };
 
 #endif

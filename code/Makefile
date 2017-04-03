@@ -1,7 +1,7 @@
 CXX= g++ -std=c++11
 CXXFLAGS= -pthread -Wall -Wextra -g
 
-LDFLAGS= -lncurses -lpanel -L${OSPL_HOME}/lib/ -ldcpssacpp -lddskernel
+LDFLAGS= -lncurses -lz -lpanel -L${OSPL_HOME}/lib/ -ldcpssacpp -lddskernel
 INCLUDES= -Iinclude/ -Isrc/ -Ibin/idl -I${OSPL_HOME}/include/dcps/C++/SACPP/
 
 OBJDIR = obj/

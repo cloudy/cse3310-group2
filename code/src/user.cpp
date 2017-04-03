@@ -117,11 +117,11 @@ static user loadUser(std::string desired_name)
 {
 	user found_user;
 	ifstream read_User;
-
+	string found_uuid;
 	try
 	{
 		read_User.open("User_data.txt");
-		found_user.nick = desired_name.c_str();		
+		strcpy(found_user.nick, desired_name.c_str());
 		getline(read_User, found_uuid, '~');
 		std::string::size_type sz = 0;
 		found_user.uuid = std::stoull(found_uuid, &sz, 0);
@@ -130,7 +130,7 @@ static user loadUser(std::string desired_name)
 	}
 	catch (exception& userfiledoesnotexist)
 	{
-		found_user.nick = desired_name.c_str();
+		strcpy(found_user.nick, desired_name.c_str());
 		found_user.uuid = generateUUID();
 		found_user.chatroom_idx = 0;
 		return found_user;

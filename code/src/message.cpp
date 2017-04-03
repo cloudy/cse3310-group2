@@ -1,12 +1,13 @@
 #include "message.h"
 #include <zlib.h>
 #include <string>
+#include <iostream>
 
 using namespace std;
 
 //constructor for messages created locally, we calculate checksum ourself
 Message::Message(User p_user, std::string p_content) : 
-	author_nick_name(p_user.getNickName()), author_uuid(p_user.getUUID()), chat_room_index(p_user.getChatRoomIndex()), content(p_content), checksum(calculateChecksum()) {}
+	author_nick_name(p_user.getNickName()), author_uuid(p_user.getUUID()), chat_room_index(p_user.getChatRoomIndex()), content(p_content), checksum(calculateChecksum(p_content)) {}
 
 //constructor for recevied messages when we are given a checksum
 Message::Message(User p_user, unsigned long p_chat_room_index, std::string p_content, unsigned long long p_checksum) : 
@@ -22,9 +23,9 @@ message Message::convertToOS()
 	return result;
 }
 
-bool Message::isCorrupted()
+bool Message::isCorrupted(string message)
 {
-	return !(calculateChecksum() == checksum);
+	return !(calculateChecksum(message) == checksum);
 }
 
 unsigned long long Message::calculateChecksum(std::string message)
