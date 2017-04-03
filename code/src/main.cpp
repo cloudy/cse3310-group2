@@ -2,6 +2,7 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <mutex>
 
 #include "model.h"
 #include "view.h"
@@ -10,8 +11,10 @@
 using namespace DDS;
 using namespace SuperChat;
 
+//global data
 Model chat_building;
-View ncurses(chat_building);
+std::mutex model_mutex;
+View ncurses;
 
 void run();
 void ncursesLoop();
@@ -51,11 +54,17 @@ void openSpliceLoop()
 	message_data message_IO ( (char*) "msg" );
 	int seconds = 0;
 
+	model_mutex.lock();
 	while (chat_building.is_running)
 	{
-		//--------------------OUTGOING--------------------//
-		if(chat_building.logged_in)
+		model_mutex.unlock();
+		model_mutex.lock();
+		bool is_logged_in = chat_building.logged_in;
+		model_mutex.unlock();
+		if(is_logged_in)
 		{
+			//--------------------OUTGOING--------------------//
+			model_mutex.lock();
 			// Send heartbeat every 2 seconds
 			if (seconds % 2 == 0)
 			{
@@ -100,10 +109,8 @@ void openSpliceLoop()
 				u.time_online_seconds++;
 			}
 
-			if(seconds % 2 == 0)
-			{
-				ncurses.RefreshGUI();
-			}
+			model_mutex.unlock();
+			ncurses.RefreshGUI();
 
 			seconds++;
 			this_thread::sleep_for(chrono::milliseconds(1000));
