@@ -24,7 +24,8 @@ void Model::updateUsers(vector<user> p_users)
 			users.push_back(temp_user);
 		}
 		//TODO: this is where logic for chatroom time would go
-		users[index] = temp_user; //update even if nothing changed, update anyway
+		users[index].setName(temp_user.getNickName()); //update even if nothing changed, update 
+		users[index].setChatRoomIndex(temp_user.getChatRoomIndex());
 	}
 }
 

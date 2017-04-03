@@ -62,7 +62,7 @@ void openSpliceLoop()
 				user local_user = chat_building.users[0].convertToOS();
 				user_IO.send ( local_user );
 			}
-
+			
 			// Send chatroom outbox
 			for (ChatRoom cr : chat_building.chat_room_outbox)
 			{
@@ -94,7 +94,13 @@ void openSpliceLoop()
 			message_IO.recv ( &m_list );
 			chat_building.updateMessages(m_list); // Sends messages to model inbox
 
-			if(seconds % 1 == 0)
+			//--------------------LOGIC--------------------//
+			for(User& u : chat_building.users)
+			{
+				u.time_online_seconds++;
+			}
+
+			if(seconds % 2 == 0)
 			{
 				ncurses.RefreshGUI();
 			}
