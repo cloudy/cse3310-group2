@@ -15,7 +15,7 @@ Model::Model() : logged_in(false), is_running(true)
 
 void Model::updateUsers(vector<user> p_users)
 {
-	printf("user size: %d\n", p_users.size());
+	//printf("user size: %d\n", p_users.size());
 	
 	if (p_users.size() > 0)
 	{

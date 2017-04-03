@@ -511,8 +511,9 @@ public:
 				current_window = Window::Settings;
 				Settings_Draw();
 				model_mutex.lock();
-				return chat_building.users[0].getChatRoomIndex();
+				unsigned long return_index = chat_building.users[0].getChatRoomIndex(); //change: locked mutex, did return, and then unlocked. caused delay in going back to chat window and formatting issues
 				model_mutex.unlock();
+				return return_index;
 			}
 
 			//Go to the Logout Window
