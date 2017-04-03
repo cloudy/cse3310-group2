@@ -1,4 +1,6 @@
 #include "message.h"
+#include <zlib.h>
+#include <string>
 
 using namespace std;
 
@@ -25,9 +27,12 @@ bool Message::isCorrupted()
 	return !(calculateChecksum() == checksum);
 }
 
-unsigned long long Message::calculateChecksum()
+unsigned long long Message::calculateChecksum(std::string message)
 {
-	return 0;
+	unsigned long long crc;
+	crc = crc32(0L, Z_NULL, 0);
+	crc = crc32(crc, (const unsigned char*) message.c_str(), message.length() );
+	return crc;
 }
 
 //getters

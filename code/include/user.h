@@ -19,10 +19,11 @@ public:
 	int time_online_seconds; //TODO: DISCUSSION: logic for incrementing this. do we do ++ for every loop, +2.5 or +5 for each heartbeat
 	int time_since_last_hb;
 
-	static User loadUser(std::string desired_name); //TODO: KARTIK, if file doesn't exist throw userfiledoesnotexist exception that will be cuaght 
 	static unsigned long long generateUUID(); //TODO: KARTIK
 
-	void saveUser(); //TODO: KARTIK
+	static user loadUser(std::string desired_name); //TODO: KARTIK, if file doesn't exist throw userfiledoesnotexist exception that will be cuaght 
+	
+	void saveUser(user user_to_be_saved); //TODO: KARTIK
 
 	user convertToOS();
 

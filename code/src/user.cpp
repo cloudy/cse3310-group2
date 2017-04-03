@@ -1,6 +1,12 @@
 #include "user.h"
 
 #include <stdexcept>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 using namespace std;
 
@@ -97,4 +103,46 @@ string User::timeToString()
 	sprintf(result, "%02d:%02d:%02d", hours, minutes, seconds);
 	string string_result(result);
 	return string_result;
+}
+
+static unsigned long long generateUUID()
+{
+	boost::uuids::uuid uuid = boost::uuids::random_generator()();
+	unsigned long long x;
+	memcpy ( &x, &uuid, sizeof (x) );
+	return x;
+}
+
+static user loadUser(std::string desired_name)
+{
+	user found_user;
+	ifstream read_User;
+
+	try
+	{
+		read_User.open("User_data.txt");
+		found_user.nick = desired_name.c_str();		
+		getline(read_User, found_uuid, '~');
+		std::string::size_type sz = 0;
+		found_user.uuid = std::stoull(found_uuid, &sz, 0);
+		found_user.chatroom_idx = 0;
+		return found_user;
+	}
+	catch (exception& userfiledoesnotexist)
+	{
+		found_user.nick = desired_name.c_str();
+		found_user.uuid = generateUUID();
+		found_user.chatroom_idx = 0;
+		return found_user;
+	}
+
+	read_User.close();
+}
+
+void saveUser(user user_to_be_saved)
+{
+	ofstream write_User;
+	write_User.open("User_data.txt");
+	write_User << user_to_be_saved.uuid << '~' << endl;
+	write_User.close();
 }
