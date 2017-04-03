@@ -31,6 +31,9 @@ public:
 	//CHANGE: Constructor; basically gives you reference to the model that controller is using so any changes you make to it here will be reflected in the model used by controller class.
 	View() : current_window(Window::Login) {}; //this assigns model in this class to the model in controller when an instance of this class is made in controller.
 
+	//TOD0: int current_menu_index;
+	//TODO: vector<char> message_buffer; 
+
 	Window current_window;
 
 	//- - - - - - - - - - - CALCULATION FUNCTIONS - - - - - - - - - - -
@@ -627,6 +630,10 @@ public:
 			ChatMessage_ChatHistory();
 
 			ChatMessage_Users();
+
+			//TODO: Refresh chatroom_menu
+
+			//TODO: Refresh message box (have access to vector so don't need to pass any parameters)
 		}
 	}
 
