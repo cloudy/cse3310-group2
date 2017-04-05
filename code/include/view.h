@@ -71,6 +71,7 @@ public:
 
 		//Refresh the Window
 		wrefresh(window);
+		//Delete Window
 		delwin(window);
 	}
 
@@ -105,6 +106,7 @@ public:
 
 		//Refresh the Window
 		wrefresh(window);
+		//Delete Window
 		delwin(window);
 	}
 
@@ -139,6 +141,7 @@ public:
 
 		//Refresh the Window
 		wrefresh(window);
+		//Delete Window
 		delwin(window);
 	}
 
@@ -154,7 +157,7 @@ public:
 
 		//Print the User Profiles
 		model_mutex.lock();
-		for (int i = 0; i < chat_building.users.size(); i++) //CHANGE: access through model
+		for (unsigned int i = 0; i < chat_building.users.size(); i++) //CHANGE: access through model
 		{
 			User temp_user = chat_building.users[i];  //CHANGE: access through model
 													  //Print User Name
@@ -182,6 +185,7 @@ public:
 
 		//Refresh the Window
 		wrefresh(window);
+		//Delete Window
 		delwin(window);
 	}
 
@@ -190,7 +194,6 @@ public:
 		model_mutex.lock();
 		string new_user_nick = chat_building.users[0].getNickName(), new_chatroom_name = chat_building.calculateCurrentChatRoomName();  //CHANGE: access through model
 		model_mutex.unlock();
-		int input_char;
 
 		Settings_TopBar();
 		Settings_ChangeUserName("New Nick");
@@ -204,7 +207,7 @@ public:
 
 		int window_char, input;
 		input = getch();
-		while (window_char = input)
+		while ((window_char = input) == true)
 		{
 			//Change the User's Name
 			if (window_char == ChangeUserNickFKey)
@@ -279,6 +282,7 @@ public:
 
 		//Refresh the Window
 		wrefresh(window);
+		//Delete Window
 		delwin(window);
 	}
 
@@ -292,7 +296,7 @@ public:
 		WINDOW *window = MakeWindow(chatHeight-1, chatWidth, 3, 1, "Chatrooms");
 
 		//Display the Chatroom Footer
-		mvwprintw(window, chatHeight - 4, chatWidth / 2 - 12, "Enter - Switch Classrooms");
+		mvwprintw(window, chatHeight - 3, chatWidth / 2 - 12, "Enter - Switch Classrooms");
 		model_mutex.lock();
 		//CHANGE: Moved functionality for getting info into model
 		for (int i = 0; i < 10; i++)
@@ -336,6 +340,7 @@ public:
 
 		//Refresh the Window
 		wrefresh(window);
+		//Delete Window
 		delwin(window);
 	}
 	void ChatMessage_Users()
@@ -346,22 +351,25 @@ public:
 		string header = chat_building.calculateCurrentChatRoomName() + " Users"; //CHANGE: access through model
 		WINDOW* window = MakeWindow(userHeight-2, userWidth, (userHeight+2), 1, header);
 
-		//Print the text inside the Users Window
-		mvwprintw(window, userHeight - 2, userWidth / 2 - 7, "F5 - All Users");
-
+	
 
 		//Only show the current users in the chatroom
 		vector<User> usersInSameChatroom = chat_building.getUsersInChatRoom(chat_building.users[0].getChatRoomIndex()); //CHANGE: moved functionality into model
-		for (int i = 0; i < usersInSameChatroom.size(); i++)
+		for (unsigned int i = 0; i < usersInSameChatroom.size(); i++)
 		{
 			//Print the User's Name and time in chatroom
 			mvwprintw(window, 2 + i, 2, usersInSameChatroom[i].getNickName().c_str()); //CHANGE: .name to .getNickName()
 			mvwprintw(window, 2 + i, 20, usersInSameChatroom[i].timeToString().c_str());
 		}
+
+		//Print the text inside the Users Window
+		mvwprintw(window, LINES - 5, userWidth / 2 - 7, "F5 - All Users");
+
 		model_mutex.unlock();
 
 		//Refresh the Window
 		wrefresh(window);
+		//Delete Window
 		delwin(window);
 	}
 
@@ -379,7 +387,7 @@ public:
 		ChatRoom& current_chat_room = chat_building.chat_rooms[chat_building.users[0].getChatRoomIndex()]; //CHANGE:
 
 																										   //Print the Chat History
-		for (int i = 0; i < current_chat_room.message_history.size() && i < MAX_CHAT_HISTORY; i++)
+		for (unsigned int i = 0; i < current_chat_room.message_history.size() && i < MAX_CHAT_HISTORY; i++)
 		{
 			mvwprintw(window, 2 * i + 2, 2, "%s:", current_chat_room.message_history[i].getAuthorNickName().c_str()); //CHANGE: access through model
 			mvwprintw(window, 2 * i + 3, 5, "%s", current_chat_room.message_history[i].getContent().c_str()); //CHANGE: access through model
@@ -388,6 +396,7 @@ public:
 
 		//Refresh the Window
 		wrefresh(window);
+		//Delete Window
 		delwin(window);
 	}
 
@@ -395,13 +404,13 @@ public:
 	{
 		int winHeight = 9;
 		int winWidth = COLS - 32;
-		int charCount = 0;
+	//	int charCount = 0;
 
 		//Initialize the Window
 		WINDOW *window = MakeWindow(winHeight, winWidth, LINES - winHeight - 1, 31, "Send a Message");
 
 		//Print the "Send a Message" Footer
-		mvwprintw(window, winHeight - 2, 1, "Press 'Enter' To Send Message");
+		mvwprintw(window, winHeight - 2, 1, "Enter - Send Message");
 		mvwprintw(window, winHeight - 2, winWidth - 26, "%d Characters Remaining", MESSAGE_LENGTH - Message.length());
 
 		//Print the message
@@ -409,16 +418,18 @@ public:
 
 		//Refresh the Window
 		wrefresh(window);
+		//Delete Window
 		delwin(window);
 	}
 
-	int ChatMessage_Draw(unsigned long chatroom_index)
+	int ChatMessage_Draw(long chatroom_index)
 	{
 		//Paint the Background Window
-		WINDOW *mainWin = newwin(LINES, COLS, 0, 0);
+	//	WINDOW *mainWin = newwin(LINES, COLS, 0, 0);
 
 		//Assign the user to the passed chatroomIndex
 		model_mutex.lock();
+		// unsigned long
 		chat_building.users[0].setChatRoomIndex(chatroom_index); //CHANGE: access through model
 		model_mutex.unlock();
 
@@ -437,12 +448,12 @@ public:
 		int SendMessageFKey = 10; // Enter Key
 
 		sub_char = SendMessageFKey;
-		while (window_char = sub_char)
+		while ((window_char = sub_char) == true)
 		{
 			//Change the Chatroom
 			if (window_char == ChangeChatroomFKey)
 			{
-				current_menu_index = 0;
+				current_menu_index = chat_building.users[0].getChatRoomIndex(); // jump to current chat room on list
 
 				//Draw initial
 				ChatMessage_Chatrooms(current_menu_index);
@@ -547,6 +558,7 @@ public:
 				sub_char = getch();
 			}
 		}
+		return 0;
 	}
 
 	//- - - - - - - - - - - START WINDOW - - - - - - - - - - -
@@ -561,6 +573,7 @@ public:
 
 		//Refresh the window
 		wrefresh(window);
+		//Delete Window
 		delwin(window);
 	}
 
@@ -569,16 +582,18 @@ public:
 		//Make the window
 		WINDOW* window = MakeWindow(LINES - 3, COLS, 3, 0, "Username");
 
-		//Print the limits
-		mvwprintw(window, 3, COLS / 2 - 8, "8 Character Limit");
-		mvwchgat(window, 2, COLS / 2 - 10, 20, A_NORMAL, 4, NULL);
-
+		//print user name 
 		wattron(window, COLOR_PAIR(4));
 		mvwprintw(window, 2, COLS / 2 - 10, userName.c_str());
 		wattroff(window, COLOR_PAIR(4));
 
+		//Print the limits
+		mvwprintw(window, 4, COLS / 2 - 8, "8 Character Limit");
+		mvwchgat(window, 2, COLS / 2 - 10, 20, A_NORMAL, 4, NULL);
+
 		//Refresh the window
 		wrefresh(window);
+		//Delete Window
 		delwin(window);
 	}
 
@@ -589,7 +604,7 @@ public:
 	{
 		string user_nick = "";
 		int input_char;
-		unsigned long chat_room_index = 0; //change
+		long chat_room_index = 0; //change
 
 		StartScreen_TopBorder();
 		StartScreen_Username(user_nick.c_str());
