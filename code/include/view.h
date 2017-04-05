@@ -31,7 +31,7 @@ public:
 	//CHANGE: Constructor; basically gives you reference to the model that controller is using so any changes you make to it here will be reflected in the model used by controller class.
 	View() : current_window(Window::Login) {}; //this assigns model in this class to the model in controller when an instance of this class is made in controller.
 
-	int current_menu_index;
+	int current_menu_index; // global attribute for current chat room from menu
 	//TODO: vector<char> message_buffer; 
 
 	Window current_window;
@@ -370,8 +370,6 @@ public:
 		//Delete Window
 		delwin(window);
 	}
-
-	
 
 	void ChatMessage_ChatHistory()
 	{
