@@ -31,7 +31,7 @@ public:
 	//CHANGE: Constructor; basically gives you reference to the model that controller is using so any changes you make to it here will be reflected in the model used by controller class.
 	View() : current_window(Window::Login) {}; //this assigns model in this class to the model in controller when an instance of this class is made in controller.
 
-	//TOD0: int current_menu_index;
+	int current_menu_index;
 	//TODO: vector<char> message_buffer; 
 
 	Window current_window;
@@ -420,6 +420,7 @@ public:
 		ChatMessage_SendMessage("");
 
 		//Navigation
+		current_menu_index = 0;
 		int window_char, sub_char;
 		int ChangeChatroomFKey = KEY_F(4);
 		int SendMessageFKey = KEY_F(5);
@@ -432,10 +433,10 @@ public:
 			//Change the Chatroom
 			if (window_char == ChangeChatroomFKey)
 			{
-				int index = 0;
+				current_menu_index = 0;
 
 				//Draw initial
-				ChatMessage_Chatrooms(index);
+				ChatMessage_Chatrooms(current_menu_index);
 
 				//Get keyboard for up, down, or other function keys
 				do
@@ -445,18 +446,18 @@ public:
 					{
 						//Up Key Pressed
 					case KEY_UP:
-						ChatMessage_Chatrooms(index >= 1 ? --index : 0);
+						ChatMessage_Chatrooms(current_menu_index >= 1 ? --current_menu_index : 0);
 						break;
 
 						//Down key Pressed
 					case KEY_DOWN:
-						ChatMessage_Chatrooms(index == NUM_CHATROOMS - 1 ? NUM_CHATROOMS - 1 : ++index);
+						ChatMessage_Chatrooms(current_menu_index == NUM_CHATROOMS - 1 ? NUM_CHATROOMS - 1 : ++current_menu_index);
 						break;
 
 						//Enter Presed
 					case 10:
-						//Change user to this index of chatroom
-						return index;
+						//Change user to this current_menu_index of chatroom
+						return current_menu_index;
 
 						//If the user types something unexpected, then take them to the 'Send a Message' window
 					default:
