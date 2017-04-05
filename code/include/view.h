@@ -157,7 +157,7 @@ public:
 
 		//Print the User Profiles
 		model_mutex.lock();
-		for (unsigned int i = 0; i < chat_building.users.size(); i++) //CHANGE: access through model
+		for (int i = 0; i < chat_building.users.size(); i++) //CHANGE: access through model
 		{
 			User temp_user = chat_building.users[i];  //CHANGE: access through model
 													  //Print User Name
@@ -351,11 +351,9 @@ public:
 		string header = chat_building.calculateCurrentChatRoomName() + " Users"; //CHANGE: access through model
 		WINDOW* window = MakeWindow(userHeight-2, userWidth, (userHeight+2), 1, header);
 
-	
-
 		//Only show the current users in the chatroom
 		vector<User> usersInSameChatroom = chat_building.getUsersInChatRoom(chat_building.users[0].getChatRoomIndex()); //CHANGE: moved functionality into model
-		for (unsigned int i = 0; i < usersInSameChatroom.size(); i++)
+		for (int i = 0; i < usersInSameChatroom.size(); i++)
 		{
 			//Print the User's Name and time in chatroom
 			mvwprintw(window, 2 + i, 2, usersInSameChatroom[i].getNickName().c_str()); //CHANGE: .name to .getNickName()
@@ -363,7 +361,7 @@ public:
 		}
 
 		//Print the text inside the Users Window
-		mvwprintw(window, LINES - 5, userWidth / 2 - 7, "F5 - All Users");
+		mvwprintw(window,(userHeight - 4), userWidth / 2 - 7, "F5 - All Users");
 
 		model_mutex.unlock();
 
@@ -387,7 +385,7 @@ public:
 		ChatRoom& current_chat_room = chat_building.chat_rooms[chat_building.users[0].getChatRoomIndex()]; //CHANGE:
 
 																										   //Print the Chat History
-		for (unsigned int i = 0; i < current_chat_room.message_history.size() && i < MAX_CHAT_HISTORY; i++)
+		for (int i = 0; i < current_chat_room.message_history.size() && i < MAX_CHAT_HISTORY; i++)
 		{
 			mvwprintw(window, 2 * i + 2, 2, "%s:", current_chat_room.message_history[i].getAuthorNickName().c_str()); //CHANGE: access through model
 			mvwprintw(window, 2 * i + 3, 5, "%s", current_chat_room.message_history[i].getContent().c_str()); //CHANGE: access through model
@@ -425,7 +423,7 @@ public:
 	int ChatMessage_Draw(long chatroom_index)
 	{
 		//Paint the Background Window
-	//	WINDOW *mainWin = newwin(LINES, COLS, 0, 0);
+		WINDOW *mainWin = newwin(LINES, COLS, 0, 0);
 
 		//Assign the user to the passed chatroomIndex
 		model_mutex.lock();
@@ -558,7 +556,7 @@ public:
 				sub_char = getch();
 			}
 		}
-		return 0;
+		//return 0;
 	}
 
 	//- - - - - - - - - - - START WINDOW - - - - - - - - - - -
@@ -580,16 +578,16 @@ public:
 	void StartScreen_Username(string userName)
 	{
 		//Make the window
-		WINDOW* window = MakeWindow(LINES - 3, COLS, 3, 0, "Username");
-
-		//print user name 
-		wattron(window, COLOR_PAIR(4));
-		mvwprintw(window, 2, COLS / 2 - 10, userName.c_str());
-		wattroff(window, COLOR_PAIR(4));
+		WINDOW* window = MakeWindow(LINES - 3, COLS, 3, 0, "User Nick");
 
 		//Print the limits
 		mvwprintw(window, 4, COLS / 2 - 8, "8 Character Limit");
-		mvwchgat(window, 2, COLS / 2 - 10, 20, A_NORMAL, 4, NULL);
+		mvwchgat(window, 3, COLS / 2 - 10, 20, A_NORMAL, 4, NULL);
+
+		//print user name 
+		wattron(window, COLOR_PAIR(4));
+		mvwprintw(window, 3, COLS / 2 - 10, userName.c_str());
+		wattroff(window, COLOR_PAIR(4));
 
 		//Refresh the window
 		wrefresh(window);
