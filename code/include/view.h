@@ -292,7 +292,7 @@ public:
 		WINDOW *window = MakeWindow(chatHeight-1, chatWidth, 3, 1, "Chatrooms");
 
 		//Display the Chatroom Footer
-		mvwprintw(window, chatHeight - 1, chatWidth / 2 - 14, "Enter - Switch Classrooms");
+		mvwprintw(window, chatHeight - 4, chatWidth / 2 - 12, "Enter - Switch Classrooms");
 		model_mutex.lock();
 		//CHANGE: Moved functionality for getting info into model
 		for (int i = 0; i < 10; i++)
@@ -434,7 +434,7 @@ public:
 		int ChangeChatroomFKey = KEY_F(4);
 		int SettingsFKey = KEY_F(5);
 		int LogoutFKey = KEY_F(6);
-		int SendMessageFKey = 10;
+		int SendMessageFKey = 10; // Enter Key
 
 		sub_char = SendMessageFKey;
 		while (window_char = sub_char)
@@ -511,7 +511,9 @@ public:
 
 					//add the character if the message is not longer than MESSAGE_LENGTH and the character is not 'enter'
 					if (user_Message.length() < MESSAGE_LENGTH && sub_char != 10)
+					{
 						user_Message += sub_char;
+					}
 
 				} while ((sub_char >= 32 && sub_char <= 127) || sub_char == 10);
 
@@ -541,7 +543,9 @@ public:
 
 			//Get a new key from the user
 			else
+			{
 				sub_char = getch();
+			}
 		}
 	}
 
@@ -553,7 +557,7 @@ public:
 		WINDOW* window = MakeWindow(3, COLS, 0, 0, "");
 
 		//Print the text inside the window
-		mvwprintw(window, 1, 1, "Enter Key - Login \t F6 - EXIT ");
+		mvwprintw(window, 1, 1, "Enter Key - LOGIN \t F6 - EXIT ");
 
 		//Refresh the window
 		wrefresh(window);
@@ -617,19 +621,17 @@ public:
 					chat_room_index = ChatMessage_Draw(chat_room_index);
 					if(chat_room_index == -1)
 					{
-						input_char = ExitFKey;
+						input_char = ExitFKey; // Exit and Log Out
 					}
 					else if (chat_room_index<-1 && chat_room_index>9)
 					{
-						chat_room_index = 0; // public
+						chat_room_index = 0; // Public Chatroom
 					}
 
 				} while (chat_room_index != -1);
 				StartScreen_TopBorder();
 				StartScreen_Username("");
 			}
-			
-			//input_char = getch();
 		}
 	}
 
@@ -670,14 +672,14 @@ public:
 		init_pair(4, COLOR_WHITE, COLOR_BLUE);	//Textbox
 		init_pair(5, COLOR_WHITE, COLOR_BLACK); //Normal
 		init_pair(7, COLOR_WHITE, COLOR_YELLOW); //Element of Interest
-		init_pair(8, COLOR_YELLOW, COLOR_BLACK);
-		init_pair(9, COLOR_BLUE, COLOR_BLACK);
+		init_pair(8, COLOR_YELLOW, COLOR_BLACK); //Inactive chatroom
+		init_pair(9, COLOR_BLUE, COLOR_BLACK); // Item Selected form list
 		init_pair(10, COLOR_MAGENTA, COLOR_BLACK);
 		init_pair(11, COLOR_CYAN, COLOR_BLACK);
 		init_pair(12, COLOR_BLUE, COLOR_WHITE); //selected Index
+					
+		StartScreen_Draw(); //Show the Login Screen
 
-												//Show the Login Screen
-		StartScreen_Draw();
 		model_mutex.lock();
 		chat_building.is_running = false;
 		model_mutex.unlock();
