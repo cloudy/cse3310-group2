@@ -5,7 +5,7 @@ using namespace SuperChat;
 
 Model::Model()
 {
-	chat_rooms[0] = ChatRoom(0, "public");
+	chat_rooms[0] = ChatRoom(0, "PUBLIC");
 	for (int i = 1; i < NUM_CHATROOMS; i++)
 	{
 		string name = "Chatroom #" + to_string(i);
