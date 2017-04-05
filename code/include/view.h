@@ -14,8 +14,11 @@
 //Global Data
 namespace GUI_DATA
 {
-	enum Windows { Login = 0, Chatroom = 1, Settings = 2 };
+	enum class Window { Login, Chatroom, Settings };
 }
+
+extern std::mutex model_mutex;
+extern Model chat_building;
 
 using namespace std;
 using namespace GUI_DATA;
@@ -23,11 +26,15 @@ using namespace GUI_DATA;
 class View //CHANGE: Basically moved everything into a class. Made it easier to access model as an common attribute rather than passing reference between each function. 
 {
 private:
-	Model& chat_building;
+
 public:
 	//CHANGE: Constructor; basically gives you reference to the model that controller is using so any changes you make to it here will be reflected in the model used by controller class.
-	View(Model& parameter_chat_building) : chat_building(parameter_chat_building), logged_in(false) {}; //this assigns model in this class to the model in controller when an instance of this class is made in controller.
-	bool logged_in;
+	View() : current_window(Window::Login) {}; //this assigns model in this class to the model in controller when an instance of this class is made in controller.
+
+	//TOD0: int current_menu_index;
+	//TODO: vector<char> message_buffer; 
+
+	Window current_window;
 
 	//- - - - - - - - - - - CALCULATION FUNCTIONS - - - - - - - - - - -
 	WINDOW* MakeWindow(int Height, int Width, int Yposition, int Xposition, string Title)
@@ -82,7 +89,9 @@ public:
 
 		//Print the Current Username
 		wattron(window, COLOR_PAIR(9));
+		model_mutex.lock();
 		string current_user_name = chat_building.users[0].getNickName(); //CHANGE: access through model
+		model_mutex.unlock();
 		mvwprintw(window, 3, window_width / 2 - current_user_name.length() / 2, current_user_name.c_str()); //CHANGE: access through model
 		wattroff(window, COLOR_PAIR(9));
 
@@ -114,7 +123,9 @@ public:
 
 		//Print the Current Username
 		wattron(window, COLOR_PAIR(9));
+		model_mutex.lock();
 		string current_user_chatroom_name = chat_building.calculateCurrentChatRoomName(); //CHANGE: access through model
+		model_mutex.unlock();
 		mvwprintw(window, 3, window_width / 2 - current_user_chatroom_name.length() / 2, current_user_chatroom_name.c_str()); //CHANGE: access through model
 		wattroff(window, COLOR_PAIR(9));
 
@@ -142,6 +153,7 @@ public:
 		wattroff(window, A_BOLD);
 
 		//Print the User Profiles
+		model_mutex.lock();
 		for (int i = 0; i < chat_building.users.size(); i++) //CHANGE: access through model
 		{
 			User temp_user = chat_building.users[i];  //CHANGE: access through model
@@ -166,6 +178,7 @@ public:
 				wprintw(window, "%-10s\t\t\t%s", "----------", "----------");
 			}
 		}
+		model_mutex.unlock();
 
 		//Refresh the Window
 		wrefresh(window);
@@ -174,7 +187,9 @@ public:
 
 	void Settings_Draw()
 	{
+		model_mutex.lock();
 		string new_user_nick = chat_building.users[0].getNickName(), new_chatroom_name = chat_building.calculateCurrentChatRoomName();  //CHANGE: access through model
+		model_mutex.unlock();
 		int input_char;
 
 		Settings_TopBar();
@@ -221,10 +236,13 @@ public:
 			}
 			else if (window_char == Cancel)
 			{
+				current_window = Window::Chatroom;
 				break;
 			}
 			else if (window_char == SaveAndReturn) //CHANGE: changed logic so we don't send chatroom info to other computers if name hasn't changed
 			{
+				current_window = Window::Chatroom;
+				model_mutex.lock();
 				//update username even if it didnt change because it isn't too slower than checking. don't publish manually since it will be included in heartbeat
 				if (!new_user_nick.empty())
 					chat_building.users[0].setName(new_user_nick); //CHANGE: access through model
@@ -240,6 +258,7 @@ public:
 						chat_building.chat_room_outbox.push_back(current_chat_room);
 					}
 				}
+				model_mutex.unlock();
 				break;
 			}
 			else
@@ -267,6 +286,7 @@ public:
 	{
 		//Create the Window
 		int userHeight = 21, userWidth = 30;
+		model_mutex.lock();
 		string header = chat_building.calculateCurrentChatRoomName() + " Users"; //CHANGE: access through model
 		WINDOW* window = MakeWindow(userHeight, userWidth, 19, 1, header);
 
@@ -282,6 +302,7 @@ public:
 			mvwprintw(window, 2 + i, 2, usersInSameChatroom[i].getNickName().c_str()); //CHANGE: .name to .getNickName()
 			mvwprintw(window, 2 + i, 20, usersInSameChatroom[i].timeToString().c_str());
 		}
+		model_mutex.unlock();
 
 		//Refresh the Window
 		wrefresh(window);
@@ -298,14 +319,15 @@ public:
 		WINDOW *window = MakeWindow(chatHeight, chatWidth, 3, 1, "Chatrooms");
 
 		//Display the Chatroom Footer
-		mvwprintw(window, chatHeight - 2, chatWidth / 2 - 11, "Enter Switch Chatrooms");
-
+		mvwprintw(window, chatHeight - 2, chatWidth / 2 - 14, "'Enter' to Switch Classrooms");
+		model_mutex.lock();
 		//CHANGE: Moved functionality for getting info into model
 		for (int i = 0; i < 10; i++)
 		{
 			roomNames[i] = chat_building.chat_rooms[i].getName();
 			roomStats[i] = chat_building.calculateNumUsersInChatRoom(i);
 		}
+		model_mutex.unlock();
 
 		for (int i = 0; i < 10; i++)
 		{
@@ -342,6 +364,7 @@ public:
 		int winHeight = LINES - 13;
 
 		//Initialize the Window
+		model_mutex.lock();
 		WINDOW *window = MakeWindow(winHeight, winWidth, 3, 31, chat_building.calculateCurrentChatRoomName()); //CHANGE: 
 
 		ChatRoom& current_chat_room = chat_building.chat_rooms[chat_building.users[0].getChatRoomIndex()]; //CHANGE:
@@ -352,6 +375,7 @@ public:
 			mvwprintw(window, 2 * i + 2, 2, "%s:", current_chat_room.message_history[i].getAuthorNickName().c_str()); //CHANGE: access through model
 			mvwprintw(window, 2 * i + 3, 5, "%s", current_chat_room.message_history[i].getContent().c_str()); //CHANGE: access through model
 		}
+		model_mutex.unlock();
 
 		//Refresh the Window
 		wrefresh(window);
@@ -385,7 +409,9 @@ public:
 		WINDOW *mainWin = newwin(LINES, COLS, 0, 0);
 
 		//Assign the user to the passed chatroomIndex
+		model_mutex.lock();
 		chat_building.users[0].setChatRoomIndex(chatroom_index); //CHANGE: access through model
+		model_mutex.unlock();
 
 		ChatMessage_TopBar();
 		ChatMessage_Users();
@@ -458,10 +484,12 @@ public:
 					//Check what input was
 					if (sub_char == 10) //ENTER key
 					{
+						model_mutex.lock();
 						//Send the message //CHANGE: use message constructor and send through model
 						Message newMessage = Message(chat_building.users[0], user_Message);
 						chat_building.chat_rooms[chat_building.users[0].getChatRoomIndex()].addMessage(newMessage);
 						user_Message = "";
+						model_mutex.unlock();
 
 						//Redraw the Chatmessage History
 						ChatMessage_ChatHistory();
@@ -483,13 +511,21 @@ public:
 			//Go to Settings Window
 			else if (window_char == SettingsFKey)
 			{
+				current_window = Window::Settings;
 				Settings_Draw();
-				return chat_building.users[0].getChatRoomIndex();
+				model_mutex.lock();
+				unsigned long return_index = chat_building.users[0].getChatRoomIndex(); //change: locked mutex, did return, and then unlocked. caused delay in going back to chat window and formatting issues
+				model_mutex.unlock();
+				return return_index;
 			}
 
 			//Go to the Logout Window
 			else if (window_char == LogoutFKey)
 			{
+				current_window = Window::Login;
+				model_mutex.lock();
+				chat_building.logged_in = false;
+				model_mutex.unlock();
 				return -1;
 			}
 
@@ -555,6 +591,10 @@ public:
 
 			if (input_char == 10) // enter key
 			{
+				model_mutex.lock();
+				chat_building.logged_in = true;
+				model_mutex.unlock();
+				current_window = Window::Chatroom;
 				do
 				{
 					//Send the user to the public chatroom
@@ -580,13 +620,21 @@ public:
 	//- - - - - - - - - - - MAIN - - - - - - - - - - -
 	void RefreshGUI()
 	{
-		Settings_AllUsers();
+		if(current_window == Window::Settings)
+		{
+			Settings_AllUsers();
+		}
 
-		ChatMessage_ChatHistory();
+		else if(current_window == Window::Chatroom)
+		{
+			ChatMessage_ChatHistory();
 
-		ChatMessage_Users();
+			ChatMessage_Users();
 
-		//ChatMessage_Chatrooms(index);
+			//TODO: Refresh chatroom_menu
+
+			//TODO: Refresh message box (have access to vector so don't need to pass any parameters)
+		}
 	}
 
 	void StartGUI()
@@ -613,7 +661,9 @@ public:
 
 												//Show the Login Screen
 		StartScreen_Draw();
-
+		model_mutex.lock();
+		chat_building.is_running = false;
+		model_mutex.unlock();
 		endwin();
 	}
 };
