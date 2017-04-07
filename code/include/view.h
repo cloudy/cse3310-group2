@@ -677,10 +677,6 @@ public:
 				StartScreen_TopBorder();
 				StartScreen_Username("");
 			}
-			else if (user_nick.size() < MAX_USER_NICK_SIZE)
-			{
-				user_nick += input_char;
-			}
 
 			input_char = getch();
 		}
