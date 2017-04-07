@@ -7,12 +7,20 @@ ChatRoom::ChatRoom()
 
 }
 
-ChatRoom::ChatRoom(unsigned long p_chat_room_index, std::string p_chat_room_name) : chat_room_index(p_chat_room_index), chat_room_name(p_chat_room_name) {}
+ChatRoom::ChatRoom(unsigned long p_chat_room_index, std::string p_chat_room_name) : chat_room_index(p_chat_room_index), chat_room_name(p_chat_room_name), time_empty_seconds(0) {}
 
 
 void ChatRoom::changeName(string desired_name)
 {
 	chat_room_name = desired_name;
+}
+
+chatroom ChatRoom::convertToOS()
+{
+	chatroom result;
+	result.chatroom_idx = chat_room_index;
+	strcpy(result.chatroom_name, chat_room_name.c_str());
+	return result;
 }
 
 

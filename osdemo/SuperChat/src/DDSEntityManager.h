@@ -40,8 +40,8 @@
       void createPublisher();
       void deletePublisher();
       void createWriter();
-  	  void createWriter(bool autodispose_unregistered_instances);
-	    void deleteWriter();
+	  void createWriter(bool autodispose_unregistered_instances);
+	  void deleteWriter();
       void createSubscriber();
       void deleteSubscriber();
       void createReader();

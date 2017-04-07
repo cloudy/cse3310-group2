@@ -8,7 +8,7 @@ OBJDIR = obj/
 IDL_SRC= idl/SuperChat.idl
 OSDDS_SRC= src/DDSEntityManager.cpp src/CheckStatus.cpp \
                                      src/chat_room.cpp \
-                                     src/message.cpp src/user.cpp
+                                     src/message.cpp src/user.cpp src/osdds_io.cpp
 OSDDS_IDL_GEN= bin/idl/SuperChatDcps_impl.h bin/idl/SuperChat.cpp \
                                      bin/idl/SuperChatSplDcps.cpp bin/idl/SuperChatDcps.cpp \
                                      bin/idl/SuperChatDcps_impl.cpp bin/idl/ccpp_SuperChat.h \

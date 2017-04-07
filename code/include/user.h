@@ -1,8 +1,16 @@
 #ifndef USER_H
 #define USER_H 2016
 
-#include <string>
+#include <stdexcept>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <fstream>
+
 #include "constants.h"
+#include "ddsincludes.h"
+
+using namespace SuperChat;
 
 enum OnlineStatus { Online, Offline };
 
@@ -13,12 +21,15 @@ class User
 public:
 	User();
 	User(std::string p_nick_name, unsigned long long p_uuid, unsigned long p_chat_room_index);
+	int time_online_seconds; //TODO: DISCUSSION: logic for incrementing this. do we do ++ for every loop, +2.5 or +5 for each heartbeat
+	int time_since_last_hb;
 
-	static User loadUser(); //TODO: KARTIK, if file doesn't exist throw userfiledoesnotexist exception that will be cuaght
-	static void saveUser(); //TODO: KARTIK
-	static unsigned long long generateUUID(); //TODO: KARTIK
+	static User loadUser(std::string desired_name); 
+	static unsigned long long generateUUID(); 
 
-	//TODO: .toStruct for OpenSplice
+	void saveUser(unsigned long long uuid); //TODO: KARTIK
+
+	user convertToOS();
 
 	//setters
 	void setName(std::string desired_name);
@@ -30,7 +41,6 @@ public:
 	unsigned long long getUUID();
 	OnlineStatus getStatus();
 	unsigned long getChatRoomIndex();
-	int getColorIndex();
 
 	std::string timeToString();
 
@@ -39,9 +49,6 @@ private:
 	unsigned long long uuid;
 	OnlineStatus online_status;
 	unsigned long chat_room_index;
-	int color_index; //DISCUSSION: is this used?
-
-	int time_online_seconds; //TODO: DISCUSSION: logic for incrementing this. do we do ++ for every loop, +2.5 or +5 for each heartbeat
 };
 
 #endif
