@@ -1,11 +1,12 @@
 #include "model.h"
+#include "stdlib.h"
 
 using namespace std;
 using namespace SuperChat;
 
 Model::Model() : logged_in(false), is_running(true)
 {
-	chat_rooms[0] = ChatRoom(0, "Public");
+	chat_rooms[0] = ChatRoom(0, "public");
 	for (int i = 1; i < NUM_CHATROOMS; i++)
 	{
 		string name = "Chatroom #" + to_string(i);
@@ -16,23 +17,29 @@ Model::Model() : logged_in(false), is_running(true)
 void Model::updateUsers(vector<user> p_users)
 {
 	//printf("user size: %d\n", p_users.size());
-	
+
 	if (p_users.size() > 0)
 	{
 		for (user u : p_users)
 		{
-			User temp_user = User(string(u.nick), u.uuid, u.chatroom_idx);
+			User temp_user = User(u.nick, u.uuid, u.chatroom_idx);
 			int index = findUserIndex(u.uuid);
 			if (index == -1) //if user is new
 			{
+				system("echo adding new user >> debug/fui.txt");
+
 				users.push_back(temp_user);
 			}
 			try
-			{//TODO: this is where logic for chatroom time would go
-			users[index].setName(temp_user.getNickName()); //update even if nothing changed, update
-			users[index].setChatRoomIndex(temp_user.getChatRoomIndex());
+			{	//TODO: this is where logic for chatroom time would go
+				if (index >= 0 && index < (signed)users.size())
+				{
+					system("echo modifying user >> debug/fui.txt");
+					users[index].setName(temp_user.getNickName()); //update even if nothing changed, update
+					users[index].setChatRoomIndex(temp_user.getChatRoomIndex());
+				}
 			}
-			catch(...)
+			catch (...)
 			{
 				printf("Unable to change user at index %d", index);
 			}
@@ -67,14 +74,16 @@ void Model::updateMessages(vector<message> p_messages)
 //returns index of user in users vector. If not in the vector, returns -1, so caller should push to vector
 int Model::findUserIndex(unsigned long long uuid)
 {
-	for (unsigned int i = 0; i < users.size(); i++)
+	for (int i = 0; i < (signed)users.size(); i++)
 	{
+		system("echo looping through fui >> debug/fui.txt");
 		if (users[i].getUUID() == uuid)
 		{
+			system("echo user found, break >> debug/fui.txt");
 			return i;
 		}
 	}
-
+	system("echo user not found, break >> debug/fui.txt");
 	return -1;
 }
 

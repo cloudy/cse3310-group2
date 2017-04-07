@@ -14,7 +14,7 @@
 //Global Data
 namespace GUI_DATA
 {
-	enum class Window { Login, Chatroom, Settings };
+enum class Window { Login, Chatroom, Settings };
 }
 
 extern std::mutex model_mutex;
@@ -23,7 +23,7 @@ extern Model chat_building;
 using namespace std;
 using namespace GUI_DATA;
 
-class View //CHANGE: Basically moved everything into a class. Made it easier to access model as an common attribute rather than passing reference between each function. 
+class View //CHANGE: Basically moved everything into a class. Made it easier to access model as an common attribute rather than passing reference between each function.
 {
 private:
 
@@ -115,7 +115,7 @@ public:
 		//Make the window
 		int window_width = COLS / 2;
 
-		WINDOW *window = MakeWindow(10, window_width-1, 4, window_width, "Change Chatroom Name");
+		WINDOW *window = MakeWindow(10, window_width - 1, 4, window_width, "Change Chatroom Name");
 
 		//Print Columns "Current UserName" and "New Username"
 		wattron(window, A_BOLD);
@@ -160,7 +160,7 @@ public:
 		for (unsigned int i = 0; i < chat_building.users.size(); i++) //CHANGE: access through model
 		{
 			User temp_user = chat_building.users[i];  //CHANGE: access through model
-													  //Print User Name
+			//Print User Name
 			mvwprintw(window, 3 + i, 1, "%-8s\t\t\t", temp_user.getNickName().c_str());  //CHANGE: access through model
 			if (temp_user.getStatus() == Online)
 			{
@@ -203,7 +203,7 @@ public:
 		int SaveAndReturn = 10; //Enter key
 		int ChangeUserNickFKey = KEY_F(4);
 		int ChangeChatroomNameFKey = KEY_F(5);
-		int Cancel = KEY_F(6); 
+		int Cancel = KEY_F(6);
 
 		int window_char, input;
 		input = getch();
@@ -287,12 +287,12 @@ public:
 
 	void ChatMessage_Chatrooms(int SelectedIndex)
 	{
-		int chatHeight = LINES/2, chatWidth = 40;
+		int chatHeight = LINES / 2, chatWidth = 40;
 		string roomNames[10];
 		int roomStats[10];
 
 		//Create the Window
-		WINDOW *window = MakeWindow(chatHeight-1, chatWidth, 3, 1, "Chatrooms");
+		WINDOW *window = MakeWindow(chatHeight - 1, chatWidth, 3, 1, "Chatrooms");
 
 		//Display the Chatroom Footer
 		mvwprintw(window, chatHeight - 3, chatWidth / 2 - 12, "Enter - Switch Classrooms");
@@ -307,7 +307,7 @@ public:
 
 		for (unsigned long i = 0; i < 10; i++)
 		{
-			if(i==0)
+			if (i == 0)
 			{
 				wattron(window, A_ITALIC | COLOR_PAIR(3));
 				mvwprintw(window, 2 + i, 1, "%s", roomNames[i].c_str());
@@ -348,10 +348,10 @@ public:
 	void ChatMessage_Users()
 	{
 		//Create the Window
-		int userHeight = LINES/2, userWidth = 40;
+		int userHeight = LINES / 2, userWidth = 40;
 		model_mutex.lock();
 		string header = chat_building.calculateCurrentChatRoomName() + " Users"; //CHANGE: access through model
-		WINDOW* window = MakeWindow(userHeight-2, userWidth, (userHeight+2), 1, header);
+		WINDOW* window = MakeWindow(userHeight - 2, userWidth, (userHeight + 2), 1, header);
 
 		//Only show the current users in the chatroom
 		vector<User> usersInSameChatroom = chat_building.getUsersInChatRoom(chat_building.users[0].getChatRoomIndex()); //CHANGE: moved functionality into model
@@ -363,7 +363,7 @@ public:
 		}
 
 		//Print the text inside the Users Window
-		mvwprintw(window,(userHeight - 4), userWidth / 2 - 7, "F5 - All Users");
+		mvwprintw(window, (userHeight - 4), userWidth / 2 - 7, "F5 - All Users");
 
 		model_mutex.unlock();
 
@@ -380,11 +380,11 @@ public:
 
 		//Initialize the Window
 		model_mutex.lock();
-		WINDOW *window = MakeWindow(winHeight, winWidth, 3, 41, chat_building.calculateCurrentChatRoomName()); //CHANGE: 
+		WINDOW *window = MakeWindow(winHeight, winWidth, 3, 41, chat_building.calculateCurrentChatRoomName()); //CHANGE:
 
 		ChatRoom& current_chat_room = chat_building.chat_rooms[chat_building.users[0].getChatRoomIndex()]; //CHANGE:
 
-																										   //Print the Chat History
+		//Print the Chat History
 		for (unsigned int i = 0; i < current_chat_room.message_history.size() && i < MAX_CHAT_HISTORY; i++)
 		{
 			mvwprintw(window, 2 * i + 2, 2, "%s:", current_chat_room.message_history[i].getAuthorNickName().c_str()); //CHANGE: access through model
@@ -420,7 +420,7 @@ public:
 	}
 
 	int ChatMessage_Draw(long chatroom_index)
-	{	
+	{
 		//Assign the user to the passed chatroomIndex
 		model_mutex.lock();
 		chat_building.users[0].setChatRoomIndex(chatroom_index); //CHANGE: access through model
@@ -457,7 +457,7 @@ public:
 					sub_char = getch();
 					switch (sub_char)
 					{
-						//Up Key Pressed
+					//Up Key Pressed
 					case KEY_UP:
 						if (current_menu_index >= 1)
 							current_menu_index--;
@@ -466,20 +466,20 @@ public:
 						ChatMessage_Chatrooms(current_menu_index);
 						break;
 
-						//Down key Pressed
+					//Down key Pressed
 					case KEY_DOWN:
 						if (current_menu_index == NUM_CHATROOMS - 1)
-							current_menu_index = 0; 
+							current_menu_index = 0;
 						else current_menu_index++;
 						ChatMessage_Chatrooms(current_menu_index);
 						break;
 
-						//Enter Presed
+					//Enter Presed
 					case 10:
 						//Change user to this current_menu_index of chatroom
 						return current_menu_index;
 
-						//If the user types something unexpected, then take them to the 'Send a Message' window
+					//If the user types something unexpected, then take them to the 'Send a Message' window
 					default:
 						sub_char = SendMessageFKey;
 						break;
@@ -510,7 +510,9 @@ public:
 							model_mutex.lock();
 							//Send the message //CHANGE: use message constructor and send through model
 							Message newMessage = Message(chat_building.users[0], string(message_buffer.data(), message_buffer.size()));
-							chat_building.chat_rooms[chat_building.users[0].getChatRoomIndex()].addMessage(newMessage);
+							//chat_building.chat_rooms[chat_building.users[0].getChatRoomIndex()].addMessage(newMessage);
+							chat_building.message_outbox.push_back(newMessage);
+
 							message_buffer.clear();
 							model_mutex.unlock();
 
@@ -589,7 +591,7 @@ public:
 		mvwprintw(window, 4, COLS / 2 - 8, "8 Character Limit");
 		mvwchgat(window, 3, COLS / 2 - 10, 20, A_NORMAL, 4, NULL);
 
-		//print user name 
+		//print user name
 		wattron(window, COLOR_PAIR(4));
 		mvwprintw(window, 3, COLS / 2 - 10, userName.c_str());
 		wattroff(window, COLOR_PAIR(4));
@@ -600,7 +602,7 @@ public:
 		delwin(window);
 	}
 
-	//DISCUSSION: IMPORTANT: make sure logic is right here. 1) in here, when enter is pushed, load user is called, if file doesnt exist, 
+	//DISCUSSION: IMPORTANT: make sure logic is right here. 1) in here, when enter is pushed, load user is called, if file doesnt exist,
 	// generate uuid 3) if file exists, use exisitng uuid 4) push new User onto users with this info, set local_user to point to this, set logged_in to true
 	// need to keep bool loggedin in model so we don't publish user heartbeat with default info
 	void StartScreen_Draw()
@@ -618,8 +620,8 @@ public:
 		input_char = getch();
 		while ((input_char > 32 && input_char < 128 && input_char != ExitFKey) || input_char == 10)
 		{
-			
-			if (user_nick.size() < MAX_USER_NICK_SIZE && input_char!=10)
+
+			if (user_nick.size() < MAX_USER_NICK_SIZE && input_char != 10)
 			{
 				user_nick += input_char;
 				StartScreen_TopBorder();
@@ -637,13 +639,13 @@ public:
 				{
 					//Send the user to the public chatroom
 					chat_room_index = ChatMessage_Draw(chat_room_index);
-					if(chat_room_index == -1)
+					if (chat_room_index == -1)
 					{
 						input_char = ExitFKey; // Exit and Log Out
 						//save users
 						return;
 					}
-					else if (chat_room_index<-1 && chat_room_index>9)
+					else if (chat_room_index < -1 && chat_room_index > 9)
 					{
 						chat_room_index = 0; // Public Chatroom
 					}
@@ -657,16 +659,16 @@ public:
 		}
 	}
 
-	
+
 	//- - - - - - - - - - - MAIN - - - - - - - - - - -
 	void RefreshGUI()
 	{
-		if(current_window == Window::Settings)
+		if (current_window == Window::Settings)
 		{
 			Settings_AllUsers();
 		}
 
-		else if(current_window == Window::Chatroom)
+		else if (current_window == Window::Chatroom)
 		{
 			ChatMessage_ChatHistory();
 
@@ -699,7 +701,7 @@ public:
 		init_pair(10, COLOR_MAGENTA, COLOR_BLACK);
 		init_pair(11, COLOR_CYAN, COLOR_BLACK);
 		init_pair(12, COLOR_BLUE, COLOR_WHITE); //selected Index
-					
+
 		StartScreen_Draw(); //Show the Login Screen
 
 		model_mutex.lock();
