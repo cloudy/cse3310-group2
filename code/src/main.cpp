@@ -32,11 +32,11 @@ int main(int argc, char* argv[])
 void run()
 {
 	thread ncurses_thread(ncursesLoop);
-	//thread open_splice_thread(openSpliceLoop);
+	thread open_splice_thread(openSpliceLoop);
 
 	//Added these to avoid crash
 	ncurses_thread.join();
-	//open_splice_thread.join();
+	open_splice_thread.join();
 }
 
 void ncursesLoop()
