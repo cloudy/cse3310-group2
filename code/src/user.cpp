@@ -105,44 +105,52 @@ string User::timeToString()
 	return string_result;
 }
 
-static unsigned long long generateUUID()
+ unsigned long long User::generateUUID() // Why static?
 {
-	boost::uuids::uuid uuid = boost::uuids::random_generator()();
+	boost::uuids::uuid uuidb = boost::uuids::random_generator()();
 	unsigned long long x;
-	memcpy ( &x, &uuid, sizeof (x) );
+	memcpy ( &x, &uuidb, sizeof (x) );
+	uuid = x;
 	return x;
 }
 
-static user loadUser(std::string desired_name)
+User User::loadUser(std::string desired_name)
 {
-	user found_user;
+	User found_user;
 	ifstream read_User;
 	string found_uuid;
 	try
 	{
 		read_User.open("User_data.txt");
-		strcpy(found_user.nick, desired_name.c_str());
-		getline(read_User, found_uuid, '~');
-		std::string::size_type sz = 0;
-		found_user.uuid = std::stoull(found_uuid, &sz, 0);
-		found_user.chatroom_idx = 0;
-		return found_user;
+		found_user.nick_name = desired_name;
+		if(!read_User)
+		{
+        	throw UserFileDoesNotExist();
+    	}
+    	else
+    	{
+    		getline(read_User, found_uuid, '~');
+			std::string::size_type sz = 0;
+			found_user.uuid = std::stoull(found_uuid, &sz, 0);
+			found_user.chat_room_index = 0;
+			read_User.close();
+			return found_user;
+		}
 	}
-	catch (exception& userfiledoesnotexist)
+	catch (const UserFileDoesNotExist& e)
 	{
-		strcpy(found_user.nick, desired_name.c_str());
+		found_user.nick_name = desired_name;
 		found_user.uuid = generateUUID();
-		found_user.chatroom_idx = 0;
+		found_user.chat_room_index = 0;
+		read_User.close();
 		return found_user;
 	}
-
-	read_User.close();
 }
 
-void saveUser(user user_to_be_saved)
+ void User::saveUser(unsigned long long sent_uuid) // Why static?
 {
 	ofstream write_User;
 	write_User.open("User_data.txt");
-	write_User << user_to_be_saved.uuid << '~' << endl;
+	write_User << sent_uuid << '~' << endl;
 	write_User.close();
 }
