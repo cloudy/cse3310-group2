@@ -157,7 +157,7 @@ public:
 
 		//Print the User Profiles
 		model_mutex.lock();
-		for (int i = 0; i < chat_building.users.size(); i++) //CHANGE: access through model
+		for (unsigned int i = 0; i < chat_building.users.size(); i++) //CHANGE: access through model
 		{
 			User temp_user = chat_building.users[i];  //CHANGE: access through model
 													  //Print User Name
@@ -207,7 +207,7 @@ public:
 
 		int window_char, input;
 		input = getch();
-		while ((window_char = input) == true)
+		while ((window_char = input))
 		{
 			//Change the User's Name
 			if (window_char == ChangeUserNickFKey)
@@ -276,7 +276,6 @@ public:
 		//Make the window
 		WINDOW *window = MakeWindow(LINES, COLS, 0, 0, "");
 
-
 		//Print the text inside top bar window
 		mvwprintw(window, 1, 1, "Enter - Send Message \t\t F4 - Chatrooms Menu \t\t F5 - Settings \t\t F6 - Logout & Exit");
 
@@ -310,9 +309,9 @@ public:
 		{
 			if(i==0)
 			{
-				wattron(window, COLOR_PAIR(3));
+				wattron(window, A_ITALIC | COLOR_PAIR(3));
 				mvwprintw(window, 2 + i, 1, "%s", roomNames[i].c_str());
-				wattroff(window, COLOR_PAIR(3));
+				wattroff(window, A_ITALIC | COLOR_PAIR(3));
 			}
 			else
 			{
@@ -353,7 +352,7 @@ public:
 
 		//Only show the current users in the chatroom
 		vector<User> usersInSameChatroom = chat_building.getUsersInChatRoom(chat_building.users[0].getChatRoomIndex()); //CHANGE: moved functionality into model
-		for (int i = 0; i < usersInSameChatroom.size(); i++)
+		for (unsigned int i = 0; i < usersInSameChatroom.size(); i++)
 		{
 			//Print the User's Name and time in chatroom
 			mvwprintw(window, 2 + i, 2, usersInSameChatroom[i].getNickName().c_str()); //CHANGE: .name to .getNickName()
@@ -383,7 +382,7 @@ public:
 		ChatRoom& current_chat_room = chat_building.chat_rooms[chat_building.users[0].getChatRoomIndex()]; //CHANGE:
 
 																										   //Print the Chat History
-		for (int i = 0; i < current_chat_room.message_history.size() && i < MAX_CHAT_HISTORY; i++)
+		for (unsigned int i = 0; i < current_chat_room.message_history.size() && i < MAX_CHAT_HISTORY; i++)
 		{
 			mvwprintw(window, 2 * i + 2, 2, "%s:", current_chat_room.message_history[i].getAuthorNickName().c_str()); //CHANGE: access through model
 			mvwprintw(window, 2 * i + 3, 5, "%s", current_chat_room.message_history[i].getContent().c_str()); //CHANGE: access through model
@@ -400,7 +399,6 @@ public:
 	{
 		int winHeight = 9;
 		int winWidth = COLS - 32;
-	//	int charCount = 0;
 
 		//Initialize the Window
 		WINDOW *window = MakeWindow(winHeight, winWidth, LINES - winHeight - 1, 31, "Send a Message");
@@ -419,13 +417,9 @@ public:
 	}
 
 	int ChatMessage_Draw(long chatroom_index)
-	{
-		//Paint the Background Window
-		WINDOW *mainWin = newwin(LINES, COLS, 0, 0);
-
+	{	
 		//Assign the user to the passed chatroomIndex
 		model_mutex.lock();
-		// unsigned long
 		chat_building.users[0].setChatRoomIndex(chatroom_index); //CHANGE: access through model
 		model_mutex.unlock();
 
@@ -444,7 +438,7 @@ public:
 		int SendMessageFKey = 10; // Enter Key
 
 		sub_char = SendMessageFKey;
-		while ((window_char = sub_char) == true)
+		while ((window_char = sub_char))
 		{
 			//Change the Chatroom
 			if (window_char == ChangeChatroomFKey)
@@ -554,7 +548,7 @@ public:
 				sub_char = getch();
 			}
 		}
-		//return 0;
+		return 0;
 	}
 
 	//- - - - - - - - - - - START WINDOW - - - - - - - - - - -
@@ -624,6 +618,7 @@ public:
 			{
 				model_mutex.lock();
 				chat_building.logged_in = true;
+				//User::loadUser
 				model_mutex.unlock();
 				current_window = Window::Chatroom;
 				do
@@ -633,6 +628,7 @@ public:
 					if(chat_room_index == -1)
 					{
 						input_char = ExitFKey; // Exit and Log Out
+						//save users
 					}
 					else if (chat_room_index<-1 && chat_room_index>9)
 					{
