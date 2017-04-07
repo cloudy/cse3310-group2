@@ -285,31 +285,6 @@ public:
 		delwin(window);
 	}
 
-	void ChatMessage_Users()
-	{
-		//Create the Window
-		int userHeight = 21, userWidth = 30;
-		string header = chat_building.calculateCurrentChatRoomName() + " Users"; //CHANGE: access through model
-		WINDOW* window = MakeWindow(userHeight, userWidth, 19, 1, header);
-
-		//Print the text inside the Users Window
-		mvwprintw(window, userHeight - 2, userWidth / 2 - 7, "F6 - All Users");
-
-
-		//Only show the current users in the chatroom
-		vector<User> usersInSameChatroom = chat_building.getUsersInChatRoom(chat_building.users[0].getChatRoomIndex()); //CHANGE: moved functionality into model
-		for (int i = 0; i < usersInSameChatroom.size(); i++)
-		{
-			//Print the User's Name and time in chatroom
-			mvwprintw(window, 2 + i, 2, usersInSameChatroom[i].getNickName().c_str()); //CHANGE: .name to .getNickName()
-			mvwprintw(window, 2 + i, 20, usersInSameChatroom[i].timeToString().c_str());
-		}
-
-		//Refresh the Window
-		wrefresh(window);
-		delwin(window);
-	}
-
 	void ChatMessage_Chatrooms(int SelectedIndex)
 	{
 		int chatHeight = LINES/2, chatWidth = 40;
