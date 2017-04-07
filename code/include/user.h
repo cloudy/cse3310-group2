@@ -27,7 +27,7 @@ public:
 	static User loadUser(std::string desired_name); 
 	static unsigned long long generateUUID(); 
 
-	void saveUser(unsigned long long uuid); //TODO: KARTIK
+	void saveUser(); //TODO: KARTIK
 
 	user convertToOS();
 

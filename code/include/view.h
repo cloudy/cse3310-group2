@@ -630,9 +630,12 @@ public:
 
 			else if (input_char == 10) // enter key
 			{
+				//Create User
 				model_mutex.lock();
+				User temp_user = User::loadUser(user_nick);
+				temp_user.saveUser();
+				chat_building.users.push_back(temp_user);
 				chat_building.logged_in = true;
-				//User::loadUser
 				model_mutex.unlock();
 				current_window = Window::Chatroom;
 				do

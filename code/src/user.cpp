@@ -12,7 +12,7 @@ User::User()
 
 //this will likely only be used for when we receive heartbeat from new user and these are known
 User::User(std::string p_nick_name, unsigned long long p_uuid, unsigned long p_chat_room_index) :
-	nick_name(p_nick_name), uuid(p_uuid), chat_room_index(p_chat_room_index), online_status(Online), time_online_seconds(0) {} //by default, a new user will be online and their duration is 0 seconds
+	nick_name(p_nick_name), uuid(p_uuid), chat_room_index(p_chat_room_index), online_status(Online), time_online_seconds(0), time_since_last_hb(0) {} //by default, a new user will be online and their duration is 0 seconds
 
 user User::convertToOS()
 {
@@ -135,16 +135,19 @@ User User::loadUser(std::string desired_name)
 		read_User.close();
 	}
 
+	//Set other initialized variables
 	found_user.nick_name = desired_name;
 	found_user.online_status = OnlineStatus::Online;
 	found_user.chat_room_index = 0;
+	found_user.time_online_seconds = 0;
+	found_user.time_since_last_hb = 0;
 	return found_user;
 }
 
- void User::saveUser(unsigned long long sent_uuid) // Why static?
+ void User::saveUser() // Why static?
 {
 	ofstream write_User;
 	write_User.open("User_data.txt");
-	write_User << sent_uuid << '~' << endl;
+	write_User << uuid << '~' << endl;
 	write_User.close();
 }
