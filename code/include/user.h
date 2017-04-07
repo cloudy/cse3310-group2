@@ -1,7 +1,12 @@
 #ifndef USER_H
 #define USER_H 2016
 
-#include <string>
+#include <stdexcept>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <fstream>
+
 #include "constants.h"
 #include "ddsincludes.h"
 
