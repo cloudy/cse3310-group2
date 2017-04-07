@@ -31,7 +31,7 @@ private:
 	unsigned long long author_uuid;
 	unsigned long chat_room_index; 
 	unsigned long long checksum; 
-	std::string author_nick_name;
+	std::string author_nick_name; //TODO: lookup name every time draw message instead of storing name
 
 	unsigned long long calculateChecksum(); //TODO: KARTIK
 };
