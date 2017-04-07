@@ -109,7 +109,8 @@ void openSpliceLoop()
 			}
 
 			model_mutex.unlock();
-			ncurses.RefreshGUI();
+
+			ncurses.RefreshGUI(); // update GUI windows per heartbeat
 
 			seconds++;
 		}
