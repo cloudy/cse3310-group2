@@ -36,7 +36,6 @@ public:
 
 	Window current_window;
 
-	//- - - - - - - - - - - CALCULATION FUNCTIONS - - - - - - - - - - -
 	WINDOW* MakeWindow(int Height, int Width, int Yposition, int Xposition, string Title)
 	{
 		//Create the Window
@@ -58,6 +57,8 @@ public:
 
 		return returnWindow;
 	}
+
+	WINDOW* MakeBackround() { return MakeWindow(LINES, COLS, 0, 0, ""); }
 
 	//- - - - - - - - - - - SETTINGS WINDOW - - - - - - - - - - -
 
@@ -274,7 +275,7 @@ public:
 	void ChatMessage_TopBar()
 	{
 		//Make the window
-		WINDOW *window = MakeWindow(LINES, COLS, 0, 0, "");
+		WINDOW *window = MakeWindow(3, COLS, 0, 0, "");
 
 		//Print the text inside top bar window
 		mvwprintw(window, 1, 1, "ENTER - Send Message \t\t F4 - Chatrooms Menu \t\t F5 - Settings \t\t F6 - Logout & Exit");
@@ -345,6 +346,7 @@ public:
 		//Delete Window
 		delwin(window);
 	}
+
 	void ChatMessage_Users()
 	{
 		//Create the Window
@@ -426,11 +428,13 @@ public:
 		chat_building.users[0].setChatRoomIndex(chatroom_index); //CHANGE: access through model
 		model_mutex.unlock();
 
+		//Draw the Chatroom Windows
 		ChatMessage_TopBar();
 		ChatMessage_Users();
 		ChatMessage_Chatrooms(-1);
 		ChatMessage_ChatHistory();
 		ChatMessage_SendMessage("");
+		WINDOW *background = MakeBackround();
 
 		//Navigation
 		current_menu_index = 0;
@@ -502,8 +506,12 @@ public:
 					ChatMessage_SendMessage(string(message_buffer.data(), message_buffer.size()));
 					sub_char = getch();
 
-					//Check what input was
-					if (sub_char == 10) //ENTER key
+					//add the character if the message is not longer than MESSAGE_LENGTH and the character is not 'enter'
+					if (message_buffer.size() < MESSAGE_LENGTH && sub_char != 10 && sub_char != KEY_LEFT)
+					{
+						message_buffer.push_back(sub_char);
+					}
+					else if (sub_char == 10)
 					{
 						if (message_buffer.size() > 0)
 						{
@@ -520,18 +528,12 @@ public:
 							ChatMessage_ChatHistory();
 						}
 					}
-					else if (sub_char == 127) //Backspace key
+					//Backspace key
+					else if (sub_char == KEY_LEFT)
 					{
-						ChatMessage_SendMessage(string(message_buffer.data(), message_buffer.size()));
+						message_buffer.pop_back();
 					}
-
-					//add the character if the message is not longer than MESSAGE_LENGTH and the character is not 'enter'
-					if (message_buffer.size() < MESSAGE_LENGTH && sub_char != 10)
-					{
-						message_buffer.push_back(sub_char);
-					}
-
-				} while ((sub_char >= 32 && sub_char <= 127) || sub_char == 10);
+				} while ((sub_char >= 32 && sub_char < 127) || sub_char == 10 || sub_char == KEY_LEFT);
 
 				ChatMessage_SendMessage(spaces);
 			}
@@ -563,6 +565,9 @@ public:
 				sub_char = getch();
 			}
 		}
+
+		delwin(background);
+		refresh();
 		return 0;
 	}
 
@@ -673,6 +678,8 @@ public:
 
 		else if (current_window == Window::Chatroom)
 		{
+			ChatMessage_TopBar();
+
 			ChatMessage_ChatHistory();
 
 			ChatMessage_Users();
@@ -713,6 +720,4 @@ public:
 		endwin();
 	}
 };
-
-//
 #endif
