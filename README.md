@@ -9,3 +9,11 @@ This is a Git repository for a program called SuperChat that is based on an Ncur
 
 ## Documentation
 [Google Drive](https://drive.google.com/drive/folders/0B9oSQPfiBnhpbG1aWWtOUzZuOUk?usp=sharing)
+
+## How to use
+
+    cd code/
+    . ./configure
+    make
+    ./bin/superchat
+
