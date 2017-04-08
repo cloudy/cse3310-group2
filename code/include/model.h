@@ -16,6 +16,7 @@ public:
 
 	ChatRoom chat_rooms[10];
 	std::vector<User> users; //TESTING: can we have our user be first in the vector?
+	std::vector<int> blacklist; //
 
 	bool logged_in;
 	bool is_running;

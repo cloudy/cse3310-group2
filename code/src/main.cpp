@@ -117,6 +117,7 @@ void openSpliceLoop()
 				if(u.getStatus() == OnlineStatus::Online)
 				{
 					u.time_online_seconds++;
+					u.time_in_chatroom++;
 				}
 			}
 

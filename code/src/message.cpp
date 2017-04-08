@@ -4,11 +4,18 @@ using namespace std;
 
 //constructor for messages created locally, we calculate checksum ourself
 Message::Message(User p_user, std::string p_content) : 
-	author_nick_name(p_user.getNickName()), author_uuid(p_user.getUUID()), chat_room_index(p_user.getChatRoomIndex()), content(p_content), checksum(calculateChecksum()) {}
+	author_nick_name(p_user.getNickName()), author_uuid(p_user.getUUID()), chat_room_index(p_user.getChatRoomIndex()), content(p_content)
+	{
+		contentToArray();
+		checksum = calculateChecksum();
+	}
 
 //constructor for recevied messages when we are given a checksum
 Message::Message(User p_user, unsigned long p_chat_room_index, std::string p_content, unsigned long long p_checksum) : 
-	author_nick_name(p_user.getNickName()), author_uuid(p_user.getUUID()), chat_room_index(p_chat_room_index), content(p_content), checksum(p_checksum) {}
+	author_nick_name(p_user.getNickName()), author_uuid(p_user.getUUID()), chat_room_index(p_chat_room_index), content(p_content), checksum(p_checksum) 
+	{
+		contentToArray();
+	}
 
 message Message::convertToOS()
 {
@@ -25,9 +32,25 @@ bool Message::isCorrupted()
 	return !(calculateChecksum() == checksum);
 }
 
+void Message::contentToArray()
+{
+	for(int i = 0; i < 144; i++)
+	{
+		if(i < content.length())
+		{
+			content_array[i] = content[i];
+		}
+
+		else content_array[i] = '\0';
+	}
+}
+
 unsigned long long Message::calculateChecksum()
 {
-	return 0;
+	unsigned long long crc;
+	crc = crc32(0L, Z_NULL, 0);
+	crc = crc32(crc, (const unsigned char*) content_array, 144);
+	return crc;
 }
 
 //getters

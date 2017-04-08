@@ -30,7 +30,12 @@ void Model::updateUsers(vector<user> p_users)
 			} 
 			else
 			{
+				if(users[index].previous_chatroom_index != temp_user.getChatRoomIndex()) 
+				{
+					users[index].time_in_chatroom = 0;
+				}
 				users[index].setName(temp_user.getNickName()); //update even if nothing changed, update
+				users[index].previous_chatroom_index = temp_user.getChatRoomIndex();
 				users[index].setChatRoomIndex(temp_user.getChatRoomIndex());
 				users[index].setStatus(OnlineStatus::Online);
 				users[index].time_since_last_hb = -1; //trigger value to say to not update hb timer for when we go through all users and increment hb timer
@@ -64,6 +69,12 @@ void Model::updateMessages(vector<message> p_messages)
 		{
 			User temp_user = users[findUserIndex(m.uuid)];
 			Message temp_message = Message(temp_user, m.chatroom_idx, string(m.message), m.cksum);
+			if(temp_message.isCorrupted())
+			{
+				temp_message.content += " ~~~Message has been corrupted~~~";
+			}
+			//for testing
+			//temp_message.content = "\"" + temp_message.content + "\"" + " calc cs: " + to_string(temp_message.calculateChecksum()) + " rec cs: " + to_string(temp_message.getChecksum());
 			chat_rooms[temp_message.getChatRoomIndex()].addMessage(temp_message);
 		}
 	}

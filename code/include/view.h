@@ -361,7 +361,7 @@ public:
 		{
 			//Print the User's Name and time in chatroom
 			mvwprintw(window, 2 + i, 2, usersInSameChatroom[i].getNickName().c_str()); //CHANGE: .name to .getNickName()
-			mvwprintw(window, 2 + i, 30, usersInSameChatroom[i].timeToString().c_str());
+			mvwprintw(window, 2 + i, 30, usersInSameChatroom[i].timeChatRoomToString().c_str());
 		}
 
 		//Print the text inside the Users Window

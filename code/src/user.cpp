@@ -12,7 +12,7 @@ User::User()
 
 //this will likely only be used for when we receive heartbeat from new user and these are known
 User::User(char p_nick_name[MAX_USER_NICK_SIZE], unsigned long long p_uuid, unsigned long p_chat_room_index) :
-	nick_name(string(p_nick_name, MAX_USER_NICK_SIZE)), uuid(p_uuid), chat_room_index(p_chat_room_index), online_status(Online), time_online_seconds(0), time_since_last_hb(0) {} //by default, a new user will be online and their duration is 0 seconds
+	nick_name(string(p_nick_name, MAX_USER_NICK_SIZE)), uuid(p_uuid), chat_room_index(p_chat_room_index), online_status(Online), time_online_seconds(0), time_since_last_hb(0), time_in_chatroom(0), previous_chatroom_index(0) {} //by default, a new user will be online and their duration is 0 seconds
 
 user User::convertToOS()
 {
@@ -99,6 +99,19 @@ string User::timeToString()
 	return string_result;
 }
 
+string User::timeChatRoomToString()
+{
+	char result[10];
+	int temp_time_seconds = time_in_chatroom;
+	int hours = temp_time_seconds / 3600;
+	temp_time_seconds = temp_time_seconds % 3600;
+	int minutes = temp_time_seconds / 60;
+	int seconds = time_in_chatroom % 60;
+	sprintf(result, "%02d:%02d:%02d", hours, minutes, seconds);
+	string string_result(result);
+	return string_result;
+}
+
 //KARTIK
 unsigned long long User::generateUUID() // Why static?
 {
@@ -115,7 +128,7 @@ User User::loadUser(std::string desired_name)
 	string found_uuid;
 	try
 	{
-		read_User.open("User_data.txt");
+		read_User.open("user_data.txt");
 		found_user.nick_name = desired_name;
 		if(!read_User)
 		{
@@ -147,7 +160,7 @@ User User::loadUser(std::string desired_name)
  void User::saveUser() // Why static?
 {
 	ofstream write_User;
-	write_User.open("User_data.txt");
+	write_User.open("user_data.txt");
 	write_User << uuid << '~' << endl;
 	write_User.close();
 }
