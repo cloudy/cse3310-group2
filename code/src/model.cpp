@@ -29,19 +29,12 @@ void Model::updateUsers(vector<user> p_users)
 				system("echo adding new user >> debug/fui.txt");
 
 				users.push_back(temp_user);
-			}
-			try
-			{	//TODO: this is where logic for chatroom time would go
-				if (index >= 0 && index < (signed)users.size())
-				{
-					system("echo modifying user >> debug/fui.txt");
-					users[index].setName(temp_user.getNickName()); //update even if nothing changed, update
-					users[index].setChatRoomIndex(temp_user.getChatRoomIndex());
-				}
-			}
-			catch (...)
+			} 
+			else
 			{
-				printf("Unable to change user at index %d", index);
+				system("echo modifying user >> debug/fui.txt");
+				users[index].setName(temp_user.getNickName()); //update even if nothing changed, update
+				users[index].setChatRoomIndex(temp_user.getChatRoomIndex());
 			}
 		}
 	}

@@ -4,10 +4,12 @@
 #include <chrono>
 #include <mutex>
 
+
 #include "model.h"
 #include "view.h"
 #include "osdds_io.h"
 
+using namespace std;
 using namespace DDS;
 using namespace SuperChat;
 
@@ -22,9 +24,9 @@ void openSpliceLoop();
 
 int main(int argc, char* argv[])
 {
-	int selection = (argc < 2) ? -1 : stoi(string(argv[1]));
+	//int selection = (argc < 2) ? -1 : stoi(string(argv[1]));
 
-	chat_building.populateForTesting(selection);
+	//chat_building.populateForTesting(selection);
 	run();
 	return 0;
 }
@@ -53,15 +55,15 @@ void openSpliceLoop()
 	user_data user_IO ( (char*) "user" );
 	message_data message_IO ( (char*) "msg" );
 	int seconds = 0;
-
 	model_mutex.lock();
 	while (chat_building.is_running)
 	{
 		model_mutex.unlock();
 		model_mutex.lock();
+		auto starttime = chrono::high_resolution_clock::now();
 		bool is_logged_in = chat_building.logged_in;
 		model_mutex.unlock();
-		if(is_logged_in)
+		if (is_logged_in)
 		{
 			//--------------------OUTGOING--------------------//
 			model_mutex.lock();
@@ -70,7 +72,7 @@ void openSpliceLoop()
 			{
 				user_IO.send ( chat_building.users[0].convertToOS() );
 			}
-			
+
 			// Send chatroom outbox
 			for (ChatRoom cr : chat_building.chat_room_outbox)
 			{
@@ -83,7 +85,7 @@ void openSpliceLoop()
 			{
 				message_IO.send(m.convertToOS());
 			}
-			chat_building.message_outbox.clear(); 
+			chat_building.message_outbox.clear();
 
 			//--------------------INCOMING--------------------//
 
@@ -103,7 +105,7 @@ void openSpliceLoop()
 			chat_building.updateMessages(m_list); // Sends messages to model inbox
 
 			//--------------------LOGIC--------------------//
-			for(User& u : chat_building.users)
+			for (User& u : chat_building.users)
 			{
 				u.time_online_seconds++;
 			}
@@ -114,8 +116,9 @@ void openSpliceLoop()
 
 			seconds++;
 		}
-
-		this_thread::sleep_for(chrono::milliseconds(1000));
+		auto endtime = chrono::high_resolution_clock::now();
+		auto elapsed = chrono::duration_cast<chrono::milliseconds>(endtime - starttime).count();
+		this_thread::sleep_for(chrono::milliseconds(abs(1000 - elapsed)));
 	}
 	std::cout << "normal exit" << '\n';
 }
