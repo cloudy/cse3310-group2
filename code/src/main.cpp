@@ -107,7 +107,17 @@ void openSpliceLoop()
 			//--------------------LOGIC--------------------//
 			for (User& u : chat_building.users)
 			{
-				u.time_online_seconds++;
+				if(u.time_since_last_hb > 5) // > 5 because possible values are 0s, 2s, 4s, 6s <- this is when considered offline
+				{
+					u.setStatus(OnlineStatus::Offline);
+					u.time_online_seconds = 0;
+
+				}
+
+				if(u.getStatus() == OnlineStatus::Online)
+				{
+					u.time_online_seconds++;
+				}
 			}
 
 			model_mutex.unlock();
