@@ -99,7 +99,7 @@ bool Model::isUserNew(unsigned long long uuid)
 
 void Model::populateForTesting(int selected_user) //TODO
 {
-	//Create Fake Users
+	/*//Create Fake Users
 	string user_names[] = { "Joe", "Robert", "Rivka", "Ramon", "Stephani", "Jewel", "Isaias", "Murray", "Darell", "Alyce", "Carylon", "Dona", "George", "Doug", "Hannah" };
 	unsigned long long uuids[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 	unsigned long chat_room_indexes[] = { 0, 0, 0, 1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4 };
@@ -128,7 +128,7 @@ void Model::populateForTesting(int selected_user) //TODO
 	{
 		User me = User(user_names[selected_user], selected_user, 0);
 		users.push_back(me);
-	}
+	}*/
 }
 
 bool Model::isChatRoomEmpty(unsigned long chatroom_index)
