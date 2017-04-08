@@ -26,13 +26,10 @@ void Model::updateUsers(vector<user> p_users)
 			int index = findUserIndex(u.uuid);
 			if (index == -1) //if user is new
 			{
-				system("echo adding new user >> debug/fui.txt");
-
 				users.push_back(temp_user);
 			} 
 			else
 			{
-				system("echo modifying user >> debug/fui.txt");
 				users[index].setName(temp_user.getNickName()); //update even if nothing changed, update
 				users[index].setChatRoomIndex(temp_user.getChatRoomIndex());
 			}
@@ -69,14 +66,11 @@ int Model::findUserIndex(unsigned long long uuid)
 {
 	for (int i = 0; i < (signed)users.size(); i++)
 	{
-		system("echo looping through fui >> debug/fui.txt");
 		if (users[i].getUUID() == uuid)
 		{
-			system("echo user found, break >> debug/fui.txt");
 			return i;
 		}
 	}
-	system("echo user not found, break >> debug/fui.txt");
 	return -1;
 }
 
