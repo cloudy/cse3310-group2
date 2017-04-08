@@ -32,8 +32,16 @@ void Model::updateUsers(vector<user> p_users)
 			{
 				users[index].setName(temp_user.getNickName()); //update even if nothing changed, update
 				users[index].setChatRoomIndex(temp_user.getChatRoomIndex());
+				users[index].setStatus(OnlineStatus::Online);
+				users[index].time_since_last_hb = -1; //trigger value to say to not update hb timer for when we go through all users and increment hb timer
 			}
 		}
+	}
+
+	for(User& u : users)
+	{
+		if(u.time_since_last_hb == -1) u.time_since_last_hb = 0; //if heartbeat was just received, set timer to 0
+		else u.time_since_last_hb++;
 	}
 }
 
@@ -135,7 +143,7 @@ int Model::calculateNumUsersInChatRoom(unsigned long desired_chatroom_index)
 	int count = 0;
 	for (User& user : users)
 	{
-		if (user.getChatRoomIndex() == desired_chatroom_index)
+		if (user.getStatus() == OnlineStatus::Online && user.getChatRoomIndex() == desired_chatroom_index)
 		{
 			count++;
 		}
@@ -151,7 +159,7 @@ vector<User> Model::getUsersInChatRoom(unsigned long desired_chatroom_index)
 	vector<User> result;
 	for (User user : users)
 	{
-		if (user.getChatRoomIndex() == desired_chatroom_index)
+		if (user.getStatus() == OnlineStatus::Online && user.getChatRoomIndex() == desired_chatroom_index)
 		{
 			result.push_back(user);
 		}
