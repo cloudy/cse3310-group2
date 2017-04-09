@@ -140,7 +140,7 @@ User User::loadUser(std::string desired_name)
 	string found_uuid;
 	try
 	{
-		read_User.open("user_data.txt");
+		read_User.open(".superchat");
 		found_user.nick_name = desired_name;
 		if(!read_User)
 		{
@@ -172,7 +172,7 @@ User User::loadUser(std::string desired_name)
  void User::saveUser() // Why static?
 {
 	ofstream write_User;
-	write_User.open("user_data.txt");
+	write_User.open(".superchat");
 	write_User << uuid << '~' << endl;
 	write_User.close();
 }
