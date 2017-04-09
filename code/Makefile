@@ -33,9 +33,9 @@ osdds.o: $(OSDDS_SRC)
 
 clean:
 	@echo Deleting $(shell ls $(BINDIR))...
-	rm -rf $(BINDIR)/* 
+	rm -r $(BINDIR) 
 	@echo Deleting object files $(shell ls $(OBJDIR))...
-	rm $(OBJDIR)/*
+	rm -r $(OBJDIR)
 
 test:
 	@echo Test targets here...
