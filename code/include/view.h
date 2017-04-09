@@ -36,7 +36,6 @@ public:
 
 	Window current_window;
 
-	//- - - - - - - - - - - CALCULATION FUNCTIONS - - - - - - - - - - -
 	WINDOW* MakeWindow(int Height, int Width, int Yposition, int Xposition, string Title)
 	{
 		//Create the Window
@@ -58,6 +57,8 @@ public:
 
 		return returnWindow;
 	}
+
+	WINDOW* MakeBackround() { return MakeWindow(LINES, COLS, 0, 0, ""); }
 
 	//- - - - - - - - - - - SETTINGS WINDOW - - - - - - - - - - -
 
@@ -247,16 +248,26 @@ public:
 				current_window = Window::Chatroom;
 				model_mutex.lock();
 				//update username even if it didnt change because it isn't too slower than checking. don't publish manually since it will be included in heartbeat
-				if (!new_user_nick.empty())
-					chat_building.users[0].setName(new_user_nick); //CHANGE: access through model
+				if (!new_user_nick.empty() && chat_building.users[0].getNickName() != new_user_nick) //if user name actually changed
+				{
+					string alert_string = "*** " + chat_building.users[0].getNickName() + " CHANGED NAME TO \"" + new_user_nick + "\" ***";
+					Message alert_message = Message(chat_building.users[0], alert_string);
+					chat_building.message_outbox.push_back(alert_message);
+
+					chat_building.users[0].setName(new_user_nick);
+				} //CHANGE: access through model
 
 				ChatRoom& current_chat_room = chat_building.chat_rooms[chat_building.users[0].getChatRoomIndex()];
 				//update and publish chat room name if user actually changed chat room name
 				if (current_chat_room.getName() != new_chatroom_name)
 				{
-					//Check if the Chatroom is not Public, if it is not then you can rename it
-					if (current_chat_room.getChatRoomIndex() != 0)
+					//Check if the Chatroom is not Public and is renameable, if it is not then you can rename it
+					if (current_chat_room.getChatRoomIndex() != 0 && current_chat_room.isRenameable)
 					{
+						string alert_string = "*** CHANGED " + current_chat_room.getName() + " TO \"" + new_chatroom_name + "\" ***";
+						Message alert_message = Message(chat_building.users[0], alert_string);
+						chat_building.message_outbox.push_back(alert_message);
+
 						current_chat_room.setName(new_chatroom_name);
 						chat_building.chat_room_outbox.push_back(current_chat_room);
 					}
@@ -274,7 +285,7 @@ public:
 	void ChatMessage_TopBar()
 	{
 		//Make the window
-		WINDOW *window = MakeWindow(LINES, COLS, 0, 0, "");
+		WINDOW *window = MakeWindow(3, COLS, 0, 0, "");
 
 		//Print the text inside top bar window
 		mvwprintw(window, 1, 1, "ENTER - Send Message \t\t F4 - Chatrooms Menu \t\t F5 - Settings \t\t F6 - Logout & Exit");
@@ -303,7 +314,6 @@ public:
 			roomNames[i] = chat_building.chat_rooms[i].getName();
 			roomStats[i] = chat_building.calculateNumUsersInChatRoom(i);
 		}
-		model_mutex.unlock();
 
 		for (unsigned long i = 0; i < 10; i++)
 		{
@@ -340,11 +350,14 @@ public:
 				mvwchgat(window, 2 + i, 1, chatWidth - 2, A_NORMAL, 2, NULL);
 		}
 
+		model_mutex.unlock();
+
 		//Refresh the Window
 		wrefresh(window);
 		//Delete Window
 		delwin(window);
 	}
+
 	void ChatMessage_Users()
 	{
 		//Create the Window
@@ -359,7 +372,7 @@ public:
 		{
 			//Print the User's Name and time in chatroom
 			mvwprintw(window, 2 + i, 2, usersInSameChatroom[i].getNickName().c_str()); //CHANGE: .name to .getNickName()
-			mvwprintw(window, 2 + i, 30, usersInSameChatroom[i].timeToString().c_str());
+			mvwprintw(window, 2 + i, 30, usersInSameChatroom[i].timeChatRoomToString().c_str());
 		}
 
 		//Print the text inside the Users Window
@@ -426,11 +439,13 @@ public:
 		chat_building.users[0].setChatRoomIndex(chatroom_index); //CHANGE: access through model
 		model_mutex.unlock();
 
+		//Draw the Chatroom Windows
 		ChatMessage_TopBar();
 		ChatMessage_Users();
 		ChatMessage_Chatrooms(-1);
 		ChatMessage_ChatHistory();
 		ChatMessage_SendMessage("");
+		WINDOW *background = MakeBackround();
 
 		//Navigation
 		current_menu_index = 0;
@@ -446,8 +461,9 @@ public:
 			//Change the Chatroom
 			if (window_char == ChangeChatroomFKey)
 			{
+				model_mutex.lock();
 				current_menu_index = chat_building.users[0].getChatRoomIndex(); // jump to current chat room on list
-
+				model_mutex.unlock();
 				//Draw initial
 				ChatMessage_Chatrooms(current_menu_index);
 
@@ -502,11 +518,60 @@ public:
 					ChatMessage_SendMessage(string(message_buffer.data(), message_buffer.size()));
 					sub_char = getch();
 
-					//Check what input was
-					if (sub_char == 10) //ENTER key
+					//add the character if the message is not longer than MESSAGE_LENGTH and the character is not 'enter'
+					if (message_buffer.size() < MESSAGE_LENGTH && sub_char != 10 && sub_char != KEY_LEFT)
+					{
+						message_buffer.push_back(sub_char);
+					}
+					else if (sub_char == 10)
 					{
 						if (message_buffer.size() > 0)
 						{
+							if(message_buffer.at(0) == '/') //if message is a command
+							{
+								string content = "", command = "", command_arg = "";
+								for(char c : message_buffer) content += c;
+								int i = 0;
+
+								//get command until space character
+								for(char c : content)
+								{
+									i++;
+									if(c == ' ') break;
+									else command += c;
+								}
+								//get command arg after space to end of string
+								for( ; i < content.length(); i++)
+								{
+									command_arg += content[i];
+								}
+
+								model_mutex.lock();
+								unsigned long uuid_ban = chat_building.findUserUUID(command_arg, chat_building.getUsersInChatRoom(chat_building.users[0].getChatRoomIndex()));
+								if(uuid_ban != 0)
+								{
+									if(command.compare("/mute") == 0)
+									{
+										chat_building.addToBlacklist(uuid_ban);
+										string mute_string = "*** MUTED " + command_arg + " ***";
+										Message mute_message = Message(chat_building.users[0], mute_string);
+										chat_building.message_outbox.push_back(mute_message);
+									}
+
+									else if(command.compare("/unmute") == 0)
+									{
+										chat_building.removeFromBlacklist(uuid_ban);
+										string mute_string = "*** UNMUTED " + command_arg + " ***";
+										Message mute_message = Message(chat_building.users[0], mute_string);
+										chat_building.message_outbox.push_back(mute_message);
+									}
+								}
+								message_buffer.clear();
+								model_mutex.unlock();
+							}
+
+							else
+							{
 							model_mutex.lock();
 							//Send the message //CHANGE: use message constructor and send through model
 							Message newMessage = Message(chat_building.users[0], string(message_buffer.data(), message_buffer.size()));
@@ -515,23 +580,21 @@ public:
 
 							message_buffer.clear();
 							model_mutex.unlock();
+							}
 
 							//Redraw the Chatmessage History
 							ChatMessage_ChatHistory();
 						}
 					}
-					else if (sub_char == 127) //Backspace key
+					//Backspace key
+					else if (sub_char == KEY_LEFT)
 					{
-						ChatMessage_SendMessage(string(message_buffer.data(), message_buffer.size()));
+						if(message_buffer.size() > 0)
+						{
+						message_buffer.pop_back();
+						}
 					}
-
-					//add the character if the message is not longer than MESSAGE_LENGTH and the character is not 'enter'
-					if (message_buffer.size() < MESSAGE_LENGTH && sub_char != 10)
-					{
-						message_buffer.push_back(sub_char);
-					}
-
-				} while ((sub_char >= 32 && sub_char <= 127) || sub_char == 10);
+				} while ((sub_char >= 32 && sub_char < 127) || sub_char == 10 || sub_char == KEY_LEFT);
 
 				ChatMessage_SendMessage(spaces);
 			}
@@ -563,6 +626,9 @@ public:
 				sub_char = getch();
 			}
 		}
+
+		delwin(background);
+		refresh();
 		return 0;
 	}
 
@@ -630,9 +696,12 @@ public:
 
 			else if (input_char == 10) // enter key
 			{
+				//Create User
 				model_mutex.lock();
+				User temp_user = User::loadUser(user_nick);
+				temp_user.saveUser();
+				chat_building.users.push_back(temp_user);
 				chat_building.logged_in = true;
-				//User::loadUser
 				model_mutex.unlock();
 				current_window = Window::Chatroom;
 				do
@@ -670,6 +739,8 @@ public:
 
 		else if (current_window == Window::Chatroom)
 		{
+			ChatMessage_TopBar();
+
 			ChatMessage_ChatHistory();
 
 			ChatMessage_Users();
@@ -710,6 +781,4 @@ public:
 		endwin();
 	}
 };
-
-//
 #endif

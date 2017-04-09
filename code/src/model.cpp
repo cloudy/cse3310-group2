@@ -1,6 +1,9 @@
 #include "model.h"
 #include "stdlib.h"
 
+#include <algorithm>
+#include <string.h>
+
 using namespace std;
 using namespace SuperChat;
 
@@ -26,24 +29,27 @@ void Model::updateUsers(vector<user> p_users)
 			int index = findUserIndex(u.uuid);
 			if (index == -1) //if user is new
 			{
-				system("echo adding new user >> debug/fui.txt");
-
 				users.push_back(temp_user);
-			}
-			try
-			{	//TODO: this is where logic for chatroom time would go
-				if (index >= 0 && index < (signed)users.size())
-				{
-					system("echo modifying user >> debug/fui.txt");
-					users[index].setName(temp_user.getNickName()); //update even if nothing changed, update
-					users[index].setChatRoomIndex(temp_user.getChatRoomIndex());
-				}
-			}
-			catch (...)
+			} 
+			else
 			{
-				printf("Unable to change user at index %d", index);
+				if(users[index].previous_chatroom_index != temp_user.getChatRoomIndex()) 
+				{
+					users[index].time_in_chatroom = 0;
+				}
+				users[index].setName(temp_user.getNickName()); //update even if nothing changed, update
+				users[index].previous_chatroom_index = temp_user.getChatRoomIndex();
+				users[index].setChatRoomIndex(temp_user.getChatRoomIndex());
+				users[index].setStatus(OnlineStatus::Online);
+				users[index].time_since_last_hb = -1; //trigger value to say to not update hb timer for when we go through all users and increment hb timer
 			}
 		}
+	}
+
+	for(User& u : users)
+	{
+		if(u.time_since_last_hb == -1) u.time_since_last_hb = 0; //if heartbeat was just received, set timer to 0
+		else u.time_since_last_hb++;
 	}
 }
 
@@ -66,7 +72,16 @@ void Model::updateMessages(vector<message> p_messages)
 		{
 			User temp_user = users[findUserIndex(m.uuid)];
 			Message temp_message = Message(temp_user, m.chatroom_idx, string(m.message), m.cksum);
-			chat_rooms[temp_message.getChatRoomIndex()].addMessage(temp_message);
+			if(temp_message.isCorrupted())
+			{
+				temp_message.content += " ~~~Message has been corrupted~~~";
+			}
+			//for testing
+			//temp_message.content = "\"" + temp_message.content + "\"" + " calc cs: " + to_string(temp_message.calculateChecksum()) + " rec cs: " + to_string(temp_message.getChecksum());
+			if(find(blacklist.begin(), blacklist.end(), m.uuid) == blacklist.end()) //if uuid isnt in blacklist, add message to chat room
+			{
+				chat_rooms[temp_message.getChatRoomIndex()].addMessage(temp_message);
+			}
 		}
 	}
 }
@@ -76,14 +91,11 @@ int Model::findUserIndex(unsigned long long uuid)
 {
 	for (int i = 0; i < (signed)users.size(); i++)
 	{
-		system("echo looping through fui >> debug/fui.txt");
 		if (users[i].getUUID() == uuid)
 		{
-			system("echo user found, break >> debug/fui.txt");
 			return i;
 		}
 	}
-	system("echo user not found, break >> debug/fui.txt");
 	return -1;
 }
 
@@ -102,6 +114,26 @@ bool Model::isUserNew(unsigned long long uuid)
 		}
 	}
 	return true;
+}
+
+void Model::updateAllChatRoomsTimeEmpty()
+{
+	for(ChatRoom& cr : chat_rooms)
+	{
+		if(calculateNumUsersInChatRoom(cr.getChatRoomIndex()) == 0)
+		{
+			cr.time_empty_seconds++;
+			if(cr.isRenameable == false && cr.time_empty_seconds >= CHATROOM_RENAMEABLE_DURATION && cr.getChatRoomIndex() != 0) cr.isRenameable = true;
+			if(cr.isRenameable)
+			{
+				cr.setName("________");//"________" is chosen value for renameable chatroom
+			}
+		}
+		else 
+		{
+			cr.time_empty_seconds = 0;
+		}
+	}
 }
 
 void Model::populateForTesting(int selected_user) //TODO
@@ -148,7 +180,7 @@ int Model::calculateNumUsersInChatRoom(unsigned long desired_chatroom_index)
 	int count = 0;
 	for (User& user : users)
 	{
-		if (user.getChatRoomIndex() == desired_chatroom_index)
+		if (user.getStatus() == OnlineStatus::Online && user.getChatRoomIndex() == desired_chatroom_index)
 		{
 			count++;
 		}
@@ -164,10 +196,34 @@ vector<User> Model::getUsersInChatRoom(unsigned long desired_chatroom_index)
 	vector<User> result;
 	for (User user : users)
 	{
-		if (user.getChatRoomIndex() == desired_chatroom_index)
+		if (user.getStatus() == OnlineStatus::Online && user.getChatRoomIndex() == desired_chatroom_index)
 		{
 			result.push_back(user);
 		}
 	}
 	return result;
+}
+
+unsigned long Model::findUserUUID(std::string desired_name, std::vector<User> users_in_chatroom)
+{
+	for(User u : users_in_chatroom)
+	{
+		if(strcmp(u.getNickName().c_str(), desired_name.c_str()) == 0) //if names are the same
+		{
+			return u.getUUID();
+		}
+	}
+
+	return 0; //error value, not in current chatroom
+}
+
+void Model::addToBlacklist(unsigned long desired_uuid)
+{
+	blacklist.push_back(desired_uuid);
+	blacklist.unique();
+}
+
+void Model::removeFromBlacklist(unsigned long desired_uuid)
+{
+	blacklist.remove(desired_uuid);
 }

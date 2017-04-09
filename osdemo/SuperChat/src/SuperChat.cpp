@@ -333,7 +333,7 @@ int main()
       // you have to deal with when printing who is online and 
       // where a message is from.
       strncpy ( messageInstance.nick, "Donny", sizeof ( messageInstance.nick ) );
-      messageInstance.chatroom_idx = seconds% 10;  // test data
+      messageInstance.chatroom_idx = seconds;  // test data
       if (seconds%2 == 0) 
       {
          // 2.0 is less than 2.5, so this is still compliant

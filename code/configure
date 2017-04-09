@@ -16,8 +16,8 @@ if [ ! -d "$OSDIR" ]; then
 	sed -i 12s@.*@"OSPL_HOME="$OSDIR"@" $OSDIR/release.com
 fi
 
-echo "Sourcing release.com ..."
+echo "Sourcing release.com ... "
 source $OSDIR/release.com
 
-echo "Setting opensplice path ..."
+echo "Setting opensplice path ... "
 export OSPL_HOME="$OSDIR"
