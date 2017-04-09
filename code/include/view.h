@@ -248,8 +248,14 @@ public:
 				current_window = Window::Chatroom;
 				model_mutex.lock();
 				//update username even if it didnt change because it isn't too slower than checking. don't publish manually since it will be included in heartbeat
-				if (!new_user_nick.empty())
-					chat_building.users[0].setName(new_user_nick); //CHANGE: access through model
+				if (!new_user_nick.empty() && chat_building.users[0].getNickName() != new_user_nick) //if user name actually changed
+				{
+					string alert_string = "*** " + chat_building.users[0].getNickName() + " CHANGED NAME TO \"" + new_user_nick + "\" ***";
+					Message alert_message = Message(chat_building.users[0], alert_string);
+					chat_building.message_outbox.push_back(alert_message);
+
+					chat_building.users[0].setName(new_user_nick);
+				} //CHANGE: access through model
 
 				ChatRoom& current_chat_room = chat_building.chat_rooms[chat_building.users[0].getChatRoomIndex()];
 				//update and publish chat room name if user actually changed chat room name
@@ -258,6 +264,10 @@ public:
 					//Check if the Chatroom is not Public, if it is not then you can rename it
 					if (current_chat_room.getChatRoomIndex() != 0)
 					{
+						string alert_string = "*** CHANGED " + current_chat_room.getName() + " TO \"" + new_chatroom_name + "\" ***";
+						Message alert_message = Message(chat_building.users[0], alert_string);
+						chat_building.message_outbox.push_back(alert_message);
+
 						current_chat_room.setName(new_chatroom_name);
 						chat_building.chat_room_outbox.push_back(current_chat_room);
 					}
