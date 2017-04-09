@@ -314,7 +314,6 @@ public:
 			roomNames[i] = chat_building.chat_rooms[i].getName();
 			roomStats[i] = chat_building.calculateNumUsersInChatRoom(i);
 		}
-		model_mutex.unlock();
 
 		for (unsigned long i = 0; i < 10; i++)
 		{
@@ -350,6 +349,8 @@ public:
 			else if (chat_building.users[0].getChatRoomIndex() == i)
 				mvwchgat(window, 2 + i, 1, chatWidth - 2, A_NORMAL, 2, NULL);
 		}
+
+		model_mutex.unlock();
 
 		//Refresh the Window
 		wrefresh(window);
@@ -460,8 +461,9 @@ public:
 			//Change the Chatroom
 			if (window_char == ChangeChatroomFKey)
 			{
+				model_mutex.lock();
 				current_menu_index = chat_building.users[0].getChatRoomIndex(); // jump to current chat room on list
-
+				model_mutex.unlock();
 				//Draw initial
 				ChatMessage_Chatrooms(current_menu_index);
 
