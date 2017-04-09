@@ -1,6 +1,9 @@
 #include "model.h"
 #include "stdlib.h"
 
+#include <algorithm>
+#include <string.h>
+
 using namespace std;
 using namespace SuperChat;
 
@@ -75,7 +78,10 @@ void Model::updateMessages(vector<message> p_messages)
 			}
 			//for testing
 			//temp_message.content = "\"" + temp_message.content + "\"" + " calc cs: " + to_string(temp_message.calculateChecksum()) + " rec cs: " + to_string(temp_message.getChecksum());
-			chat_rooms[temp_message.getChatRoomIndex()].addMessage(temp_message);
+			if(find(blacklist.begin(), blacklist.end(), m.uuid) == blacklist.end()) //if uuid isnt in blacklist, add message to chat room
+			{
+				chat_rooms[temp_message.getChatRoomIndex()].addMessage(temp_message);
+			}
 		}
 	}
 }
@@ -176,4 +182,28 @@ vector<User> Model::getUsersInChatRoom(unsigned long desired_chatroom_index)
 		}
 	}
 	return result;
+}
+
+unsigned long Model::findUserUUID(std::string desired_name, std::vector<User> users_in_chatroom)
+{
+	for(User u : users_in_chatroom)
+	{
+		if(strcmp(u.getNickName().c_str(), desired_name.c_str()) == 0) //if names are the same
+		{
+			return u.getUUID();
+		}
+	}
+
+	return 0; //error value, not in current chatroom
+}
+
+void Model::addToBlacklist(unsigned long desired_uuid)
+{
+	blacklist.push_back(desired_uuid);
+	blacklist.unique();
+}
+
+void Model::removeFromBlacklist(unsigned long desired_uuid)
+{
+	blacklist.remove(desired_uuid);
 }

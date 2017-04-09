@@ -515,6 +515,51 @@ public:
 					{
 						if (message_buffer.size() > 0)
 						{
+							if(message_buffer.at(0) == '/') //if message is a command
+							{
+								string content = "", command = "", command_arg = "";
+								for(char c : message_buffer) content += c;
+								int i = 0;
+
+								//get command until space character
+								for(char c : content)
+								{
+									i++;
+									if(c == ' ') break;
+									else command += c;
+								}
+								//get command arg after space to end of string
+								for( ; i < content.length(); i++)
+								{
+									command_arg += content[i];
+								}
+
+								model_mutex.lock();
+								unsigned long uuid_ban = chat_building.findUserUUID(command_arg, chat_building.getUsersInChatRoom(chat_building.users[0].getChatRoomIndex()));
+								if(uuid_ban != 0)
+								{
+									if(command.compare("/mute") == 0)
+									{
+										chat_building.addToBlacklist(uuid_ban);
+										string mute_string = "*** MUTED " + command_arg + " ***";
+										Message mute_message = Message(chat_building.users[0], mute_string);
+										chat_building.message_outbox.push_back(mute_message);
+									}
+
+									else if(command.compare("/unmute") == 0)
+									{
+										chat_building.removeFromBlacklist(uuid_ban);
+										string mute_string = "*** UNMUTED " + command_arg + " ***";
+										Message mute_message = Message(chat_building.users[0], mute_string);
+										chat_building.message_outbox.push_back(mute_message);
+									}
+								}
+								message_buffer.clear();
+								model_mutex.unlock();
+							}
+
+							else
+							{
 							model_mutex.lock();
 							//Send the message //CHANGE: use message constructor and send through model
 							Message newMessage = Message(chat_building.users[0], string(message_buffer.data(), message_buffer.size()));
@@ -523,6 +568,7 @@ public:
 
 							message_buffer.clear();
 							model_mutex.unlock();
+							}
 
 							//Redraw the Chatmessage History
 							ChatMessage_ChatHistory();
@@ -531,7 +577,10 @@ public:
 					//Backspace key
 					else if (sub_char == KEY_LEFT)
 					{
+						if(message_buffer.size() > 0)
+						{
 						message_buffer.pop_back();
+						}
 					}
 				} while ((sub_char >= 32 && sub_char < 127) || sub_char == 10 || sub_char == KEY_LEFT);
 

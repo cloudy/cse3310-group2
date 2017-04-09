@@ -2,6 +2,7 @@
 #define MODEL_H 2016
 
 #include <vector>
+#include <list>
 
 #include "chat_room.h"
 #include "user.h"
@@ -16,7 +17,9 @@ public:
 
 	ChatRoom chat_rooms[10];
 	std::vector<User> users; //TESTING: can we have our user be first in the vector?
-	std::vector<int> blacklist; //
+	std::list<unsigned long> blacklist; //vector of UUIDs 
+	void addToBlacklist(unsigned long desired_uuid);
+	void removeFromBlacklist(unsigned long desired_uuid);
 
 	bool logged_in;
 	bool is_running;
@@ -29,6 +32,7 @@ public:
 
 	void updateUsers(std::vector<SuperChat::user> p_users);
 	int findUserIndex(unsigned long long uuid);
+	unsigned long findUserUUID(std::string desired_name, std::vector<User> users_in_chatroom);
 
 	void updateChatRooms(std::vector<SuperChat::chatroom> p_chat_rooms);
 	void updateMessages(std::vector<SuperChat::message> p_messages);
