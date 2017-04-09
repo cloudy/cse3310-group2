@@ -261,8 +261,8 @@ public:
 				//update and publish chat room name if user actually changed chat room name
 				if (current_chat_room.getName() != new_chatroom_name)
 				{
-					//Check if the Chatroom is not Public, if it is not then you can rename it
-					if (current_chat_room.getChatRoomIndex() != 0)
+					//Check if the Chatroom is not Public and is renameable, if it is not then you can rename it
+					if (current_chat_room.getChatRoomIndex() != 0 && current_chat_room.isRenameable)
 					{
 						string alert_string = "*** CHANGED " + current_chat_room.getName() + " TO \"" + new_chatroom_name + "\" ***";
 						Message alert_message = Message(chat_building.users[0], alert_string);

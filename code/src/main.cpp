@@ -121,6 +121,8 @@ void openSpliceLoop()
 				}
 			}
 
+			chat_building.updateAllChatRoomsTimeEmpty();
+
 			model_mutex.unlock();
 
 			ncurses.RefreshGUI(); // update GUI windows per heartbeat

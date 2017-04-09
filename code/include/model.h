@@ -21,6 +21,8 @@ public:
 	void addToBlacklist(unsigned long desired_uuid);
 	void removeFromBlacklist(unsigned long desired_uuid);
 
+	void updateAllChatRoomsTimeEmpty();
+
 	bool logged_in;
 	bool is_running;
 	//vectors that will be accessed in OS loop of outgoing things to be published

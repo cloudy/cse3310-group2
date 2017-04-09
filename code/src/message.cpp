@@ -29,6 +29,7 @@ message Message::convertToOS()
 
 bool Message::isCorrupted()
 {
+	if (checksum == 0) return false; //received checksum of 0, they didnt calculate it
 	return !(calculateChecksum() == checksum);
 }
 
