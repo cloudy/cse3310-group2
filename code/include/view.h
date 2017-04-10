@@ -531,7 +531,7 @@ public:
 							{
 								string content = "", command = "", command_arg = "";
 								for(char c : message_buffer) content += c;
-								int i = 0;
+								unsigned int i = 0;
 
 								//get command until space character
 								for(char c : content)
