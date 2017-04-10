@@ -348,6 +348,13 @@ public:
 			//bold the chatroom the user is in
 			else if (chat_building.users[0].getChatRoomIndex() == i)
 				mvwchgat(window, 2 + i, 1, chatWidth - 2, A_NORMAL, 2, NULL);
+
+			if (i == 0)
+			{
+				wattron(window, A_ITALIC | COLOR_PAIR(3));
+				mvwprintw(window, 2 + i, 1, "%s", roomNames[i].c_str());
+				wattroff(window, A_ITALIC | COLOR_PAIR(3));
+			}
 		}
 
 		model_mutex.unlock();
@@ -675,7 +682,7 @@ public:
 	{
 		string user_nick = "";
 		int input_char;
-		long chat_room_index = 0; //change
+		long chat_room_index = 0;
 
 		StartScreen_TopBorder();
 		StartScreen_Username(user_nick.c_str());
@@ -711,7 +718,6 @@ public:
 					if (chat_room_index == -1)
 					{
 						input_char = ExitFKey; // Exit and Log Out
-						//save users
 						return;
 					}
 					else if (chat_room_index < -1 && chat_room_index > 9)
@@ -732,12 +738,12 @@ public:
 	//- - - - - - - - - - - MAIN - - - - - - - - - - -
 	void RefreshGUI()
 	{
-		if (current_window == Window::Settings)
+		if (current_window == Window::Settings) // Refresh Windows on Settings Screen
 		{
 			Settings_AllUsers();
 		}
 
-		else if (current_window == Window::Chatroom)
+		else if (current_window == Window::Chatroom) // Refresh Windows on Chat Message Screen
 		{
 			ChatMessage_TopBar();
 
