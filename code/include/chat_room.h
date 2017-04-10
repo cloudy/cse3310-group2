@@ -24,6 +24,8 @@ public:
 	void addMessage(Message message);
 	chatroom convertToOS();
 
+	bool isRenameable;
+
 	//getters
 	std::string getName();
 	unsigned long getChatRoomIndex();
