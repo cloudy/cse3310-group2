@@ -58,7 +58,10 @@ public:
 		return returnWindow;
 	}
 
-	WINDOW* MakeBackround() { return MakeWindow(LINES, COLS, 0, 0, ""); }
+	WINDOW* MakeBackground() 
+	{ 
+		return MakeWindow(LINES, COLS, 0, 0, "");
+	}
 
 	//- - - - - - - - - - - SETTINGS WINDOW - - - - - - - - - - -
 
@@ -81,12 +84,12 @@ public:
 		//Make the window
 		int window_width = COLS / 2;
 
-		WINDOW *window = MakeWindow(10, window_width - 1, 4, 1, "Change User Nick");
+		WINDOW *window = MakeWindow(10, window_width - 1, 3, 1, "Change User Nick");
 
 		//Print Columns "Current UserName" and "New Username"
 		wattron(window, A_BOLD);
-		mvwprintw(window, 2, window_width / 2 - 8, "Current Username");
-		mvwprintw(window, 6, window_width / 2 - 6, "New Username");
+		mvwprintw(window, 2, window_width / 2 - 8, "Current User Nick");
+		mvwprintw(window, 6, window_width / 2 - 6, "New User Nick");
 		wattroff(window, A_BOLD);
 
 		//Print the Current Username
@@ -116,7 +119,7 @@ public:
 		//Make the window
 		int window_width = COLS / 2;
 
-		WINDOW *window = MakeWindow(10, window_width - 1, 4, window_width, "Change Chatroom Name");
+		WINDOW *window = MakeWindow(10, window_width - 1, 3, window_width, "Change Chatroom Name");
 
 		//Print Columns "Current UserName" and "New Username"
 		wattron(window, A_BOLD);
@@ -149,7 +152,8 @@ public:
 	void Settings_AllUsers()
 	{
 		//Make the window
-		WINDOW *window = MakeWindow(20, COLS - 2, 14, 1, "All Users");
+		int window_height = LINES - 14;
+		WINDOW *window = MakeWindow(window_height, COLS - 2, 13, 1, "All Users");
 
 		//Create the Columns "Users", "Status", "Chatroom", "Time Online"
 		wattron(window, A_BOLD);
@@ -329,13 +333,35 @@ public:
 			}
 			//if there is more than one user in the chatroom
 			if (roomStats[i] > 1)
+			{	
+				if (i == 0)
+				{
+					wattron(window, A_ITALIC | COLOR_PAIR(3));
+					mvwprintw(window, 2 + i, 1, "%s", roomNames[i].c_str());
+					wattroff(window, A_ITALIC | COLOR_PAIR(3));
+				}	
 				mvwprintw(window, 2 + i, 30, "%d users", roomStats[i]);
+			}
 			//if there is only one user in the chatroom
 			else if (roomStats[i] == 1)
+			{
+				if (i == 0)
+				{
+					wattron(window, A_ITALIC | COLOR_PAIR(3));
+					mvwprintw(window, 2 + i, 1, "%s", roomNames[i].c_str());
+					wattroff(window, A_ITALIC | COLOR_PAIR(3));
+				}
 				mvwprintw(window, 2 + i, 30, "%d user", roomStats[i]);
+			}
 			//there are no users in the chatroom
 			else
 			{
+				if (i == 0)
+				{
+					wattron(window, A_ITALIC | COLOR_PAIR(3));
+					mvwprintw(window, 2 + i, 1, "%s", roomNames[i].c_str());
+					wattroff(window, A_ITALIC | COLOR_PAIR(3));
+				}			
 				mvwchgat(window, 2 + i, 1, chatWidth - 2, A_NORMAL, 8, NULL);
 				wattron(window, A_NORMAL | COLOR_PAIR(8));
 				mvwprintw(window, 2 + i, 30, "0 users");
@@ -344,17 +370,27 @@ public:
 
 			//highlight the selected user
 			if ((unsigned)SelectedIndex == i)
+			{
+				if (i == 0)
+				{
+					wattron(window, A_ITALIC | COLOR_PAIR(3));
+					mvwprintw(window, 2 + i, 1, "%s", roomNames[i].c_str());
+					wattroff(window, A_ITALIC | COLOR_PAIR(3));
+				}
 				mvwchgat(window, 2 + i, 1, chatWidth - 2, A_NORMAL, 9, NULL);
+			}
 			//bold the chatroom the user is in
 			else if (chat_building.users[0].getChatRoomIndex() == i)
-				mvwchgat(window, 2 + i, 1, chatWidth - 2, A_NORMAL, 2, NULL);
-
-			if (i == 0)
 			{
+				if (i == 0)
+				{
 				wattron(window, A_ITALIC | COLOR_PAIR(3));
 				mvwprintw(window, 2 + i, 1, "%s", roomNames[i].c_str());
 				wattroff(window, A_ITALIC | COLOR_PAIR(3));
+				}
+				mvwchgat(window, 2 + i, 1, chatWidth - 2, A_NORMAL, 2, NULL);
 			}
+
 		}
 
 		model_mutex.unlock();
@@ -452,7 +488,7 @@ public:
 		ChatMessage_Chatrooms(-1);
 		ChatMessage_ChatHistory();
 		ChatMessage_SendMessage("");
-		WINDOW *background = MakeBackround();
+		WINDOW *background = MakeBackground();
 
 		//Navigation
 		current_menu_index = 0;
@@ -675,9 +711,6 @@ public:
 		delwin(window);
 	}
 
-	//DISCUSSION: IMPORTANT: make sure logic is right here. 1) in here, when enter is pushed, load user is called, if file doesnt exist,
-	// generate uuid 3) if file exists, use exisitng uuid 4) push new User onto users with this info, set local_user to point to this, set logged_in to true
-	// need to keep bool loggedin in model so we don't publish user heartbeat with default info
 	void StartScreen_Draw()
 	{
 		string user_nick = "";
@@ -784,7 +817,7 @@ public:
 		model_mutex.lock();
 		chat_building.is_running = false;
 		model_mutex.unlock();
-		endwin();
+		endwin(); // clean exit
 	}
 };
 #endif
