@@ -724,7 +724,7 @@ public:
 
 		//Draw the Login Window
 		input_char = getch();
-		while ((input_char > 32 && input_char < 128 && input_char != ExitFKey) || input_char == 10)
+		while ((input_char > 32 && input_char < 127 && input_char != ExitFKey) || input_char == 10)
 		{
 
 			if (user_nick.size() < MAX_USER_NICK_SIZE && input_char != 10)
