@@ -13,11 +13,11 @@ OSDDS_IDL_GEN= bin/idl/SuperChat.cpp bin/idl/SuperChatSplDcps.cpp \
 INTERFACE_SRC= src/model.cpp src/main.cpp
 
 BINDIR = bin
-IDLBINDIR = bin/idl
+IDLBINDIR = $(BINDIR)/idl
 
 all: bin/superchat
 
-bin/superchat: $(OSDDS_IDL_GEN) osdds.o 
+bin/superchat: $(OSDDS_IDL_GEN) OSDDS_OBJ 
 	@echo Final linking and compilation...
 	$(CXX) $(CXXFLAGS) $(OBJDIR)/* $(INTERFACE_SRC) $(INCLUDES) $(LDFLAGS) -o $(BINDIR)/superchat
 
@@ -26,7 +26,7 @@ $(OSDDS_IDL_GEN): $(IDL_SRC)
 	@echo Building IDL sources files...
 	idlpp -I ${OSPL_HOME}/etc/idl -l cpp $(IDL_SRC) -d $(IDLBINDIR)/
 
-osdds.o: $(OSDDS_SRC)
+OSDDS_OBJ: $(OSDDS_SRC)
 	@echo Compiling opensplice files...
 	$(CXX) $(INCLUDES) $(OSDDS_SRC) $(OSDDS_IDL_GEN) $(LDFLAGS) -c
 	@mv *.o $(OBJDIR)/
