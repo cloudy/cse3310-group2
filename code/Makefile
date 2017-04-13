@@ -42,3 +42,4 @@ clean:
 	rm -r $(OBJDIR)
 
 test:  bin/superchat
+	./bin/superchat
