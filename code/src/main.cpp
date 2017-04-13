@@ -22,7 +22,7 @@ void run();
 void ncursesLoop();
 void openSpliceLoop();
 
-int main(int argc, char* argv[])
+int main(/*int argc, char* argv[]*/)
 {
 	//int selection = (argc < 2) ? -1 : stoi(string(argv[1]));
 
