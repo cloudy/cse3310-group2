@@ -14,6 +14,7 @@ void testCalculateNumUsersInChatRoom();
 
 //----------GLOBAL VARIABLES----------
 Model m;
+bool fail_exit = false;
 
 /* Template for model after populateForTesting(-1)
 0)  Name: me       ~ UUID: 0  ~ CRI: 0
@@ -38,6 +39,7 @@ int main()
 {
 	m.populateForTesting(-1);
 	runTests();
+	if (fail_exit) exit(EXIT_FAILURE);
 	return 0;
 }
 
@@ -45,7 +47,11 @@ void printResult(int test_num, bool passed)
 {
 	printf("\tTest #%d: ", test_num);
 	if(passed) printf("PASSED");
-	else printf("******FAILED******");
+	else 
+	{
+		printf("******FAILED******");
+		fail_exit = true;
+	}
 	printf("\n");
 }
 
