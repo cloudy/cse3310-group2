@@ -1,137 +1,96 @@
 #include <stdlib.h>
 #include <iostream>
-#include <thread>
-#include <chrono>
-#include <mutex>
-
 
 #include "model.h"
-#include "view.h"
-#include "osdds_io.h"
 
 using namespace std;
-using namespace DDS;
-using namespace SuperChat;
 
-//global data
-Model chat_building;
-std::mutex model_mutex;
-View ncurses;
+//----------FUNCTION PROTOTYPES----------
+void printResult(int test_num, bool passed);
+void runTests();
+void testIsUserNew();
+void testFindUserIndex();
+void testCalculateNumUsersInChatRoom();
 
-void run();
-void ncursesLoop();
-void openSpliceLoop();
+//----------GLOBAL VARIABLES----------
+Model m;
 
-int main(int argc, char* argv[])
+/* Template for model after populateForTesting(-1)
+0)  Name: me       ~ UUID: 0  ~ CRI: 0
+1)  Name: Joe      ~ UUID: 1  ~ CRI: 0
+2)  Name: Robert   ~ UUID: 2  ~ CRI: 0 
+3)  Name: Rivka    ~ UUID: 3  ~ CRI: 0
+4)  Name: Ramon    ~ UUID: 4  ~ CRI: 1
+5)  Name: Stephani ~ UUID: 5  ~ CRI: 1
+6)  Name: Jewel    ~ UUID: 6  ~ CRI: 1
+7)  Name: Isaias   ~ UUID: 7  ~ CRI: 2
+8)  Name: Murray   ~ UUID: 8  ~ CRI: 2
+9)  Name: Darell   ~ UUID: 9  ~ CRI: 2
+10) Name: Alyce    ~ UUID: 10 ~ CRI: 3
+11) Name: Carylon  ~ UUID: 11 ~ CRI: 3
+12) Name: Dona     ~ UUID: 12 ~ CRI: 3
+13) Name: George   ~ UUID: 13 ~ CRI: 4 
+14) Name: Doug     ~ UUID: 14 ~ CRI: 4
+15) Name: Hannah   ~ UUID: 15 ~ CRI: 4 
+*/
+
+int main()
 {
-	//int selection = (argc < 2) ? -1 : stoi(string(argv[1]));
-
-	//chat_building.populateForTesting(selection);
-	run();
+	m.populateForTesting(-1);
+	runTests();
 	return 0;
 }
 
-void run()
+void printResult(int test_num, bool passed)
 {
-	thread ncurses_thread(ncursesLoop);
-	thread open_splice_thread(openSpliceLoop);
-
-	//Added these to avoid crash
-	ncurses_thread.join();
-	open_splice_thread.join();
+	printf("\tTest #%d: ", test_num);
+	if(passed) printf("PASSED");
+	else printf("******FAILED******");
+	printf("\n");
 }
 
-void ncursesLoop()
+void runTests()
 {
-	ncurses.StartGUI();
+	testIsUserNew();
+	testFindUserIndex();
+	testCalculateNumUsersInChatRoom();
 }
 
-//dont do OS stuff until View.logged_in is true
-void openSpliceLoop()
+void testIsUserNew()
 {
+	printf("Testing isUserNew()\n");
+	if(m.isUserNew(0) == false) printResult(1,1);
+	else printResult(1,0); 
+	if(m.isUserNew(16) == true) printResult(2,1);
+	else printResult(2,0); 
+	if(m.isUserNew(5) == false) printResult(3,1);
+	else printResult(3,0); 
+	if(m.isUserNew(3) == false) printResult(4,1);
+	else printResult(4,0); 
+}
 
-	// instantiate classes
-	chatroom_data chatroom_IO ( (char*) "chatroom" );
-	user_data user_IO ( (char*) "user" );
-	message_data message_IO ( (char*) "msg" );
-	int seconds = 0;
-	model_mutex.lock();
-	while (chat_building.is_running)
-	{
-		model_mutex.unlock();
-		model_mutex.lock();
-		auto starttime = chrono::high_resolution_clock::now();
-		bool is_logged_in = chat_building.logged_in;
-		model_mutex.unlock();
-		if (is_logged_in)
-		{
-			//--------------------OUTGOING--------------------//
-			model_mutex.lock();
-			// Send heartbeat every 2 seconds
-			if (seconds % 2 == 0)
-			{
-				user_IO.send ( chat_building.users[0].convertToOS() );
-			}
+void testFindUserIndex()
+{
+	printf("Testing findUserIndex()\n");
+	if(m.findUserIndex(0) == 0) printResult(1,1);
+	else printResult(1,0); 
+	if(m.findUserIndex(15) == 15) printResult(2,1);
+	else printResult(2,0); 
+	if(m.findUserIndex(16) == -1) printResult(3,1);
+	else printResult(3,0); 
+	if(m.findUserIndex(50) == -1) printResult(4,1);
+	else printResult(4,0); 
+}
 
-			// Send chatroom outbox
-			for (ChatRoom cr : chat_building.chat_room_outbox)
-			{
-				chatroom_IO.send(cr.convertToOS());
-			}
-			chat_building.chat_room_outbox.clear(); // Don't send the same thing from outbox more than once
-
-			// Send message outbox
-			for (Message m : chat_building.message_outbox)
-			{
-				message_IO.send(m.convertToOS());
-			}
-			chat_building.message_outbox.clear();
-
-			//--------------------INCOMING--------------------//
-
-			// Receive chatrooms
-			chatroom_list_t  cr_list;
-			chatroom_IO.recv ( &cr_list );
-			chat_building.updateChatRooms(cr_list);
-
-			// Receive users
-			user_list_t  u_list;
-			user_IO.recv ( &u_list );
-			chat_building.updateUsers(u_list);
-
-			// Receive messages
-			message_list_t  m_list;
-			message_IO.recv ( &m_list );
-			chat_building.updateMessages(m_list); // Sends messages to model inbox
-
-			//--------------------LOGIC--------------------//
-			for (User& u : chat_building.users)
-			{
-				if(u.time_since_last_hb > 5) // > 5 because possible values are 0s, 2s, 4s, 6s <- this is when considered offline
-				{
-					u.setStatus(OnlineStatus::Offline);
-					u.time_online_seconds = 0;
-					u.time_in_chatroom = 0;
-				}
-
-				if(u.getStatus() == OnlineStatus::Online)
-				{
-					u.time_online_seconds++;
-					u.time_in_chatroom++;
-				}
-			}
-
-			chat_building.updateAllChatRoomsTimeEmpty();
-
-			model_mutex.unlock();
-
-			ncurses.RefreshGUI(); // update GUI windows per heartbeat
-
-			seconds++;
-		}
-		auto endtime = chrono::high_resolution_clock::now();
-		auto elapsed = chrono::duration_cast<chrono::milliseconds>(endtime - starttime).count();
-		this_thread::sleep_for(chrono::milliseconds(abs(1000 - elapsed)));
-	}
-	std::cout << "normal exit" << '\n';
+void testCalculateNumUsersInChatRoom()
+{
+	printf("Testing calculateNumUsersInChatRoom()\n");
+	if(m.calculateNumUsersInChatRoom(0) == 4) printResult(1,1);
+	else printResult(1,0); 
+	if(m.calculateNumUsersInChatRoom(1) == 3) printResult(2,1);
+	else printResult(2,0); 
+	if(m.calculateNumUsersInChatRoom(5) == 0) printResult(3,1);
+	else printResult(3,0); 
+	if(m.calculateNumUsersInChatRoom(10) == 0) printResult(4,1);
+	else printResult(4,0); 
 }

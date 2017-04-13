@@ -136,6 +136,24 @@ void Model::updateAllChatRoomsTimeEmpty()
 	}
 }
 
+/* Template for model after populateForTesting(-1)
+0)  Name: me       ~ UUID: 0  ~ CRI: 0
+1)  Name: Joe      ~ UUID: 1  ~ CRI: 0
+2)  Name: Robert   ~ UUID: 2  ~ CRI: 0 
+3)  Name: Rivka    ~ UUID: 3  ~ CRI: 0
+4)  Name: Ramon    ~ UUID: 4  ~ CRI: 1
+5)  Name: Stephani ~ UUID: 5  ~ CRI: 1
+6)  Name: Jewel    ~ UUID: 6  ~ CRI: 1
+7)  Name: Isaias   ~ UUID: 7  ~ CRI: 2
+8)  Name: Murray   ~ UUID: 8  ~ CRI: 2
+9)  Name: Darell   ~ UUID: 9  ~ CRI: 2
+10) Name: Alyce    ~ UUID: 10 ~ CRI: 3
+11) Name: Carylon  ~ UUID: 11 ~ CRI: 3
+12) Name: Dona     ~ UUID: 12 ~ CRI: 3
+13) Name: George   ~ UUID: 13 ~ CRI: 4 
+14) Name: Doug     ~ UUID: 14 ~ CRI: 4
+15) Name: Hannah   ~ UUID: 15 ~ CRI: 4 
+*/
 void Model::populateForTesting(int selected_user) //TODO
 {
 	//Create Fake Users
@@ -146,6 +164,7 @@ void Model::populateForTesting(int selected_user) //TODO
 	if (selected_user == -1)
 	{
 		User me = User("me", 0, 0);
+		users.push_back(me);
 
 		for (int i = 0; i < 15; i++)
 		{
