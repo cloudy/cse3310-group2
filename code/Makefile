@@ -2,7 +2,7 @@ CXX= g++ -std=c++11
 CXXFLAGS= -pthread -Wall -Wextra -g
 
 LDFLAGS= -lncurses -lpanel -L${OSPL_HOME}/lib/ -ldcpssacpp -lddskernel -lz
-INCLUDES= -Iinclude/ -I$src/ -Ibin/idl -I${OSPL_HOME}/include/dcps/C++/SACPP/
+INCLUDES= -Iinclude/ -Ibin/idl -I${OSPL_HOME}/include/dcps/C++/SACPP/
 
 OBJDIR= obj
 BINDIR= bin
@@ -21,7 +21,7 @@ test: MAIN_SRC= $(SRCDIR)/test.cpp
 
 all: bin/superchat
 
-bin/superchat: $(OSDDS_IDL_GEN) OSDDS_OBJ 
+bin/superchat: $(OSDDS_IDL_GEN) OSDDS_OBJ
 	@echo Final linking and compilation...
 	$(CXX) $(CXXFLAGS) $(OBJDIR)/* $(INTERFACE_SRC) $(MAIN_SRC) $(INCLUDES) $(LDFLAGS) -o $(OUTPUT)
 
@@ -37,7 +37,7 @@ OSDDS_OBJ: $(OSDDS_SRC)
 
 clean:
 	@echo Deleting $(shell ls $(BINDIR))...
-	rm -r $(BINDIR) 
+	rm -r $(BINDIR)
 	@echo Deleting object files $(shell ls $(OBJDIR))...
 	rm -r $(OBJDIR)
 
