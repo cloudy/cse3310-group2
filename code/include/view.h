@@ -88,7 +88,7 @@ public:
 		WINDOW *window = MakeWindow(LINES, COLS, 0, 0, "");
 
 		//Print the text inside top bar window
-		mvwprintw(window, 1, 1, "ENTER - Save & Return\t\tF4 - Change User Nick\t\tF5 - Change Chatroom Name\t\tF6 - Cancel & Return");
+		mvwprintw(window, 1, 1, "ENTER - Save & Return\tLEFT ARROW - Backspace\tF4 - Change UserNick\tF5 - Change Chatroom Name\tF6 - Cancel & Return");
 
 		//Refresh the Window
 		wrefresh(window);
@@ -326,7 +326,7 @@ public:
 		WINDOW *window = MakeWindow(LINES, COLS, 0, 0, "");
 
 		//Print the text inside top bar window
-		mvwprintw(window, 1, 1, "ENTER - Send Message \t\t F4 - Chatrooms Menu \t\t F5 - Settings \t\t F6 - Logout & Exit");
+		mvwprintw(window, 1, 1, "ENTER - Send Message \t LEFT ARROW - Backspace \t F4 - Chatrooms Menu \t F5 - Settings \t F6 - Logout & Exit");
 
 		//Refresh the Window
 		wrefresh(window);
@@ -709,7 +709,7 @@ public:
 		WINDOW* window = MakeWindow(3, COLS, 0, 0, "");
 
 		//Print the text inside the window
-		mvwprintw(window, 1, 1, "ENTER - Login \t F6 - Exit ");
+		mvwprintw(window, 1, 1, "ENTER - Login \t\t LEFT ARROW - Backspace \t F6 - Exit ");
 
 		//Refresh the window
 		wrefresh(window);
