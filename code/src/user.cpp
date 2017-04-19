@@ -166,6 +166,7 @@ User User::loadUser(std::string desired_name)
 	found_user.chat_room_index = 0;
 	found_user.time_online_seconds = 0;
 	found_user.time_since_last_hb = 0;
+	found_user.time_in_chatroom = 0;
 	return found_user;
 }
 
