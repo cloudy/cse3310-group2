@@ -32,6 +32,7 @@ public:
 	View() : current_window(Window::Login) {}; //this assigns model in this class to the model in controller when an instance of this class is made in controller.
 
 	int current_menu_index; // global attribute for current chat room from menu
+	bool show_highlight_index = false;
 	vector<char> message_buffer; //global attribute for message the user types
 
 	Window current_window;
@@ -61,6 +62,24 @@ public:
 	WINDOW* MakeBackground() 
 	{ 
 		return MakeWindow(LINES, COLS, 0, 0, "");
+	}
+
+	bool IsNumberOrLetter(char input)
+	{
+		if (input >= '0' && input <= '9')
+			return true;
+		if (input >= 'A' && input <= 'Z')
+			return true;
+		if (input >= 'a' && input <= 'z')
+			return true;
+		return false;
+	}
+
+	bool IsNumberOrLetterOrSymbol(char input)
+	{
+		if (input >= ' ' && input <= '~')
+			return true;
+		return false;
 	}
 
 	//- - - - - - - - - - - SETTINGS WINDOW - - - - - - - - - - -
@@ -197,7 +216,8 @@ public:
 	void Settings_Draw()
 	{
 		model_mutex.lock();
-		string new_user_nick = chat_building.users[0].getNickName(), new_chatroom_name = chat_building.calculateCurrentChatRoomName();  //CHANGE: access through model
+		string tempUserNick = chat_building.users[0].getNickName(), tempChatroomName = chat_building.calculateCurrentChatRoomName();
+		vector<char> new_user_nick(tempUserNick.begin(), tempUserNick.end()), new_chatroom_name(tempChatroomName.begin(), tempChatroomName.end());  //CHANGE: access through model
 		model_mutex.unlock();
 
 		Settings_TopBar();
@@ -205,7 +225,7 @@ public:
 		Settings_ChangeChatroomName("New Chatroom Name");
 		Settings_AllUsers();
 
-		int SaveAndReturn = 10; //Enter key
+		int SaveAndReturn = ENTER; //Enter key
 		int ChangeUserNickFKey = KEY_F(4);
 		int ChangeChatroomNameFKey = KEY_F(5);
 		int Cancel = KEY_F(6);
@@ -217,28 +237,44 @@ public:
 			//Change the User's Name
 			if (window_char == ChangeUserNickFKey)
 			{
-				new_user_nick = "";
-				Settings_ChangeUserName(new_user_nick);
+				new_user_nick.clear();
+				Settings_ChangeUserName(string(new_user_nick.data(), new_user_nick.size()));
 
 				input = getch();
-				while ((input > 31 && input < 127) && new_user_nick.size() < MAX_USER_NICK_SIZE)
+				while (input != SaveAndReturn && input != ChangeUserNickFKey && input != ChangeChatroomNameFKey && input != Cancel)
 				{
-					new_user_nick += input;
-					Settings_ChangeUserName(new_user_nick);
+					if (IsNumberOrLetter(input) && new_user_nick.size() < MAX_USER_NICK_SIZE)
+					{
+						new_user_nick.push_back(input);	
+					}
+					else if (input == KEY_LEFT && new_user_nick.size() > 0)
+					{
+						new_user_nick.pop_back();
+					}
+
+					Settings_ChangeUserName(string(new_user_nick.data(), new_user_nick.size()));
 					input = getch();
 				}
 			}
 			//Change the Chatroom Name
 			else if (window_char == ChangeChatroomNameFKey)
 			{
-				new_chatroom_name = "";
-				Settings_ChangeChatroomName(new_chatroom_name);
+				new_chatroom_name.clear();
+				Settings_ChangeChatroomName(string(new_chatroom_name.data(), new_chatroom_name.size()));
 
 				input = getch();
-				while ((input > 31 && input < 127) && new_chatroom_name.size() < MAX_CHATROOM_NAME_SIZE)
+				while (input != SaveAndReturn && input != ChangeUserNickFKey && input != ChangeChatroomNameFKey && input != Cancel)
 				{
-					new_chatroom_name += input;
-					Settings_ChangeChatroomName(new_chatroom_name);
+					if (IsNumberOrLetter(input) && new_chatroom_name.size() < MAX_CHATROOM_NAME_SIZE)
+					{
+						new_chatroom_name.push_back(input);
+					}
+					else if (input == KEY_LEFT && new_chatroom_name.size() > 0)
+					{
+						new_chatroom_name.pop_back();
+					}
+					
+					Settings_ChangeChatroomName(string(new_chatroom_name.data(), new_chatroom_name.size()));
 					input = getch();
 				}
 			}
@@ -251,28 +287,29 @@ public:
 			{
 				current_window = Window::Chatroom;
 				model_mutex.lock();
+
 				//update username even if it didnt change because it isn't too slower than checking. don't publish manually since it will be included in heartbeat
-				if (!new_user_nick.empty() && chat_building.users[0].getNickName() != new_user_nick) //if user name actually changed
+				if (new_user_nick.size() > 0 && chat_building.users[0].getNickName() != string(new_user_nick.data(), new_user_nick.size())) //if user name actually changed
 				{
-					string alert_string = "*** " + chat_building.users[0].getNickName() + " CHANGED NAME TO \"" + new_user_nick + "\" ***";
+					string alert_string = "*** " + chat_building.users[0].getNickName() + " CHANGED NAME TO \"" + string(new_user_nick.data(), new_user_nick.size()) + "\" ***";
 					Message alert_message = Message(chat_building.users[0], alert_string);
 					chat_building.message_outbox.push_back(alert_message);
 
-					chat_building.users[0].setName(new_user_nick);
-				} //CHANGE: access through model
+					chat_building.users[0].setName(string(new_user_nick.data(), new_user_nick.size()));
+				}
 
 				ChatRoom& current_chat_room = chat_building.chat_rooms[chat_building.users[0].getChatRoomIndex()];
 				//update and publish chat room name if user actually changed chat room name
-				if (current_chat_room.getName() != new_chatroom_name)
+				if (current_chat_room.getName() != string(new_chatroom_name.data(), new_chatroom_name.size()))
 				{
 					//Check if the Chatroom is not Public and is renameable, if it is not then you can rename it
 					if (current_chat_room.getChatRoomIndex() != 0 && current_chat_room.isRenameable)
 					{
-						string alert_string = "*** CHANGED " + current_chat_room.getName() + " TO \"" + new_chatroom_name + "\" ***";
+						string alert_string = "*** CHANGED " + current_chat_room.getName() + " TO \"" + string(new_chatroom_name.data(), new_chatroom_name.size()) + "\" ***";
 						Message alert_message = Message(chat_building.users[0], alert_string);
 						chat_building.message_outbox.push_back(alert_message);
 
-						current_chat_room.setName(new_chatroom_name);
+						current_chat_room.setName(string(new_chatroom_name.data(), new_chatroom_name.size()));
 						chat_building.chat_room_outbox.push_back(current_chat_room);
 					}
 				}
@@ -369,7 +406,7 @@ public:
 			}
 
 			//highlight the selected user
-			if ((unsigned)SelectedIndex == i)
+			if ((unsigned)SelectedIndex == i && show_highlight_index)
 			{
 				if (i == 0)
 				{
@@ -384,9 +421,9 @@ public:
 			{
 				if (i == 0)
 				{
-				wattron(window, A_ITALIC | COLOR_PAIR(3));
-				mvwprintw(window, 2 + i, 1, "%s", roomNames[i].c_str());
-				wattroff(window, A_ITALIC | COLOR_PAIR(3));
+					wattron(window, A_ITALIC | COLOR_PAIR(3));
+					mvwprintw(window, 2 + i, 1, "%s", roomNames[i].c_str());
+					wattroff(window, A_ITALIC | COLOR_PAIR(3));
 				}
 				mvwchgat(window, 2 + i, 1, chatWidth - 2, A_NORMAL, 2, NULL);
 			}
@@ -496,7 +533,7 @@ public:
 		int ChangeChatroomFKey = KEY_F(4);
 		int SettingsFKey = KEY_F(5);
 		int LogoutFKey = KEY_F(6);
-		int SendMessageFKey = 10; // Enter Key
+		int SendMessageFKey = ENTER; // Enter Key
 
 		sub_char = SendMessageFKey;
 		while ((window_char = sub_char))
@@ -504,6 +541,7 @@ public:
 			//Change the Chatroom
 			if (window_char == ChangeChatroomFKey)
 			{
+				show_highlight_index = true;
 				model_mutex.lock();
 				current_menu_index = chat_building.users[0].getChatRoomIndex(); // jump to current chat room on list
 				model_mutex.unlock();
@@ -516,35 +554,33 @@ public:
 					sub_char = getch();
 					switch (sub_char)
 					{
-					//Up Key Pressed
-					case KEY_UP:
-						if (current_menu_index >= 1)
-							current_menu_index--;
-						else
-							current_menu_index = NUM_CHATROOMS - 1;
-						ChatMessage_Chatrooms(current_menu_index);
-						break;
+						case KEY_UP:
+							if (current_menu_index >= 1)
+								current_menu_index--;
+							else
+								current_menu_index = NUM_CHATROOMS - 1;
+							ChatMessage_Chatrooms(current_menu_index);
+							break;
 
-					//Down key Pressed
-					case KEY_DOWN:
-						if (current_menu_index == NUM_CHATROOMS - 1)
-							current_menu_index = 0;
-						else current_menu_index++;
-						ChatMessage_Chatrooms(current_menu_index);
-						break;
+						case KEY_DOWN:
+							if (current_menu_index == NUM_CHATROOMS - 1)
+								current_menu_index = 0;
+							else current_menu_index++;
+							ChatMessage_Chatrooms(current_menu_index);
+							break;
 
-					//Enter Presed
-					case 10:
-						//Change user to this current_menu_index of chatroom
-						return current_menu_index;
+						case ENTER:
+							//Change user to this current_menu_index of chatroom
+							show_highlight_index = false;
+							return current_menu_index;
 
-					//If the user types something unexpected, then take them to the 'Send a Message' window
-					default:
-						sub_char = SendMessageFKey;
-						break;
+						//If the user types something unexpected, then take them to the 'Send a Message' window
+						default:
+							sub_char = SendMessageFKey;
+							break;
 					}
-
 				} while (sub_char == KEY_UP || sub_char == KEY_DOWN);
+				show_highlight_index = false;
 			}
 
 			//Go to the 'Send Message' Window
@@ -556,17 +592,14 @@ public:
 
 				//Clear the message and initialize the characters
 				message_buffer.clear();
-				do
+				sub_char = getch();
+				while (sub_char != ChangeChatroomFKey && sub_char != SettingsFKey && sub_char != LogoutFKey)
 				{
-					ChatMessage_SendMessage(string(message_buffer.data(), message_buffer.size()));
-					sub_char = getch();
-
-					//add the character if the message is not longer than MESSAGE_LENGTH and the character is not 'enter'
-					if (message_buffer.size() < MESSAGE_LENGTH && sub_char != 10 && sub_char != KEY_LEFT)
+					if (IsNumberOrLetterOrSymbol(sub_char) && message_buffer.size() < MESSAGE_LENGTH)
 					{
 						message_buffer.push_back(sub_char);
 					}
-					else if (sub_char == 10)
+					else if (sub_char == ENTER)
 					{
 						if (message_buffer.size() > 0)
 						{
@@ -629,17 +662,16 @@ public:
 							ChatMessage_ChatHistory();
 						}
 					}
-					//Backspace key
-					else if (sub_char == KEY_LEFT)
+					else if (sub_char == KEY_LEFT && message_buffer.size() > 0)
 					{
-						if(message_buffer.size() > 0)
-						{
 						message_buffer.pop_back();
-						}
 					}
-				} while ((sub_char >= 32 && sub_char < 127) || sub_char == 10 || sub_char == KEY_LEFT);
 
-				ChatMessage_SendMessage(spaces);
+					ChatMessage_SendMessage(string(message_buffer.data(), message_buffer.size()));
+					sub_char = getch();
+				}
+
+				//ChatMessage_SendMessage(spaces);
 			}
 
 			//Go to Settings Window
@@ -713,32 +745,31 @@ public:
 
 	void StartScreen_Draw()
 	{
-		string user_nick = "";
+		//string user_nick = "";
+		vector<char> user_nick2;
 		int input_char;
 		long chat_room_index = 0;
 
 		StartScreen_TopBorder();
-		StartScreen_Username(user_nick.c_str());
+		StartScreen_Username(string(user_nick2.data(), user_nick2.size()));
 
 		int ExitFKey = KEY_F(6);
 
 		//Draw the Login Window
 		input_char = getch();
-		while ((input_char > 32 && input_char < 127 && input_char != ExitFKey) || input_char == 10)
+		while (input_char != ExitFKey)
 		{
-
-			if (user_nick.size() < MAX_USER_NICK_SIZE && input_char != 10)
+			if (IsNumberOrLetter(input_char) && user_nick2.size() < MAX_USER_NICK_SIZE)
 			{
-				user_nick += input_char;
-				StartScreen_TopBorder();
-				StartScreen_Username(user_nick.c_str());
+				user_nick2.push_back(input_char);
+				//StartScreen_TopBorder();
+				StartScreen_Username(string(user_nick2.data(), user_nick2.size()));
 			}
-
-			else if (input_char == 10) // enter key
+			else if (input_char == ENTER) // enter key
 			{
 				//Create User
 				model_mutex.lock();
-				User temp_user = User::loadUser(user_nick);
+				User temp_user = User::loadUser(string(user_nick2.data(), user_nick2.size()));
 				temp_user.saveUser();
 				chat_building.users.push_back(temp_user);
 				chat_building.logged_in = true;
@@ -751,16 +782,20 @@ public:
 					if (chat_room_index == -1)
 					{
 						input_char = ExitFKey; // Exit and Log Out
-						return;
+						return;				
 					}
 					else if (chat_room_index < -1 && chat_room_index > 9)
 					{
-						chat_room_index = 0; // Public Chatroom
-					}
-
+						chat_room_index = 0; // Public Chatroom		
+					}		
 				} while (chat_room_index != -1);
-				StartScreen_TopBorder();
+				///StartScreen_TopBorder();
 				StartScreen_Username("");
+			}
+			else if (input_char == KEY_LEFT && user_nick2.size() > 0)
+			{
+				user_nick2.pop_back();
+				StartScreen_Username(string(user_nick2.data(), user_nick2.size()));
 			}
 
 			input_char = getch();
