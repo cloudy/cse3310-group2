@@ -9,5 +9,6 @@ const int NUM_CHATROOMS = 10;
 const double USER_UPDATE_PERIOD = 2.5;
 const int MAX_CHAT_HISTORY = 15;
 const int CHATROOM_RENAMEABLE_DURATION = 60;
+const int ENTER = 10;
 
 #endif
