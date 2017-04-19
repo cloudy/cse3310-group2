@@ -24,9 +24,11 @@ extern Model chat_building;
 using namespace std;
 using namespace GUI_DATA;
 
-class View //CHANGE: Basically moved everything into a class. Made it easier to access model as an common attribute rather than passing reference between each function.
+class View 
 {
 private:
+	const int BSP = KEY_LEFT; // Backspace 
+	const int ExitFKey = KEY_F(6); // F6 Function Key for Cancel
 
 public:
 	//CHANGE: Constructor; basically gives you reference to the model that controller is using so any changes you make to it here will be reflected in the model used by controller class.
@@ -60,11 +62,6 @@ public:
 		return returnWindow;
 	}
 
-	WINDOW* MakeBackground() 
-	{ 
-		return MakeWindow(LINES, COLS, 0, 0, "");
-	}
-
 	bool IsNumberOrLetter(char input)
 	{
 		if (input >= '0' && input <= '9')
@@ -91,7 +88,7 @@ public:
 		WINDOW *window = MakeWindow(LINES, COLS, 0, 0, "");
 
 		//Print the text inside top bar window
-		mvwprintw(window, 1, 1, "ENTER - Save and Return\t\tF4 - Change User Nick\t\tF5 - Change Chatroom Name\t\tF6 - Cancel");
+		mvwprintw(window, 1, 1, "ENTER - Save & Return\t\tF4 - Change User Nick\t\tF5 - Change Chatroom Name\t\tF6 - Cancel & Return");
 
 		//Refresh the Window
 		wrefresh(window);
@@ -229,7 +226,6 @@ public:
 		int SaveAndReturn = ENTER; //Enter key
 		int ChangeUserNickFKey = KEY_F(4);
 		int ChangeChatroomNameFKey = KEY_F(5);
-		int Cancel = KEY_F(6);
 
 		int window_char, input;
 		input = getch();
@@ -242,13 +238,13 @@ public:
 				Settings_ChangeUserName(string(new_user_nick.data(), new_user_nick.size()));
 
 				input = getch();
-				while (input != SaveAndReturn && input != ChangeUserNickFKey && input != ChangeChatroomNameFKey && input != Cancel)
+				while (input != SaveAndReturn && input != ChangeUserNickFKey && input != ChangeChatroomNameFKey && input != ExitFKey)
 				{
 					if (IsNumberOrLetter(input) && new_user_nick.size() < MAX_USER_NICK_SIZE)
 					{
 						new_user_nick.push_back(input);	
 					}
-					else if (input == KEY_LEFT && new_user_nick.size() > 0)
+					else if (input == BSP && new_user_nick.size() > 0)
 					{
 						new_user_nick.pop_back();
 					}
@@ -264,13 +260,13 @@ public:
 				Settings_ChangeChatroomName(string(new_chatroom_name.data(), new_chatroom_name.size()));
 
 				input = getch();
-				while (input != SaveAndReturn && input != ChangeUserNickFKey && input != ChangeChatroomNameFKey && input != Cancel)
+				while (input != SaveAndReturn && input != ChangeUserNickFKey && input != ChangeChatroomNameFKey && input != ExitFKey)
 				{
 					if (IsNumberOrLetter(input) && new_chatroom_name.size() < MAX_CHATROOM_NAME_SIZE)
 					{
 						new_chatroom_name.push_back(input);
 					}
-					else if (input == KEY_LEFT && new_chatroom_name.size() > 0)
+					else if (input == BSP && new_chatroom_name.size() > 0)
 					{
 						new_chatroom_name.pop_back();
 					}
@@ -279,7 +275,7 @@ public:
 					input = getch();
 				}
 			}
-			else if (window_char == Cancel)
+			else if (window_char == ExitFKey)
 			{
 				current_window = Window::Chatroom;
 				break;
@@ -327,7 +323,7 @@ public:
 	void ChatMessage_TopBar()
 	{
 		//Make the window
-		WINDOW *window = MakeWindow(3, COLS, 0, 0, "");
+		WINDOW *window = MakeWindow(LINES, COLS, 0, 0, "");
 
 		//Print the text inside top bar window
 		mvwprintw(window, 1, 1, "ENTER - Send Message \t\t F4 - Chatrooms Menu \t\t F5 - Settings \t\t F6 - Logout & Exit");
@@ -526,14 +522,12 @@ public:
 		ChatMessage_Chatrooms(-1);
 		ChatMessage_ChatHistory();
 		ChatMessage_SendMessage("");
-		WINDOW *background = MakeBackground();
 
 		//Navigation
 		current_menu_index = 0;
 		int window_char, sub_char;
 		int ChangeChatroomFKey = KEY_F(4);
 		int SettingsFKey = KEY_F(5);
-		int LogoutFKey = KEY_F(6);
 		int SendMessageFKey = ENTER; // Enter Key
 
 		sub_char = SendMessageFKey;
@@ -594,7 +588,7 @@ public:
 				//Clear the message and initialize the characters
 				message_buffer.clear();
 				sub_char = getch();
-				while (sub_char != ChangeChatroomFKey && sub_char != SettingsFKey && sub_char != LogoutFKey)
+				while (sub_char != ChangeChatroomFKey && sub_char != SettingsFKey && sub_char != ExitFKey)
 				{
 					if (IsNumberOrLetterOrSymbol(sub_char) && message_buffer.size() < MESSAGE_LENGTH)
 					{
@@ -663,7 +657,7 @@ public:
 							ChatMessage_ChatHistory();
 						}
 					}
-					else if (sub_char == KEY_LEFT && message_buffer.size() > 0)
+					else if (sub_char == BSP && message_buffer.size() > 0)
 					{
 						message_buffer.pop_back();
 					}
@@ -687,7 +681,7 @@ public:
 			}
 
 			//Go to the Logout Window
-			else if (window_char == LogoutFKey)
+			else if (window_char == ExitFKey)
 			{
 				current_window = Window::Login;
 				model_mutex.lock();
@@ -703,7 +697,6 @@ public:
 			}
 		}
 
-		delwin(background);
 		refresh();
 		return 0;
 	}
@@ -726,16 +719,19 @@ public:
 
 	void StartScreen_Username(string userName)
 	{
+		int textbox_y = LINES/2 - 10;
+		int textbox_x = COLS/2;
+
 		//Make the window
 		WINDOW* window = MakeWindow(LINES - 3, COLS, 3, 0, "User Nick");
 
 		//Print the limits
-		mvwprintw(window, 4, COLS / 2 - 8, "8 Character Limit");
-		mvwchgat(window, 3, COLS / 2 - 10, 20, A_NORMAL, 4, NULL);
+		mvwprintw(window, textbox_y+1, textbox_x - 8, "8 Character Limit");
+		mvwchgat(window, textbox_y, textbox_x - 10, 20, A_NORMAL, 4, NULL);
 
 		//print user name
 		wattron(window, COLOR_PAIR(4));
-		mvwprintw(window, 3, COLS / 2 - 10, userName.c_str());
+		mvwprintw(window, textbox_y, textbox_x - 10, userName.c_str());
 		wattroff(window, COLOR_PAIR(4));
 
 		//Refresh the window
@@ -753,8 +749,6 @@ public:
 
 		StartScreen_TopBorder();
 		StartScreen_Username(string(user_nick2.data(), user_nick2.size()));
-
-		int ExitFKey = KEY_F(6);
 
 		//Draw the Login Window
 		input_char = getch();
@@ -793,7 +787,7 @@ public:
 				///StartScreen_TopBorder();
 				StartScreen_Username("");
 			}
-			else if (input_char == KEY_LEFT && user_nick2.size() > 0)
+			else if (input_char == BSP && user_nick2.size() > 0)
 			{
 				user_nick2.pop_back();
 				StartScreen_Username(string(user_nick2.data(), user_nick2.size()));
