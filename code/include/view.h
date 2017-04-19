@@ -329,7 +329,7 @@ public:
 
 		//Print the text inside top bar window
 		wattron(window, COLOR_PAIR(11));
-		mvwprintw(window, 1, 1, "ENTER - Send Message \t LEFT ARROW - Backspace \t F4 - Chatrooms Menu \t F5 - Settings \t F6 - Logout & Exit");
+		mvwprintw(window, 1, 1, "ENTER - Send Message\tLEFT ARROW - Backspace\tF4 - Chatrooms Menu\tF5 - Settings\tF6 - Logout & Exit");
 		wattroff(window, COLOR_PAIR(11));
 
 		//Refresh the Window
@@ -706,7 +706,7 @@ public:
 		wattroff(window, COLOR_PAIR(2));
 
 		wattron(window, COLOR_PAIR(3));
-		mvwprintw(window,LINES-7,1,"Developers - Joe Cloud, Brandon Chase, Robert Brady, Kartik Gupta and Pavanaj Biyani");
+		mvwprintw(window,LINES-7,1,"Development Team - Joe Cloud, Brandon Chase, Robert Brady, Kartik Gupta and Pavanaj Biyani");
 		wattroff(window, COLOR_PAIR(3));
 
 		wattron(window, COLOR_PAIR(10));
