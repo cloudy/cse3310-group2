@@ -694,20 +694,28 @@ public:
 
 		//Stuff  
 		wattron(window, COLOR_PAIR(11));
-		mvwprintw(window,LINES-8,1,"SuperChat v1.01");
+		mvwprintw(window,LINES-10,1,"SuperChat v1.01");
 		wattroff(window, COLOR_PAIR(11));
+
+		wattron(window, COLOR_PAIR(8));
+		mvwprintw(window,LINES-9,1,"Last Updated - 04/19/2017");
+		wattroff(window, COLOR_PAIR(8));
 		
 		wattron(window, COLOR_PAIR(2));
-		mvwprintw(window,LINES-7,1,"Customer - Jimmie Bud Davis");
+		mvwprintw(window,LINES-8,1,"Customer - Jimmie Bud Davis");
 		wattroff(window, COLOR_PAIR(2));
 
 		wattron(window, COLOR_PAIR(3));
-		mvwprintw(window,LINES-6,1,"Developers - Joe Cloud, Brandon Chase, Robert Brady, Kartik Gupta and Pavanaj Biyani");
+		mvwprintw(window,LINES-7,1,"Developers - Joe Cloud, Brandon Chase, Robert Brady, Kartik Gupta and Pavanaj Biyani");
 		wattroff(window, COLOR_PAIR(3));
 
-		wattron(window, COLOR_PAIR(8));
-		mvwprintw(window,LINES-5,1,"Date Updated - 04/19/2017");
-		wattroff(window, COLOR_PAIR(8));
+		wattron(window, COLOR_PAIR(10));
+		mvwprintw(window,LINES-6,1,"Development Tools - OpenSplice and NCurses");
+		wattroff(window, COLOR_PAIR(10));
+
+		wattron(window, COLOR_PAIR(9));
+		mvwprintw(window,LINES-5,1,"Platform - Linux Based OS");
+		wattroff(window, COLOR_PAIR(9));
 
 		//Print the limits
 		mvwprintw(window, textbox_y+1, textbox_x - 8, "8 Character Limit");
