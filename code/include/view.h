@@ -88,7 +88,9 @@ public:
 		WINDOW *window = MakeWindow(LINES, COLS, 0, 0, "");
 
 		//Print the text inside top bar window
+		wattron(window, COLOR_PAIR(8));
 		mvwprintw(window, 1, 1, "ENTER - Save & Return\tLEFT ARROW - Backspace\tF4 - Change UserNick\tF5 - Change Chatroom Name\tF6 - Cancel & Return");
+		wattroff(window, COLOR_PAIR(8));
 
 		//Refresh the Window
 		wrefresh(window);
@@ -326,7 +328,9 @@ public:
 		WINDOW *window = MakeWindow(LINES, COLS, 0, 0, "");
 
 		//Print the text inside top bar window
+		wattron(window, COLOR_PAIR(11));
 		mvwprintw(window, 1, 1, "ENTER - Send Message \t LEFT ARROW - Backspace \t F4 - Chatrooms Menu \t F5 - Settings \t F6 - Logout & Exit");
+		wattroff(window, COLOR_PAIR(11));
 
 		//Refresh the Window
 		wrefresh(window);
@@ -355,47 +359,23 @@ public:
 
 		for (unsigned long i = 0; i < 10; i++)
 		{
-			if (i == 0)
-			{
-				wattron(window, A_ITALIC | COLOR_PAIR(3));
-				mvwprintw(window, 2 + i, 1, "%s", roomNames[i].c_str());
-				wattroff(window, A_ITALIC | COLOR_PAIR(3));
-			}
-			else
-			{
-				mvwprintw(window, 2 + i, 1, "%s", roomNames[i].c_str());
-			}
+			mvwprintw(window, 2 + i, 1, "%s", roomNames[i].c_str());
 			//if there is more than one user in the chatroom
 			if (roomStats[i] > 1)
 			{	
-				if (i == 0)
-				{
-					wattron(window, A_ITALIC | COLOR_PAIR(3));
-					mvwprintw(window, 2 + i, 1, "%s", roomNames[i].c_str());
-					wattroff(window, A_ITALIC | COLOR_PAIR(3));
-				}	
+				mvwprintw(window, 2 + i, 1, "%s", roomNames[i].c_str());
 				mvwprintw(window, 2 + i, 30, "%d users", roomStats[i]);
 			}
 			//if there is only one user in the chatroom
 			else if (roomStats[i] == 1)
 			{
-				if (i == 0)
-				{
-					wattron(window, A_ITALIC | COLOR_PAIR(3));
-					mvwprintw(window, 2 + i, 1, "%s", roomNames[i].c_str());
-					wattroff(window, A_ITALIC | COLOR_PAIR(3));
-				}
+				mvwprintw(window, 2 + i, 1, "%s", roomNames[i].c_str());
 				mvwprintw(window, 2 + i, 30, "%d user", roomStats[i]);
 			}
 			//there are no users in the chatroom
 			else
 			{
-				if (i == 0)
-				{
-					wattron(window, A_ITALIC | COLOR_PAIR(3));
-					mvwprintw(window, 2 + i, 1, "%s", roomNames[i].c_str());
-					wattroff(window, A_ITALIC | COLOR_PAIR(3));
-				}			
+				mvwprintw(window, 2 + i, 1, "%s", roomNames[i].c_str());	
 				mvwchgat(window, 2 + i, 1, chatWidth - 2, A_NORMAL, 8, NULL);
 				wattron(window, A_NORMAL | COLOR_PAIR(8));
 				mvwprintw(window, 2 + i, 30, "0 users");
@@ -405,23 +385,13 @@ public:
 			//highlight the selected user
 			if ((unsigned)SelectedIndex == i && show_highlight_index)
 			{
-				if (i == 0)
-				{
-					wattron(window, A_ITALIC | COLOR_PAIR(3));
-					mvwprintw(window, 2 + i, 1, "%s", roomNames[i].c_str());
-					wattroff(window, A_ITALIC | COLOR_PAIR(3));
-				}
+				mvwprintw(window, 2 + i, 1, "%s", roomNames[i].c_str());
 				mvwchgat(window, 2 + i, 1, chatWidth - 2, A_NORMAL, 9, NULL);
 			}
 			//bold the chatroom the user is in
 			else if (chat_building.users[0].getChatRoomIndex() == i)
 			{
-				if (i == 0)
-				{
-					wattron(window, A_ITALIC | COLOR_PAIR(3));
-					mvwprintw(window, 2 + i, 1, "%s", roomNames[i].c_str());
-					wattroff(window, A_ITALIC | COLOR_PAIR(3));
-				}
+				mvwprintw(window, 2 + i, 1, "%s", roomNames[i].c_str());
 				mvwchgat(window, 2 + i, 1, chatWidth - 2, A_NORMAL, 2, NULL);
 			}
 
@@ -528,9 +498,8 @@ public:
 		int window_char, sub_char;
 		int ChangeChatroomFKey = KEY_F(4);
 		int SettingsFKey = KEY_F(5);
-		int SendMessageFKey = ENTER; // Enter Key
 
-		sub_char = SendMessageFKey;
+		sub_char = ENTER;
 		while ((window_char = sub_char))
 		{
 			//Change the Chatroom
@@ -571,7 +540,7 @@ public:
 
 						//If the user types something unexpected, then take them to the 'Send a Message' window
 						default:
-							sub_char = SendMessageFKey;
+							sub_char = ENTER;
 							break;
 					}
 				} while (sub_char == KEY_UP || sub_char == KEY_DOWN);
@@ -579,7 +548,7 @@ public:
 			}
 
 			//Go to the 'Send Message' Window
-			else if (window_char == SendMessageFKey)
+			else if (window_char == ENTER)
 			{
 				//Clear the screen again
 				string spaces;
@@ -644,9 +613,7 @@ public:
 							else
 							{
 							model_mutex.lock();
-							//Send the message //CHANGE: use message constructor and send through model
 							Message newMessage = Message(chat_building.users[0], string(message_buffer.data(), message_buffer.size()));
-							//chat_building.chat_rooms[chat_building.users[0].getChatRoomIndex()].addMessage(newMessage);
 							chat_building.message_outbox.push_back(newMessage);
 
 							message_buffer.clear();
@@ -665,8 +632,6 @@ public:
 					ChatMessage_SendMessage(string(message_buffer.data(), message_buffer.size()));
 					sub_char = getch();
 				}
-
-				//ChatMessage_SendMessage(spaces);
 			}
 
 			//Go to Settings Window
@@ -675,7 +640,7 @@ public:
 				current_window = Window::Settings;
 				Settings_Draw();
 				model_mutex.lock();
-				unsigned long return_index = chat_building.users[0].getChatRoomIndex(); //change: locked mutex, did return, and then unlocked. caused delay in going back to chat window and formatting issues
+				unsigned long return_index = chat_building.users[0].getChatRoomIndex();
 				model_mutex.unlock();
 				return return_index;
 			}
@@ -709,7 +674,9 @@ public:
 		WINDOW* window = MakeWindow(3, COLS, 0, 0, "");
 
 		//Print the text inside the window
+		wattron(window, COLOR_PAIR(9));
 		mvwprintw(window, 1, 1, "ENTER - Login \t\t LEFT ARROW - Backspace \t F6 - Exit ");
+		wattroff(window, COLOR_PAIR(9));
 
 		//Refresh the window
 		wrefresh(window);
@@ -724,6 +691,23 @@ public:
 
 		//Make the window
 		WINDOW* window = MakeWindow(LINES - 3, COLS, 3, 0, "User Nick");
+
+		//Stuff  
+		wattron(window, COLOR_PAIR(11));
+		mvwprintw(window,LINES-8,1,"SuperChat v1.01");
+		wattroff(window, COLOR_PAIR(11));
+		
+		wattron(window, COLOR_PAIR(2));
+		mvwprintw(window,LINES-7,1,"Customer - Jimmie Bud Davis");
+		wattroff(window, COLOR_PAIR(2));
+
+		wattron(window, COLOR_PAIR(3));
+		mvwprintw(window,LINES-6,1,"Developers - Joe Cloud, Brandon Chase, Robert Brady, Kartik Gupta and Pavanaj Biyani");
+		wattroff(window, COLOR_PAIR(3));
+
+		wattron(window, COLOR_PAIR(8));
+		mvwprintw(window,LINES-5,1,"Date Updated - 04/19/2017");
+		wattroff(window, COLOR_PAIR(8));
 
 		//Print the limits
 		mvwprintw(window, textbox_y+1, textbox_x - 8, "8 Character Limit");
@@ -784,7 +768,6 @@ public:
 						chat_room_index = 0; // Public Chatroom		
 					}		
 				} while (chat_room_index != -1);
-				///StartScreen_TopBorder();
 				StartScreen_Username("");
 			}
 			else if (input_char == BSP && user_nick2.size() > 0)
