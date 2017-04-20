@@ -6,6 +6,7 @@ using namespace std;
 Message::Message(User p_user, std::string p_content) : 
 	author_nick_name(p_user.getNickName()), author_uuid(p_user.getUUID()), chat_room_index(p_user.getChatRoomIndex()), content(p_content)
 	{
+		content = string(p_content.c_str(), MESSAGE_LENGTH);
 		contentToArray();
 		checksum = calculateChecksum();
 	}
@@ -14,6 +15,7 @@ Message::Message(User p_user, std::string p_content) :
 Message::Message(User p_user, unsigned long p_chat_room_index, std::string p_content, unsigned long long p_checksum) : 
 	author_nick_name(p_user.getNickName()), author_uuid(p_user.getUUID()), chat_room_index(p_chat_room_index), content(p_content), checksum(p_checksum) 
 	{
+		content = string(p_content.c_str(), MESSAGE_LENGTH);
 		contentToArray();
 	}
 
