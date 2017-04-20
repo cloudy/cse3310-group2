@@ -12,10 +12,10 @@ This is a Git repository for a program called SuperChat that is based on an Ncur
 
 ## How to Use
 1. Setup
-    1. cd code/
-    1. . ./configure
+    1. `cd code/`
+    1. `. ./configure`
 1. Test
-    1. make test
+    1. `make test`
 1. Normal Operation
-    1. make
-    1. ./bin/superchat
+    1. `make`
+    1. `./bin/superchat`
