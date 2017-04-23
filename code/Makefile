@@ -8,7 +8,7 @@ OBJDIR= obj
 BINDIR= bin
 SRCDIR= src
 IDLBINDIR= $(BINDIR)/idl
-OUTPUT= $(BINDIR)/superchat
+TARGET= $(BINDIR)/superchat
 
 IDL_SRC= idl/SuperChat.idl
 OSDDS_SRC= $(SRCDIR)/DDSEntityManager.cpp $(SRCDIR)/CheckStatus.cpp \
@@ -19,27 +19,38 @@ INTERFACE_SRC= $(SRCDIR)/model.cpp
 all : MAIN_SRC= $(SRCDIR)/main.cpp
 test: MAIN_SRC= $(SRCDIR)/test.cpp
 
-all: bin/superchat
+all: $(TARGET)
 
-bin/superchat: $(OSDDS_IDL_GEN) OSDDS_OBJ
+test:  $(TARGET)
+	@./$(TARGET); \
+	if [ $$? -eq 0 ]; then \
+		echo "\nALL TESTS PASSED AT: $(shell date)" ; \
+	else \
+		echo "\nTESTING FAILED AT: $(shell date)" ; \
+	fi
+
+$(TARGET): $(OSDDS_IDL_GEN) OSDDS_OBJ
 	@echo Final linking and compilation...
-	$(CXX) $(CXXFLAGS) $(OBJDIR)/* $(INTERFACE_SRC) $(MAIN_SRC) $(INCLUDES) $(LDFLAGS) -o $(OUTPUT)
+	$(CXX) $(CXXFLAGS) $(OBJDIR)/* $(INTERFACE_SRC) $(MAIN_SRC) $(INCLUDES) $(LDFLAGS) -o $(TARGET)
 
 $(OSDDS_IDL_GEN): $(IDL_SRC)
-	mkdir -p $(IDLBINDIR) $(OBJDIR)
+	mkdir -p $(IDLBINDIR)
 	@echo Building IDL sources files...
 	idlpp -I ${OSPL_HOME}/etc/idl -l cpp $(IDL_SRC) -d $(IDLBINDIR)/
 
 OSDDS_OBJ: $(OSDDS_SRC)
+	mkdir -p  $(OBJDIR)
 	@echo Compiling opensplice files...
 	$(CXX) $(INCLUDES) $(OSDDS_SRC) $(OSDDS_IDL_GEN) $(LDFLAGS) -c
 	@mv *.o $(OBJDIR)/
 
 clean:
-	@echo Deleting $(shell ls $(BINDIR))...
-	rm -r $(BINDIR)
-	@echo Deleting object files $(shell ls $(OBJDIR))...
-	rm -r $(OBJDIR)
+	@if [ -d $(BINDIR) ]; then \
+		echo Deleting $(shell ls $(BINDIR))... ; \
+		rm -r $(BINDIR); \
+	fi
 
-test:  bin/superchat
-	./bin/superchat
+	@if [ -d $(OBJDIR) ]; then \
+		echo Deleting $(shell ls $(OBJDIR))... ; \
+		rm -r $(OBJDIR); \
+	fi
