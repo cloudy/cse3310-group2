@@ -569,7 +569,7 @@ public:
 						{	
 							//if message is a command
 							if(message_buffer.at(0) == '/' && ( (message_buffer.at(1) == 'm' && message_buffer.at(2) == 'u' && message_buffer.at(3) == 't' && message_buffer.at(4) == 'e' && message_buffer.at(5) == ' ' )  
-								|| (message_buffer.at(1) == 'u' && message_buffer.at(2) == 'n' && message_buffer.at(3) == 'm' && message_buffer.at(4) == 'u' && message_buffer.at(5) == 't' && message_buffer.at(6) == 'e' && message_buffer.at(7) == 10) ) )
+								|| (message_buffer.at(1) == 'u' && message_buffer.at(2) == 'n' && message_buffer.at(3) == 'm' && message_buffer.at(4) == 'u' && message_buffer.at(5) == 't' && message_buffer.at(6) == 'e' && message_buffer.size() == 7 ) ) )
 							{
 								string content = "", command = "", command_arg = "";
 								for(char c : message_buffer) content += c;
@@ -700,7 +700,7 @@ public:
 		wattroff(window, COLOR_PAIR(11));
 
 		wattron(window, COLOR_PAIR(8));
-		mvwprintw(window,LINES-9,1,"Last Updated - 04/19/2017");
+		mvwprintw(window,LINES-9,1,"Last Updated - 04/23/2017");
 		wattroff(window, COLOR_PAIR(8));
 		
 		wattron(window, COLOR_PAIR(2));
