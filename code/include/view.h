@@ -15,7 +15,7 @@
 //Global Data
 namespace GUI_DATA
 {
-enum class Window { Login, Chatroom, Settings };
+	enum class Window { Login, Chatroom, Settings };
 }
 
 extern std::mutex model_mutex;
@@ -566,8 +566,10 @@ public:
 					else if (sub_char == ENTER)
 					{
 						if (message_buffer.size() > 0)
-						{
-							if(message_buffer.at(0) == '/') //if message is a command
+						{	
+							//if message is a command
+							if(message_buffer.at(0) == '/' && ( (message_buffer.at(1) == 'm' && message_buffer.at(2) == 'u' && message_buffer.at(3) == 't' && message_buffer.at(4) == 'e' && message_buffer.at(5) == ' ' )  
+								|| (message_buffer.at(1) == 'u' && message_buffer.at(2) == 'n' && message_buffer.at(3) == 'm' && message_buffer.at(4) == 'u' && message_buffer.at(5) == 't' && message_buffer.at(6) == 'e' && message_buffer.at(7) == 10) ) )
 							{
 								string content = "", command = "", command_arg = "";
 								for(char c : message_buffer) content += c;
